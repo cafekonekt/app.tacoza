@@ -9,7 +9,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SwatchBook, Settings2 } from "lucide-react";
+import { SwatchBook, Settings2, Search, X } from "lucide-react";
+import { TextRotate } from "@/components/ui/TextRotate";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -17,8 +18,17 @@ import Image from "next/image";
 import { Star } from "lucide-react"; // Import Star correctly as a named export
 import { Separator } from "@/components/ui/separator";
 import { Customize } from "./Customize";
-import { SearchMenu } from "./SearchMenu";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const iconMap = {
   veg: "/veg.svg",
@@ -161,8 +171,161 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
   );
 }
 
+export function SearchMenu({ items }) {
+  const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const words = items.flatMap(category =>
+    [...(category.food_items || []).map(item => item.name),
+    ...(category.sub_categories || []).flatMap(subcategory =>
+      (subcategory.food_items || []).map(item => item.name)
+    )]
+  );
+
+  // Recursively search through categories and subcategories
+  const searchItems = (category) => {
+    let results = [];
+    // Search food_items in the current category
+    category.food_items.forEach((item) => {
+      if (
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        results.push(item);
+      }
+    });
+    // Search sub_categories recursively
+    if (
+      Array.isArray(category.sub_categories) &&
+      category.sub_categories.length > 0
+    ) {
+      category.sub_categories.forEach((subCategory) => {
+        results = [...results, ...searchItems(subCategory)];
+      });
+    }
+
+    return results;
+  };
+
+  // Handle search logic
+  useEffect(() => {
+    if (searchQuery === "") {
+      setFilteredItems([]);
+      return;
+    }
+    setLoading(true);
+    const delayDebounceFn = setTimeout(() => {
+      let results = [];
+      // Search through all categories and subcategories
+      items.forEach((category) => {
+        results = [...results, ...searchItems(category)];
+      });
+      setFilteredItems(results);
+      setLoading(false);
+    }, 300); // Debounce for 300ms
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, items]);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-full justify-start items-center text-muted-foreground mt-2"
+        >
+          <Search className="w-4 h-4 mr-2" /> Search for
+          <TextRotate
+            className="ml-1"
+            duration={2000}
+            words={words}
+          />
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent className="h-3/4 w-full">
+        <DrawerHeader>
+          <div className="flex items-center justify-between w-full">
+            <DrawerTitle className="truncate">
+              Search in Kohlis Menu
+            </DrawerTitle>
+            <DrawerClose>
+              <Button
+                size="icon"
+                variant="outline"
+                className="rounded-full h-6 w-6"
+              >
+                <X size={16} />
+              </Button>
+            </DrawerClose>
+          </div>
+
+          <Input
+            placeholder="Search for items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </DrawerHeader>
+
+        <div className="flex flex-col gap-4 p-4">
+          {loading && (
+            <div className="flex justify-center">
+              <Image
+                src="/loader.gif"
+                alt="loading"
+                width={50}
+                height={50}
+                className="opacity-80"
+                draggable={false}
+              />
+            </div>
+          )}
+
+          {/* Display search results */}
+          {!loading && filteredItems.length > 0
+            ? filteredItems.map((item) => (
+              <div className="overflow-y-scroll" key={item.name}>
+                <MenuItemComponent item={item} />
+              </div>
+            ))
+            : !loading && (
+              <p className="text-center text-gray-500 text-sm">
+                Nothing found
+              </p>
+            )}
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+
 export function MenuAccordion({ items }) {
   const [focusCategory, setFocusCategory] = useState(null);
+  const [foodTypeFilter, setFoodTypeFilter] = useState(null);
+
+  // Filter items based on the selected food type
+  const filteredItems = items.map((category) => {
+    // Filter food_items in the category
+    const filteredFoodItems = category.food_items.filter((item) => {
+      if (!foodTypeFilter) return true; // Show all if no filter is selected
+      return item.food_type === foodTypeFilter; // Match selected food type
+    });
+
+    // Filter food_items in the subcategories
+    const filteredSubCategories = category.sub_categories.map((sub) => ({
+      ...sub,
+      food_items: sub.food_items.filter((item) => {
+        if (!foodTypeFilter) return true;
+        return item.food_type === foodTypeFilter;
+      })
+    }));
+
+    return {
+      ...category,
+      food_items: filteredFoodItems,
+      sub_categories: filteredSubCategories
+    };
+  });
+
   return (
     <>
       <section className="w-full">
@@ -172,43 +335,53 @@ export function MenuAccordion({ items }) {
               Filters <Settings2 className="w-3.5 h-3.5 ml-1" />{" "}
               <Separator orientation="vertical" className="mx-2" />
             </span>
-            <ToggleGroup type="single" variant="outline">
+            {/* Toggle Group to select the filter */}
+            <ToggleGroup
+              type="single"
+              variant="outline"
+              onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
+            >
               <ToggleGroupItem
-                value="bold"
-                aria-label="Toggle bold"
+                value="veg"
+                aria-label="Veg Filter"
                 className="gap-2 px-4 data-[state=on]:bg-green-100 data-[state=on]:text-green-700"
               >
-                <Image src="/veg.svg" alt="Dash" height="16" width="16" />
+                <Image src="/veg.svg" alt="Veg" height="16" width="16" />
                 <span>Veg</span>
               </ToggleGroupItem>
               <ToggleGroupItem
-                value="italic"
-                aria-label="Toggle italic"
+                value="egg"
+                aria-label="Egg Filter"
                 className="gap-2 px-4 data-[state=on]:bg-yellow-50 data-[state=on]:text-yellow-400"
               >
-                <Image src="/egg.svg" alt="Dash" height="16" width="16" />
+                <Image src="/egg.svg" alt="Egg" height="16" width="16" />
                 <span>Egg</span>
               </ToggleGroupItem>
               <ToggleGroupItem
-                value="strikethrough"
-                aria-label="Toggle strikethrough"
+                value="nonveg"
+                aria-label="Non-Veg Filter"
                 className="gap-2 px-4 whitespace-nowrap data-[state=on]:bg-red-100 data-[state=on]:text-red-800"
               >
-                <Image src="/non-veg.svg" alt="Dash" height="16" width="16" />
+                <Image src="/non-veg.svg" alt="Non-Veg" height="16" width="16" />
                 <span>Non-Veg</span>
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <SearchMenu items={items} />
+
+          {/* Search Menu */}
+          <SearchMenu items={filteredItems} />
+
           {/* Menu */}
           <div className="space-y-4">
-            {items.map((category) => (
+            {filteredItems.map((category) => (
               <CategoryComponent key={category.name} category={category} focusCategory={focusCategory} />
             ))}
           </div>
         </div>
       </section>
-      <MenuTab items={items} setFocusCategory={setFocusCategory} />
+
+      {/* Pass setFocusCategory to MenuTab */}
+      <MenuTab items={filteredItems} setFocusCategory={setFocusCategory} />
     </>
   );
 }

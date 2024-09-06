@@ -301,7 +301,7 @@ export default function Orders() {
           </CardTitle>
           <CardDescription>Customize your quantity</CardDescription>
         </CardHeader>
-        {cartItems.map((item, key) => (
+        {cartItems && cartItems.map((item, key) => (
           <CardContent key={key}>
             <div className="mt-2">
               <div className="flex items-center justify-between">
