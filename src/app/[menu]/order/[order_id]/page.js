@@ -1,7 +1,5 @@
-"use client";
 import {
   ChevronLeft,
-  ChevronRight,
   Copy,
   CreditCard,
   HelpCircle,
@@ -10,15 +8,12 @@ import {
   PhoneCall,
   Star,
   Timer,
-  Truck,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -70,13 +65,12 @@ function Timeline() {
 }
 
 export default function Order({ params }) {
-  const pathname = usePathname();
-  const pathnames = pathname.split("/");
+
   return (
     <main className="max-w-lg p-4 gap-4 grid">
       <h2 className="text-2xl font-semibold">
         <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
-          <Link href={`/${pathnames[1]}/${pathnames[2]}`}>
+          <Link href={`/${params.menu}/order`}>
             <ChevronLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -89,11 +83,11 @@ export default function Order({ params }) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${pathnames[1]}`}>{pathnames[1].toUpperCase()}</BreadcrumbLink>
+            <BreadcrumbLink href={`/${params.menu}`}>{params.menu.toUpperCase()}</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${pathnames[1]}/${pathnames[2]}`}>ORDERS</BreadcrumbLink>
+            <BreadcrumbLink href={`/${params.menu}/order`}>ORDERS</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
