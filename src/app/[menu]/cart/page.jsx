@@ -198,7 +198,7 @@ export default function Orders() {
     });
     if (response.status === 200) {
       const data = await response.json();
-      router.push(`/orders/${data.order_id}`);
+      router.push(`${pathnames[1]}/orders/${data.order_id}`);
     }
     if (response.status === 401) {
       setSession(false);
