@@ -1,6 +1,3 @@
-"use client";
-import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRightIcon,
@@ -23,7 +20,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import Image from "next/image";
-import Loading from "@/app/loading";
+import { apiGet } from "@/handlers/apiHandler";
+import { getSession } from "@/app/lib/auth/session";
+import { cookies } from "next/headers";
 
 const iconMap = {
   'veg': "/veg.svg",
@@ -31,40 +30,21 @@ const iconMap = {
   'egg': "/egg.svg",
 };
 
-export default function Order() {
-  const pathname = usePathname();
-  const pathnames = pathname.split("/");
-  const outletSlug = pathnames[1];
-
-  const [orderHistory, setOrderHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const ferchOrderHistory = async () => {
-    try {
-      const response = await fetch(`/api/orders/${outletSlug}`)
-      if (response.status === 200) {
-        const orderHistory = await response.json();
-        setOrderHistory(orderHistory);
-      }
-      return orderHistory;
-    } catch (error) {
-      console.error('Error fetching order history:', error);
-      return orderHistory;
+export default async function Order({ params }) {
+  const outletSlug = params.menu;
+  const cookieStore = cookies();
+  const session = cookieStore.get("session")?.value;
+  const user = await getSession(session);
+  const orderHistory = await apiGet(`/api/shop/orders/${outletSlug}`, {
+    headers: {
+      "Authorization": `Bearer ${user.tokens.access}`
     }
-  }
-
-  useEffect(() => {
-    (async () => {
-      ferchOrderHistory();
-      setLoading(false);
-    })()
-  }, []);
-
-
-  return loading ? <Loading suppressHydrationWarning /> : (
+  });
+  
+  return (
     <main className="max-w-lg p-4 gap-4 grid" suppressHydrationWarning>
       <h2 className="text-2xl font-semibold">
-        <Link href={`/${pathnames[1]}`}>
+        <Link href={`/${outletSlug}`}>
           <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -149,8 +129,6 @@ export default function Order() {
           </CardContent>
         </Card>
       ))}
-
-
     </main>
   );
 }
