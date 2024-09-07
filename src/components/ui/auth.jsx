@@ -63,7 +63,16 @@ export function Auth({ menu, drawerOpen, setDrawer }) {
         <DrawerContent className="h-[69vh]">
           <DrawerHeader className="flex items-start w-full">
             <div className="flex flex-col items-start w-full">
-              <DrawerDescription>Order with Tacoza</DrawerDescription>
+              <DrawerDescription className="flex items-center">
+                Order with
+                <Image
+                  src="/logo.png"
+                  alt="logo"
+                  width={60}
+                  height={35}
+                  className="mb-[2px] ml-1"
+                />
+              </DrawerDescription>
               <DrawerTitle>Login</DrawerTitle>
             </div>
             <DrawerClose>
