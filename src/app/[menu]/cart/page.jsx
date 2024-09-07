@@ -9,7 +9,8 @@ import {
   Store,
   Utensils,
   UtensilsCrossed,
-  Tags, NotepadText
+  Tags,
+  NotepadText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,19 +41,19 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { usePathname } from 'next/navigation';
+import { usePathname } from "next/navigation";
 import { SetQuantity } from "./SetQuantity";
-import Loading from '@/app/loading';
+import Loading from "@/app/loading";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Auth } from '@/components/ui/auth';
+import { Auth } from "@/components/ui/auth";
 import ShinyText from "@/components/ui/animations/ShinyText";
 import { useRouter } from "next/navigation";
 
 const iconMap = {
-  'veg': "/veg.svg",
-  'nonveg': "/non-veg.svg",
-  'egg': "/egg.svg",
+  veg: "/veg.svg",
+  nonveg: "/non-veg.svg",
+  egg: "/egg.svg",
 };
 
 export function Items({ items }) {
@@ -84,7 +85,7 @@ export function Items({ items }) {
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₹ {totalPrice}</span>
+              <span>₹ {totalPrice - Gst}</span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">GST</span>
@@ -122,9 +123,9 @@ export default function Orders() {
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(true);
   const [orderType, setOrderType] = useState({
-    type: 'dine_in',
+    type: "dine_in",
     table_id: null,
-    instruction: '',
+    instruction: "",
   });
   const [session, setSession] = useState(false);
   const router = useRouter();
@@ -175,9 +176,11 @@ export default function Orders() {
         setOutlet(outletData);
         setTables(tablesData);
         setSession(user);
-        setTotalPrice(cartItems?.reduce((acc, item) => acc + item.totalPrice, 0));
+        setTotalPrice(
+          cartItems?.reduce((acc, item) => acc + item.totalPrice, 0),
+        );
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -187,12 +190,12 @@ export default function Orders() {
   const handleSubmit = async () => {
     if (!session) {
       setDrawerOpen(true);
-      return
+      return;
     }
     const response = await fetch(`/api/orders/${pathnames[1]}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(orderType),
     });
@@ -203,9 +206,11 @@ export default function Orders() {
     if (response.status === 401) {
       setSession(false);
     }
-  }
+  };
 
-  return loading ? <Loading suppressHydrationWarning/> : (
+  return loading ? (
+    <Loading suppressHydrationWarning />
+  ) : (
     <main className="grid gap-4 p-6" suppressHydrationWarning>
       {/* Header */}
       <div className="flex justify-between">
@@ -217,7 +222,13 @@ export default function Orders() {
           </Link>
           Cart
         </h2>
-        {!session && <Auth menu={pathnames[1]} drawerOpen={drawerOpen} setDrawer={setDrawerOpen} /> }
+        {!session && (
+          <Auth
+            menu={pathnames[1]}
+            drawerOpen={drawerOpen}
+            setDrawer={setDrawerOpen}
+          />
+        )}
       </div>
 
       {/* Breadcrumb */}
@@ -239,13 +250,17 @@ export default function Orders() {
                   {index < pathnames.length - 1 ? (
                     <>
                       <BreadcrumbItem key={index}>
-                        <BreadcrumbLink href={`/${path}`}>{path.toLocaleUpperCase()}</BreadcrumbLink>
+                        <BreadcrumbLink href={`/${path}`}>
+                          {path.toLocaleUpperCase()}
+                        </BreadcrumbLink>
                       </BreadcrumbItem>
                       <BreadcrumbSeparator />
                     </>
                   ) : (
                     <BreadcrumbItem key={index}>
-                      <BreadcrumbPage>{path.toLocaleUpperCase()}</BreadcrumbPage>
+                      <BreadcrumbPage>
+                        {path.toLocaleUpperCase()}
+                      </BreadcrumbPage>
                     </BreadcrumbItem>
                   )}
                 </>
@@ -301,43 +316,60 @@ export default function Orders() {
           </CardTitle>
           <CardDescription>Customize your quantity</CardDescription>
         </CardHeader>
-        {cartItems && cartItems.map((item, key) => (
-          <CardContent key={key}>
-            <div className="mt-2">
-              <div className="flex items-center justify-between">
-                <p className="font-medium flex items-center gap-1">
-                  <Image src={iconMap[item.food_item.food_type]} alt="Dash" height="14" width="14" />
-                  {item.food_item?.name}{item.variant && ` - ${item.variant.name}`}
-                </p>
-                <SetQuantity item={item} />
+        {cartItems &&
+          cartItems.map((item, key) => (
+            <CardContent key={key}>
+              <div className="mt-2">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium flex items-center gap-1">
+                    <Image
+                      src={iconMap[item.food_item.food_type]}
+                      alt="Dash"
+                      height="14"
+                      width="14"
+                    />
+                    {item.food_item?.name}
+                    {item.variant && ` - ${item.variant.name}`}
+                  </p>
+                  <SetQuantity item={item} />
+                </div>
+                <div className="flex items-center justify-between text-sm mt-1">
+                  <span className="font-medium text-muted-foreground">
+                    ₹ {item.food_item.price}
+                  </span>
+                  <span className="font-medium">₹ {item.totalPrice}</span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm mt-1">
-                <span className="font-medium text-muted-foreground">
-                  ₹ {item.food_item.price}
-                </span>
-                <span className="font-medium">₹ {item.totalPrice}</span>
-              </div>
-            </div>
-            <p className="text-muted-foreground text-xs">
-              {item.addons && item.addons.length > 0 && item.addons.map((addon, key) => (
-                <span key={key}>
-                  {addon.name}{key < item.addons.length - 1 ? ', ' : ''}
-                </span>
-              ))}
-            </p>
-            <Link
-              href="/components"
-              className="flex items-center text-rose-500 text-xs"
-            >
-              Customize <ChevronsRight className="w-3 h-3 ml-1" />
-            </Link>
-          </CardContent>
-        ))}
+              <p className="text-muted-foreground text-xs">
+                {item.addons &&
+                  item.addons.length > 0 &&
+                  item.addons.map((addon, key) => (
+                    <span key={key}>
+                      {addon.name}
+                      {key < item.addons.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+              </p>
+              <Link
+                href="/components"
+                className="flex items-center text-rose-500 text-xs"
+              >
+                Customize <ChevronsRight className="w-3 h-3 ml-1" />
+              </Link>
+            </CardContent>
+          ))}
       </Card>
 
       <Card className="p-6 gap-3 items-start flex flex-col">
         <Label forhtml="type">Order Type</Label>
-        <ToggleGroup id="type" type="single" value="dine_in" onValueChange={(value) => {setOrderType({...orderType, type: value})}}>
+        <ToggleGroup
+          id="type"
+          type="single"
+          value="dine_in"
+          onValueChange={(value) => {
+            setOrderType({ ...orderType, type: value });
+          }}
+        >
           <ToggleGroupItem value="dine_in" className="border rounded-full">
             <UtensilsCrossed className="h-3.5 w-3.5 mr-1" /> DineIn
           </ToggleGroupItem>
@@ -351,23 +383,26 @@ export default function Orders() {
         </ToggleGroup>
 
         <Label forhtml="instruction">Add Cooking Instruction</Label>
-        <Textarea 
-          id="instruction" 
+        <Textarea
+          id="instruction"
           name="instruction"
-          placeholder="Add your cooking instruction" 
-          onChange={handleOrderType} />
+          placeholder="Add your cooking instruction"
+          onChange={handleOrderType}
+        />
 
         <Label forhtml="tableid">Table</Label>
-        <Select id="tableid" onValueChange={(value) => {setOrderType({...orderType, table_id: value})}}>
+        <Select
+          id="tableid"
+          onValueChange={(value) => {
+            setOrderType({ ...orderType, table_id: value });
+          }}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select Table" />
           </SelectTrigger>
           <SelectContent>
             {tables?.map((table, key) => (
-              <SelectItem 
-                key={key} 
-                value={table.id} 
-              >
+              <SelectItem key={key} value={table.id}>
                 {table.name}
               </SelectItem>
             ))}
@@ -375,7 +410,10 @@ export default function Orders() {
         </Select>
       </Card>
       <Items items={cartItems} />
-      <Button onClick={handleSubmit} className="sticky bottom-5 right-0 p-6 rounded-xl shadow-xl">
+      <Button
+        onClick={handleSubmit}
+        className="sticky bottom-5 right-0 p-6 rounded-xl shadow-xl"
+      >
         <ShinyText
           shimmerWidth={300}
           className="drop-shadow-lg text-lg font-bold"

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import {
   BellRing,
@@ -33,8 +34,14 @@ import { Separator } from "@/components/ui/separator";
 export default async function Home({ params }) {
   const itemsPromis = apiGet(`/api/shop/client-menu/${params.menu}`);
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
-  const waitPromisForLoader = new Promise((resolve) => setTimeout(resolve, 1000));
-  const [items, outlet] = await Promise.all([itemsPromis, outletPromis, waitPromisForLoader]);
+  const waitPromisForLoader = new Promise((resolve) =>
+    setTimeout(resolve, 1000),
+  );
+  const [items, outlet] = await Promise.all([
+    itemsPromis,
+    outletPromis,
+    waitPromisForLoader,
+  ]);
   const session = await getSession();
 
   return (
@@ -42,12 +49,7 @@ export default async function Home({ params }) {
       <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden">
         {/* Header */}
         <div className="flex justify-between">
-          <h2 className="text-2xl font-semibold">
-            <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
-              <ChefHat className="h-4 w-4" />
-            </Button>
-            Tacoza
-          </h2>
+          <Image src="/logo.png" alt="logo" width={150} height={100} />
           {session ? <Menu menu={params.menu} /> : <Auth menu={params.menu} />}
         </div>
 
