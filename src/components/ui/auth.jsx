@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/input-otp";
 import { Input } from "./input";
 import { Label } from "./label";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { PhoneInput } from "./phone-input";
 
 const AuthContext = createContext();
@@ -134,9 +134,10 @@ function Phone() {
   );
 }
 
-function Otp({ menu, setDrawer }) {
-  const { phone, otp, setOtp, setStep, otpTimer } = useContext(AuthContext);
+function Otp({ setDrawer }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const { phone, otp, setOtp, setStep, otpTimer } = useContext(AuthContext);
   const handleNext = async () => {
     const response = await fetch("/api/auth/verify-otp/", {
       method: "POST",
@@ -150,7 +151,7 @@ function Otp({ menu, setDrawer }) {
       if (!res.user.name || !res.user.email) {
         setStep(3);
       } else {
-        router.push(`/${menu}/cart`);
+        router.push(pathname);
         setDrawer(false);
       }
     }
@@ -187,10 +188,11 @@ function Otp({ menu, setDrawer }) {
   );
 }
 
-function Name({ menu, setDrawer }) {
+function Name({ setDrawer }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const router = useRouter();
 
   const handleNext = async () => {
     if (!name || !email) {
@@ -205,7 +207,7 @@ function Name({ menu, setDrawer }) {
       body: JSON.stringify({ name, email }),
     });
     if (response.status === 200) {
-      router.push(`${menu}/cart`);
+      router.push(pathname);
       setDrawer(false);
     }
   };

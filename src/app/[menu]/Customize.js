@@ -48,7 +48,7 @@ function VariantAddon({
                 <div className="w-full flex items-center justify-between">
                   <p className="font-medium flex items-center gap-2">
                     <Image src="/veg.svg" alt="Dash" height="16" width="16" />
-                    {option.variant}
+                    {option.name}
                   </p>
                   <span className="text-muted-foreground mr-4">
                     ₹{option.price}
@@ -153,14 +153,24 @@ export function Customize({ item }) {
 
   return (
     <Drawer>
-      <DrawerTrigger asChild>
+      {
+        item.variants ?
+        <DrawerTrigger asChild>
+          <Button
+            className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
+            variant="outline"
+          >
+            ADD
+          </Button>
+        </DrawerTrigger> :
         <Button
           className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
           variant="outline"
+          onClick={handleAddToCart}
         >
           ADD
         </Button>
-      </DrawerTrigger>
+      }
       {item && (
         <DrawerContent>
           <DrawerHeader className="flex items-start w-full">

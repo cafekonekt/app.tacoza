@@ -11,6 +11,7 @@ import {
   UtensilsCrossed,
   Tags,
   NotepadText,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -116,22 +117,24 @@ export function Items({ items }) {
 }
 
 export default function Orders() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const pathnames = pathname.split("/");
+
   const { cartItems } = useCart();
   const [tables, setTables] = useState([]);
   const [outlet, setOutlet] = useState({});
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [orderType, setOrderType] = useState({
     type: "dine_in",
     table_id: null,
     instruction: "",
   });
-  const [session, setSession] = useState(false);
-  const router = useRouter();
 
-  const pathname = usePathname();
-  const pathnames = pathname.split("/");
+  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState(false);
 
   const handleOrderType = (e) => {
     setOrderType({ ...orderType, [e.target.name]: e.target.value });
@@ -158,11 +161,16 @@ export default function Orders() {
   };
 
   const isAuthenticated = async () => {
-    const response = await fetch("/api/auth/is-authenticated/");
-    if (response.status === 200) {
-      return true;
+    try {
+      const response = await fetch("/api/auth/is-authenticated/");
+      if (response.status === 200) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error checking authentication:", error);
+      return false
     }
-    return false;
   };
 
   useEffect(() => {
@@ -192,24 +200,32 @@ export default function Orders() {
       setDrawerOpen(true);
       return;
     }
-    const response = await fetch(`/api/orders/${pathnames[1]}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(orderType),
-    });
-    if (response.status === 200) {
-      const data = await response.json();
-      router.push(`${pathnames[1]}/orders/${data.order_id}`);
-    }
-    if (response.status === 401) {
-      setSession(false);
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/orders/${pathnames[1]}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderType),
+      });
+      if (response.status === 200) {
+        const data = await response.json();
+        router.push(`/${pathnames[1]}/order/${data.order_id}`);
+      }
+      if (response.status === 401) {
+        setSession(false);
+        setDrawerOpen(true);
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return loading ? (
-    <Loading suppressHydrationWarning />
+    <Loading />
   ) : (
     <main className="grid gap-4 p-6" suppressHydrationWarning>
       {/* Header */}
@@ -223,55 +239,33 @@ export default function Orders() {
           Cart
         </h2>
         {!session && (
-          <Auth
-            menu={pathnames[1]}
-            drawerOpen={drawerOpen}
-            setDrawer={setDrawerOpen}
-          />
+          <Auth drawerOpen={drawerOpen} setDrawer={setDrawerOpen} />
         )}
       </div>
 
       {/* Breadcrumb */}
       <Breadcrumb>
         <BreadcrumbList>
-          {pathnames.map((path, index) => {
-            if (index === 0) {
-              return (
-                <>
-                  <BreadcrumbItem key={index}>
-                    <BreadcrumbLink href="/">HOME</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                </>
-              );
-            } else {
-              return (
-                <>
-                  {index < pathnames.length - 1 ? (
-                    <>
-                      <BreadcrumbItem key={index}>
-                        <BreadcrumbLink href={`/${path}`}>
-                          {path.toLocaleUpperCase()}
-                        </BreadcrumbLink>
-                      </BreadcrumbItem>
-                      <BreadcrumbSeparator />
-                    </>
-                  ) : (
-                    <BreadcrumbItem key={index}>
-                      <BreadcrumbPage>
-                        {path.toLocaleUpperCase()}
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  )}
-                </>
-              );
-            }
-          })}
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">HOME</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href={`/${pathnames[1]}`}>
+              {pathnames[1].toLocaleUpperCase()}
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>
+              {pathnames[2].toLocaleUpperCase()}
+            </BreadcrumbPage>
+          </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       {/* Restaurant Info */}
-      <Card className="overflow-hidden">
+      {outlet && <Card className="overflow-hidden">
         <CardHeader className="bg-rose-50">
           <CardTitle className="flex gap-1">
             <Store className="h-4 w-4" /> {outlet?.shop?.name}
@@ -292,7 +286,7 @@ export default function Orders() {
 
             <div className="text-muted-foreground text-sm">
               <div className="text-base text-primary font-semibold truncate">
-                Sagar Gaire, Chhindwara
+                {outlet?.name}
               </div>
               {outlet?.location}
               <div className="flex items-center gap-1">
@@ -306,18 +300,18 @@ export default function Orders() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card>}
 
       {/* List Items */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-rose-50">
-          <CardTitle className="flex gap-1">
-            <Utensils className="h-4 w-4" /> Items
-          </CardTitle>
-          <CardDescription>Customize your quantity</CardDescription>
-        </CardHeader>
-        {cartItems &&
-          cartItems.map((item, key) => (
+      {cartItems &&
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-rose-50">
+            <CardTitle className="flex gap-1">
+              <Utensils className="h-4 w-4" /> Items
+            </CardTitle>
+            <CardDescription>Customize your quantity</CardDescription>
+          </CardHeader>
+          {cartItems.map((item, key) => (
             <CardContent key={key}>
               <div className="mt-2">
                 <div className="flex items-center justify-between">
@@ -350,15 +344,10 @@ export default function Orders() {
                     </span>
                   ))}
               </p>
-              <Link
-                href="/components"
-                className="flex items-center text-rose-500 text-xs"
-              >
-                Customize <ChevronsRight className="w-3 h-3 ml-1" />
-              </Link>
             </CardContent>
           ))}
-      </Card>
+        </Card>
+      }
 
       <Card className="p-6 gap-3 items-start flex flex-col">
         <Label forhtml="type">Order Type</Label>
@@ -389,27 +378,30 @@ export default function Orders() {
           placeholder="Add your cooking instruction"
           onChange={handleOrderType}
         />
-
-        <Label forhtml="tableid">Table</Label>
-        <Select
-          id="tableid"
-          onValueChange={(value) => {
-            setOrderType({ ...orderType, table_id: value });
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Table" />
-          </SelectTrigger>
-          <SelectContent>
-            {tables?.map((table, key) => (
-              <SelectItem key={key} value={table.id}>
-                {table.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {tables &&
+          <>
+            <Label forhtml="tableid">Table</Label>
+            <Select
+              id="tableid"
+              onValueChange={(value) => {
+                setOrderType({ ...orderType, table_id: value });
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Table" />
+              </SelectTrigger>
+              <SelectContent>
+                {tables.map((table, key) => (
+                  <SelectItem key={key} value={table.id}>
+                    {table.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </>
+        }
       </Card>
-      <Items items={cartItems} />
+      {cartItems && <Items items={cartItems} />}
       <Button
         onClick={handleSubmit}
         className="sticky bottom-5 right-0 p-6 rounded-xl shadow-xl"
