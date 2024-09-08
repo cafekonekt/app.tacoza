@@ -50,7 +50,7 @@ export default async function Home({ params }) {
         {/* Header */}
         <div className="flex justify-between">
           <Image src="/logo.png" alt="logo" width={150} height={100} />
-          {session ? <Menu menu={params.menu} /> : <Auth menu={params.menu} />}
+          {session ? <Menu menu={params.menu} /> : <Auth />}
         </div>
 
         <Breadcrumb>

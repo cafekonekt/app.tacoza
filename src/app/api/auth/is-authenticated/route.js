@@ -11,6 +11,7 @@ export async function GET(request) {
         if (!user.tokens) return NextResponse.error('Invalid session', { status: 401 });
         return NextResponse.json(user, { status: 200 });
     } catch (error) {
+        console.error('Error getting user session:', error);
         return NextResponse.error('User not authenticated', { status: 401 });
     }
 }

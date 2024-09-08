@@ -1,5 +1,5 @@
 'use client'
-import React, { createContext, useContext, useState, useEffect, use } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation'
 
 // Create Cart Context
@@ -105,7 +105,7 @@ export const CartProvider = ({ children }) => {
           ...item,
           totalPrice: item.addons.reduce((sum, addon) => sum + parseFloat(addon.price), 0) +
             ((item.variant ? parseFloat(item.variant.price) : parseFloat(item.food_item.price)) *
-            newQuantity),
+              newQuantity),
           quantity: newQuantity,
         } : item
       )
