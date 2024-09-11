@@ -122,6 +122,7 @@ export default function Orders() {
   const pathnames = pathname.split("/");
 
   const { cartItems } = useCart();
+  console.log(cartItems);
   const [tables, setTables] = useState([]);
   const [outlet, setOutlet] = useState({});
 

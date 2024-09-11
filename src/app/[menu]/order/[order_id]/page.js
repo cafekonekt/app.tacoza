@@ -47,7 +47,7 @@ import {
   TimelineHeading,
   TimelineItem,
   TimelineLine,
-} from "@/components/ui/animations/timeline";
+} from "@/components/ui/animations/Timeline";
 
 export default function Order({ params }) {
   const [value, setValue] = React.useState(3);
