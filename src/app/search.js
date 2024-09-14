@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { TextRotate } from "@/components/ui/TextRotate";
 
 const frameworks = [
   { value: "next.js", label: "Next.js" },
@@ -25,29 +25,7 @@ const frameworks = [
   { value: "astro", label: "Astro" },
 ];
 
-const searchItems = ["Restaurant", "Cafe", "Bar"];
-
-const AnimatedText = ({ items }) => {
-  const [index, setIndex] = useState(0);
-  const [animationKey, setAnimationKey] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % items.length);
-      setAnimationKey((prevKey) => prevKey + 1);
-    }, 2000);
-
-    return () => clearInterval(timer);
-  }, [items]);
-
-  return (
-    <span className="inline-block overflow-hidden">
-      <span key={animationKey} className="inline-block animate-slide-up">
-        {items[index]}
-      </span>
-    </span>
-  );
-};
+const searchItems = ["Sagar Gaire", "Pizza Havein", "Dominos"];
 
 export function SearchRestro() {
   const [open, setOpen] = useState(false);
@@ -60,11 +38,10 @@ export function SearchRestro() {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[280px] items-center flex"
+          className="flex justify-start shadow-sm"
         >
-          <p className="mr-2">Search</p> &#x0022;
-          <AnimatedText items={searchItems} />
-          &#x0022;
+          <Search className="w-4 h-4 mr-2" /> Search for
+          <TextRotate className="ml-1" duration={2000} words={searchItems} />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[280px] p-0">
