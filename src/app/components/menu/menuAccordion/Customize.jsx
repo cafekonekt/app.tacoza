@@ -13,7 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import Counter from "./Counter";
+import Counter from "@/app/components/menu/menuAccordion/Counter";
 import { Separator } from "@/components/ui/separator";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";

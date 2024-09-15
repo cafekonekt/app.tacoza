@@ -1,5 +1,3 @@
-"use client";
-import * as React from "react";
 import {
   ChevronLeft,
   Copy,
@@ -48,10 +46,13 @@ import {
   TimelineItem,
   TimelineLine,
 } from "@/components/ui/animations/Timeline";
+import { Rating } from "./Rating";
+import { getOrder } from "@/app/lib/order/getOrders";
+import { notFound } from "next/navigation";
 
-export default function Order({ params }) {
-  const [value, setValue] = React.useState(3);
-
+export default async function Order({ params }) {
+  const order = await getOrder(params);
+  if (!order) return notFound();
   return (
     <main className="max-w-lg p-4 gap-4 grid">
       <h2 className="text-2xl font-semibold">
@@ -89,10 +90,10 @@ export default function Order({ params }) {
         <CardHeader className="bg-muted/50">
           <CardTitle>Restaurant</CardTitle>
           <CardDescription>
-            Sagar Gaire, Chhindwara
-            <br /> Liam Johnson1234 Main St.Anytown, CA 12345
+            {order.outlet.name}
+            <br /> {order.outlet.address}
             <div className="flex items-center gap-1">
-              <Badge className="w-fit h-6">Table: 12</Badge>
+              <Badge className="w-fit h-6">{order.table}</Badge>
               <Button size="icon" variant="outline" className="h-8 w-8">
                 <PhoneCall className="h-3.5 w-3.5" />
                 <span className="sr-only">More</span>
@@ -104,14 +105,7 @@ export default function Order({ params }) {
             </div>
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-2 mt-4">
-          <Label forhtml="review">Rate this Restaurant</Label>
-          <StarRating
-            value={value}
-            setValue={setValue}
-            iconProps={{ className: "fill-yellow-500 stroke-yellow-500" }}
-          />
-        </CardContent>
+        <Rating />
       </Card>
       <Card className="overflow-hidden">
         <CardHeader className="bg-muted/50">
@@ -120,7 +114,13 @@ export default function Order({ params }) {
             Order Delivered
             <span className="flex items-center border p-1 px-2 rounded-full text-green-700 border-green-700 bg-green-100">
               <Timer className="w-4 h-4 mr-1" />
-              Est. 21:00 Mins
+              Est.{" "}
+              {Math.floor(
+                (new Date(order.created_at).getTime() -
+                  new Date(order.updated_at).getTime()) /
+                  (1000 * 60),
+              )}{" "}
+              mins
             </span>
           </CardDescription>
         </CardHeader>
@@ -155,7 +155,7 @@ export default function Order({ params }) {
         <CardHeader className="flex flex-row items-start bg-muted/50">
           <div className="grid gap-0.5">
             <CardTitle className="group flex items-center gap-2 text-lg">
-              Order {params.order_id.split("-")[0]}
+              Order {order.order_id.split("-")[0]}
               <Button
                 size="icon"
                 variant="outline"
@@ -165,7 +165,9 @@ export default function Order({ params }) {
                 <span className="sr-only">Copy Order ID</span>
               </Button>
             </CardTitle>
-            <CardDescription>Date: November 23, 2023</CardDescription>
+            <CardDescription>
+              Date: {new Date(order.created_at).toLocaleDateString()}
+            </CardDescription>
           </div>
           <div className="ml-auto flex items-center gap-1">
             <Button size="sm" variant="outline" className="h-8 gap-1">
@@ -190,41 +192,19 @@ export default function Order({ params }) {
             </DropdownMenu>
           </div>
         </CardHeader>
+        <Separator />
         <CardContent className="p-6 text-sm">
           <div className="grid gap-3">
             <div className="font-semibold">Order Details</div>
             <ul className="grid gap-3">
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  Glimmer Lamps x <span>2</span>
-                </span>
-                <span>$250.00</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  Aqua Filters x <span>1</span>
-                </span>
-                <span>$49.00</span>
-              </li>
-            </ul>
-            <Separator className="my-2" />
-            <ul className="grid gap-3">
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>$299.00</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Shipping</span>
-                <span>$5.00</span>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-muted-foreground">Tax</span>
-                <span>$25.00</span>
-              </li>
-              <li className="flex items-center justify-between font-semibold">
-                <span className="text-muted-foreground">Total</span>
-                <span>$329.00</span>
-              </li>
+              {order.items.map((item, index) => (
+                <li className="flex items-center justify-between" key={index}>
+                  <span className="text-muted-foreground">
+                    {item.food_item.name} x <span>{item.quantity}</span>
+                  </span>
+                  <span>{item.totalPrice}</span>
+                </li>
+              ))}
             </ul>
           </div>
           <Separator className="my-4" />

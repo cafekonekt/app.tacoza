@@ -35,7 +35,7 @@ export default function Loading() {
   // Generate the random quote
   const quote = getRandomQuote();
   return (
-    <main className="h-screen w-full flex flex-col items-center justify-center gap-4 loader-container">
+    <main className="h-screen w-full flex flex-col items-center justify-center gap-4 loader-container" suppressHydrationWarning>
       <div className="text-muted-foreground/70 font-semibold text-sm animate-pulse">
         {quote}
       </div>
