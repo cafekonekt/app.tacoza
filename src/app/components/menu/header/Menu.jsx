@@ -42,12 +42,12 @@ export async function Menu({ menu }) {
           </div>
         </SheetHeader>
         <Button variant="outline">
-          <form action={
-            async () => {
-              'use server';
+          <form
+            action={async () => {
+              "use server";
               await logout();
-            }
-          }>
+            }}
+          >
             <button
               type="submit"
               className="flex items-center gap-3 rounded-lg pr-3 py-2 text-muted-foreground transition-all hover:text-primary"

@@ -8,11 +8,11 @@ export function SetQuantity({ item }) {
     
     const decrement = async () => {
         setQuantity(quantity-1)
-        await updateQuantity(item?.id, quantity-1);
+        await updateQuantity(item?.item_id, quantity-1);
     };
     const increment = async () => {
         setQuantity(quantity+1);
-        await updateQuantity(item?.id, quantity+1);
+        await updateQuantity(item?.item_id, quantity+1);
     };
 
     return (

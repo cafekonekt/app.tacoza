@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { SearchRestro } from "./search";
 import Image from "next/image";
-import { Auth } from "@/components/ui/auth";
+import { Auth } from "@/app/components/auth/Auth";
 import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
@@ -22,9 +22,6 @@ export default function Scan() {
   const handleScan = (result) => {
     const scannedBarcode = result[0];
     const scannedUrl = scannedBarcode?.rawValue;
-
-    console.log(scannedUrl);
-
     if (scannedUrl && scannedUrl.startsWith("https://tacoza.co")) {
       router.push(scannedUrl);
     } else {

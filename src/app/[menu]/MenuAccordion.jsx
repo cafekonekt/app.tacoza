@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
+// components UI
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,15 +10,15 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SwatchBook, Settings2, Search, X } from "lucide-react";
 import { TextRotate } from "@/components/ui/TextRotate";
 import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/context/CartContext";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import Image from "next/image";
-import { Star } from "lucide-react"; // Import Star correctly as a named export
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { Customize } from "./Customize";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Drawer,
@@ -29,7 +30,15 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import Image from "next/image";
+// icons
+import { SwatchBook, Settings2, Search, X } from "lucide-react";
+import { Star } from "lucide-react";
+// components
+import { Customize } from "@/app/components/menu/menuAccordion/Customize";
+// context
+import { useCart } from "@/context/CartContext";
+// utils
 const iconMap = {
   veg: "/veg.svg",
   nonveg: "/non-veg.svg",
@@ -42,7 +51,9 @@ export function MenuTab({ items, setFocusCategory }) {
   const getFoodItemCount = (item) => {
     if (item.sub_categories && item.sub_categories.length > 0) {
       return item.sub_categories.reduce((total, subCategory) => {
-        return total + (subCategory.food_items ? subCategory.food_items.length : 0);
+        return (
+          total + (subCategory.food_items ? subCategory.food_items.length : 0)
+        );
       }, 0);
     } else {
       return item.food_items ? item.food_items.length : 0;
@@ -50,7 +61,9 @@ export function MenuTab({ items, setFocusCategory }) {
   };
 
   return (
-    <div className={`fixed ${cartItems?.length > 0 ? 'bottom-20' : 'bottom-0'} right-0 m-2 w-fit`}>
+    <div
+      className={`fixed ${cartItems?.length > 0 ? "bottom-20" : "bottom-0"} right-0 m-2 w-fit`}
+    >
       <DropdownMenu>
         <DropdownMenuTrigger>
           <div className="rounded-full aspect-square h-16 w-16 flex flex-col justify-center items-center bg-black text-white text-xs shadow-lg">
@@ -62,7 +75,10 @@ export function MenuTab({ items, setFocusCategory }) {
           <DropdownMenuLabel>Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {items.map((item) => (
-            <DropdownMenuItem key={item.id} onClick={() => setFocusCategory(item.name)}>
+            <DropdownMenuItem
+              key={item.id}
+              onClick={() => setFocusCategory(item.name)}
+            >
               {item.name}
               <DropdownMenuShortcut>
                 <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
@@ -108,8 +124,9 @@ export function MenuItemComponent({ item }) {
               className="w-full h-full object-cover rounded-xl"
             />
             <div
-              className={`absolute ${item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
-                } flex flex-col items-center`}
+              className={`absolute ${
+                item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
+              } flex flex-col items-center`}
             >
               <Customize item={item} />
               {item.variants && (
@@ -132,7 +149,10 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
 
   useEffect(() => {
     if (focusCategory && focusCategory === category.name) {
-      categoryRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      categoryRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [focusCategory, category.name]);
 
@@ -152,19 +172,19 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-            category.sub_categories.length > 0
+          category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-            category.sub_categories.map((subCategory) => (
-              <CategoryComponent
-                key={subCategory.name}
-                category={subCategory}
-                depth={depth + 1} // Increment the depth for subcategories
-              />
-            ))
+              category.sub_categories.map((subCategory) => (
+                <CategoryComponent
+                  key={subCategory.name}
+                  category={subCategory}
+                  depth={depth + 1} // Increment the depth for subcategories
+                />
+              ))
             : // If no subcategories, render the menu items
-            category.food_items.map((item) => (
-              <MenuItemComponent key={item.name} item={item} />
-            ))}
+              category.food_items.map((item) => (
+                <MenuItemComponent key={item.name} item={item} />
+              ))}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -176,12 +196,12 @@ export function SearchMenu({ items }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const words = items.flatMap(category =>
-    [...(category.food_items || []).map(item => item.name),
-    ...(category.sub_categories || []).flatMap(subcategory =>
-      (subcategory.food_items || []).map(item => item.name)
-    )]
-  );
+  const words = items.flatMap((category) => [
+    ...(category.food_items || []).map((item) => item.name),
+    ...(category.sub_categories || []).flatMap((subcategory) =>
+      (subcategory.food_items || []).map((item) => item.name),
+    ),
+  ]);
 
   // Recursively search through categories and subcategories
   const searchItems = (category) => {
@@ -235,11 +255,7 @@ export function SearchMenu({ items }) {
           className="w-full justify-start items-center text-muted-foreground mt-2"
         >
           <Search className="w-4 h-4 mr-2" /> Search for
-          <TextRotate
-            className="ml-1"
-            duration={2000}
-            words={words}
-          />
+          <TextRotate className="ml-1" duration={2000} words={words} />
         </Button>
       </DrawerTrigger>
       <DrawerContent className="h-3/4 w-full">
@@ -283,15 +299,15 @@ export function SearchMenu({ items }) {
           {/* Display search results */}
           {!loading && filteredItems.length > 0
             ? filteredItems.map((item) => (
-              <div className="overflow-y-scroll" key={item.name}>
-                <MenuItemComponent item={item} />
-              </div>
-            ))
+                <div className="overflow-y-scroll" key={item.name}>
+                  <MenuItemComponent item={item} />
+                </div>
+              ))
             : !loading && (
-              <p className="text-center text-gray-500 text-sm">
-                Nothing found
-              </p>
-            )}
+                <p className="text-center text-gray-500 text-sm">
+                  Nothing found
+                </p>
+              )}
         </div>
       </DrawerContent>
     </Drawer>
@@ -316,13 +332,13 @@ export function MenuAccordion({ items }) {
       food_items: sub.food_items.filter((item) => {
         if (!foodTypeFilter) return true;
         return item.food_type === foodTypeFilter;
-      })
+      }),
     }));
 
     return {
       ...category,
       food_items: filteredFoodItems,
-      sub_categories: filteredSubCategories
+      sub_categories: filteredSubCategories,
     };
   });
 
@@ -362,7 +378,12 @@ export function MenuAccordion({ items }) {
                 aria-label="Non-Veg Filter"
                 className="gap-2 px-4 whitespace-nowrap data-[state=on]:bg-red-100 data-[state=on]:text-red-800"
               >
-                <Image src="/non-veg.svg" alt="Non-Veg" height="16" width="16" />
+                <Image
+                  src="/non-veg.svg"
+                  alt="Non-Veg"
+                  height="16"
+                  width="16"
+                />
                 <span>Non-Veg</span>
               </ToggleGroupItem>
             </ToggleGroup>
@@ -374,7 +395,11 @@ export function MenuAccordion({ items }) {
           {/* Menu */}
           <div className="space-y-4">
             {filteredItems.map((category) => (
-              <CategoryComponent key={category.name} category={category} focusCategory={focusCategory} />
+              <CategoryComponent
+                key={category.name}
+                category={category}
+                focusCategory={focusCategory}
+              />
             ))}
           </div>
         </div>
