@@ -26,6 +26,8 @@ import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { useDrawer } from "@/context/DrawerContext";
 
+import { cashfree } from "@/app/util/cashfree";
+
 export function OrderForm({ params, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
@@ -42,8 +44,24 @@ export function OrderForm({ params, tables, table, session }) {
     setOrder({ ...order, [e.target.name]: e.target.value });
   };
 
+  const handlePayment = async () => {
+    let checkoutOptions = {
+      paymentSessionId: "payment-session-id",
+      returnUrl:
+        "https://test.cashfree.com/pgappsdemos/v3success.php?myorder={order_id}",
+    };
+    cashfree.checkout(checkoutOptions).then(function (result) {
+      if (result.error) {
+        alert(result.error.message);
+      }
+      if (result.redirect) {
+        console.log("Redirection");
+      }
+    });
+  };
+
   const handleSubmit = async () => {
-    console.log("Order", order, 'session', session);
+    console.log("Order", order, "session", session);
     if (!session) {
       openDrawer();
       return;
@@ -62,9 +80,20 @@ export function OrderForm({ params, tables, table, session }) {
       });
       if (response) {
         setOrder({ type: "dine_in" });
-        const order_id = response?.order_id;
         console.log("Order created", response);
-        router.push(`/${params?.menu}/order/${order_id}`);
+        const checkoutOptions = {
+          paymentSessionId: response.payment_session_id,
+          returnUrl: `http://localhost:3000/${params.menu}/order/${response.order_id}`,
+        };
+        cashfree.checkout(checkoutOptions).then(function (result) {
+          if (result.error) {
+            alert(result.error.message);
+          }
+          if (result.redirect) {
+            console.log("Redirection");
+            console.log(result);
+          }
+        });
       }
     } catch (error) {
       console.error(error);
