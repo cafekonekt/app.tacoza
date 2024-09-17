@@ -49,6 +49,7 @@ import {
 import { Rating } from "./Rating";
 import { getOrder } from "@/app/lib/order/getOrders";
 import { notFound } from "next/navigation";
+import { Payment } from "./Payment";
 
 export default async function Order({ params }) {
   const order = await getOrder(params);
@@ -244,7 +245,7 @@ export default async function Order({ params }) {
           </div>
         </CardContent>
       </Card>
-      <Button>Report</Button>
+      <Payment order={order} params={params} />
     </main>
   );
 }

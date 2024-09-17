@@ -34,6 +34,10 @@ import { PhoneInput } from "@/components/ui/phone-input";
 // hooks
 import { usePathname, useRouter } from "next/navigation";
 import { useDrawer } from "@/context/DrawerContext";
+// server actions
+import { getOTP } from "@/app/lib/auth/getOTP";
+import { verifyOTP } from "@/app/lib/auth/verifyOTP";
+import { updateUser } from "@/app/lib/auth/updateUser";
 
 const AuthContext = createContext();
 
@@ -104,16 +108,9 @@ export function Auth({ menu }) {
 function Phone() {
   const { phone, setPhone, setStep, setOtp } = useContext(AuthContext);
   const handleNext = async () => {
-    const response = await fetch("http://localhost:8000/api/auth/send-otp/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ phone_number: phone }),
-    });
-    if (response.status === 200) {
-      const res = await response.json();
-      setOtp(res.otp);
+    const response = await getOTP(phone)
+    if (response) {
+      setOtp(response.otp);
       setStep(2);
     }
   };
@@ -138,23 +135,14 @@ function Phone() {
 }
 
 function Otp({ setDrawer }) {
-  const router = useRouter();
   const pathname = usePathname();
   const { phone, otp, setOtp, setStep, otpTimer } = useContext(AuthContext);
   const handleNext = async () => {
-    const response = await fetch("/api/auth/verify-otp/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ phone, otp }),
-    });
-    if (response.status === 200) {
-      const res = await response.json();
-      if (!res.user.name || !res.user.email) {
+    const response = await verifyOTP(phone, otp, pathname);
+    if (response) {
+      if (!response.user.name || !response.user.email) {
         setStep(3);
       } else {
-        router.push(pathname);
         setDrawer(false);
       }
     }
@@ -192,7 +180,6 @@ function Otp({ setDrawer }) {
 }
 
 function Name({ setDrawer }) {
-  const router = useRouter();
   const pathname = usePathname();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -202,15 +189,8 @@ function Name({ setDrawer }) {
       console.error("Name and Email are required");
       return;
     }
-    const response = await fetch("/api/auth/update-user/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, email }),
-    });
-    if (response.status === 200) {
-      router.push(pathname);
+    const response = await updateUser(name, email, pathname);
+    if (response) {
       setDrawer(false);
     }
   };
