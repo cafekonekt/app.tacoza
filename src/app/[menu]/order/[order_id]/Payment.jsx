@@ -8,7 +8,7 @@ export function Payment({ order, params }) {
   const handlePayment = async () => {
     const checkoutOptions = {
       paymentSessionId: order.payment_session_id,
-      returnUrl: `http://localhost:3000/${params.menu}/order/${order.order_id}`,
+      returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${order.order_id}`,
     };
     cashfree.checkout(checkoutOptions).then(function (result) {
       if (result.error) {
