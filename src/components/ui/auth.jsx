@@ -101,7 +101,7 @@ export function Auth({ menu, drawerOpen, setDrawer }) {
 function Phone() {
   const { phone, setPhone, setStep, setOtp } = useContext(AuthContext);
   const handleNext = async () => {
-    const response = await fetch("http://localhost:8000/api/auth/send-otp/", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}}/api/auth/send-otp/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
