@@ -3,9 +3,12 @@ import {
   Copy,
   CreditCard,
   HelpCircle,
+  Home,
   MapPin,
   MoreVertical,
   PhoneCall,
+  RefreshCcw,
+  Route,
   Star,
   Timer,
 } from "lucide-react";
@@ -50,6 +53,18 @@ import { Rating } from "./Rating";
 import { getOrder } from "@/app/lib/order/getOrders";
 import { notFound } from "next/navigation";
 import { Payment } from "./Payment";
+import Script from "next/script";
+import {
+  PaymentSuccessAnimation,
+  PaymentFailAnimation,
+  FoodPreparingAnimation,
+} from "@/app/components/lottie/lottie";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default async function Order({ params }) {
   const order = await getOrder(params);
@@ -67,14 +82,16 @@ export default async function Order({ params }) {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">HOME</BreadcrumbLink>
+            <BreadcrumbLink href="/">
+              <Home className="h-4 w-4" />
+            </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
+          {/* <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink href={`/${params.menu}`}>
               {params.menu.toUpperCase()}
             </BreadcrumbLink>
-          </BreadcrumbItem>
+          </BreadcrumbItem> */}
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink href={`/${params.menu}/order`}>
@@ -87,69 +104,93 @@ export default async function Order({ params }) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      {/* Payment Success */}
+      <section className="flex flex-col justify-center items-center">
+        <PaymentSuccessAnimation />
+        <span className="text-green-600 font-bold text-lg">
+          Payment Recieved
+        </span>
+        <span className="text-sm text-center">
+          Rs. 160 via Cashfree <br /> Ref Id: XXXX23423XXXX
+        </span>
+      </section>
+
+      {/* Payment Failed */}
+      <section className="flex flex-col justify-center items-center">
+        <PaymentFailAnimation />
+        <span className="text-red-600 font-bold text-lg">Payment Failed</span>
+        <span className="text-sm text-center">
+          Customer rejected upi request.
+        </span>
+        <Payment order={order} params={params} />
+      </section>
+
       <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/50">
-          <CardTitle>Restaurant</CardTitle>
-          <CardDescription>
-            {order.outlet.name}
-            <br /> {order.outlet.address}
-            <div className="flex items-center gap-1">
-              <Badge className="w-fit h-6">{order.table}</Badge>
-              <Button size="icon" variant="outline" className="h-8 w-8">
-                <PhoneCall className="h-3.5 w-3.5" />
-                <span className="sr-only">More</span>
-              </Button>
-              <Button size="icon" variant="outline" className="h-8 w-8">
-                <MapPin className="h-3.5 w-3.5" />
-                <span className="sr-only">More</span>
-              </Button>
-            </div>
-          </CardDescription>
-        </CardHeader>
-        <Rating />
-      </Card>
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/50">
-          <CardTitle>Status</CardTitle>
-          <CardDescription className="flex justify-between items-center">
-            Order Delivered
-            <span className="flex items-center border p-1 px-2 rounded-full text-green-700 border-green-700 bg-green-100">
-              <Timer className="w-4 h-4 mr-1" />
-              Est.{" "}
-              {Math.floor(
-                (new Date(order.created_at).getTime() -
-                  new Date(order.updated_at).getTime()) /
-                  (1000 * 60),
-              )}{" "}
-              mins
-            </span>
-          </CardDescription>
+        <CardHeader className="bg-green-600 items-center">
+          <FoodPreparingAnimation />
+          <span className="text-secondary font-bold">Preparing your order</span>
+          <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
+            <Timer className="w-4 h-4 mr-1" />
+            Est.{" "}
+            {Math.floor(
+              (new Date(order.created_at).getTime() -
+                new Date(order.updated_at).getTime()) /
+                (1000 * 60),
+            )}{" "}
+            mins • Ontime
+          </span>
         </CardHeader>
         <CardContent>
-          <Timeline>
-            <iframe
-              className="flex items-center justify-center w-full h-52"
-              src="https://lottie.host/embed/8b3b1e73-5217-4373-a3a8-f868f2ccc493/FCrGjRZ7Pm.json"
-            ></iframe>
-            <TimelineItem status="done">
-              <TimelineHeading>Order Places</TimelineHeading>
-              <TimelineDot status="done" />
-              <TimelineLine done />
-              <TimelineContent>
-                Before diving into coding, it is crucial to plan your software
-                project thoroughly.
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineHeading>Done!</TimelineHeading>
-              <TimelineDot />
-              <TimelineLine />
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineHeading>Done!</TimelineHeading>
-              <TimelineDot />
-            </TimelineItem>
-          </Timeline>
+          <div className="text-sm mt-4">
+            <div className="flex justify-between">
+              <div className="grid">
+                <span className="font-semibold">{order.outlet.name}</span>
+                <span className="text-muted-foreground">
+                  {order.outlet.address}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Badge variant="outline" className="w-fit h-6">
+                  {order.table}
+                </Badge>
+                <Button size="icon" variant="outline" className="h-8 w-8">
+                  <PhoneCall className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <Rating />
+          <Separator className="mt-2" />
+          <Accordion className="-mb-4" collapsible>
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                <span className="flex items-center gap-1">
+                  <Route className="h-3.5 w-3.5" />
+                  Order Timeline
+                </span>
+              </AccordionTrigger>
+              <AccordionContent>
+                <Timeline>
+                  <TimelineItem status="done">
+                    <TimelineHeading>Order Placed</TimelineHeading>
+                    <TimelineDot status="done" />
+                    <TimelineLine done />
+                    <TimelineContent>{order.created_at}</TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimelineHeading>Preparing Food</TimelineHeading>
+                    <TimelineDot />
+                    <TimelineLine />
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimelineHeading>Served</TimelineHeading>
+                    <TimelineDot />
+                  </TimelineItem>
+                </Timeline>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </CardContent>
       </Card>
       <Card className="overflow-hidden">
@@ -245,7 +286,9 @@ export default async function Order({ params }) {
           </div>
         </CardContent>
       </Card>
-      <Payment order={order} params={params} />
+
+      {/* Freshwork widget */}
+      <Script src="//in.fw-cdn.com/32110607/1125525.js" chat="true" />
     </main>
   );
 }

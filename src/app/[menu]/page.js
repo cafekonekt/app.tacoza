@@ -22,7 +22,7 @@ export default async function Home({ params }) {
 
   return (
     <>
-      <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden">
+      <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden bg-white">
         {/* Header */}
         <Header params={params} />
         {/* Breadcrumb */}
