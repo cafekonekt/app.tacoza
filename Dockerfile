@@ -3,7 +3,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm npm install --legacy-peer-deps --omit=dev
+RUN npm install --legacy-peer-deps --omit=dev
 
 COPY . .
 
