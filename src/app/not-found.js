@@ -9,7 +9,7 @@ export default function NotFound() {
       <div className="flex flex-col items-center mt-[15vh]">
         <Image src="/logo.png" alt="logo" width={100} height={30} />
         <span className="text-3xl font-bold mt-2">
-          Oops! We can't find this
+          Oops! We can&apos;t find this
         </span>
         <span>We still have a lot of good stuff to show you</span>
         <Button className="mt-4">
