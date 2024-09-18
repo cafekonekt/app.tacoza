@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <main className="max-w-screen h-screen flex flex-col items-center">
+    <main className="relative max-w-screen h-screen flex flex-col items-center">
       <div className="flex flex-col items-center mt-[15vh]">
         <Image src="/logo.png" alt="logo" width={100} height={30} />
         <span className="text-3xl font-bold mt-2">
@@ -17,6 +17,7 @@ export default function NotFound() {
         </Button>
       </div>
       <NotFoundAnimation />
+      <div className="absolute bottom-0 -z-10 w-full h-[20vh] bg-[#e11d48]" />
     </main>
   );
 }

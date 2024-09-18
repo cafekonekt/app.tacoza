@@ -13,7 +13,22 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
 import ShinyText from "@/components/ui/animations/ShinyText";
+import { HelpCircle, ScanQrCode } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { HowtoScanAnimation } from "./components/lottie/lottie";
 
 export default function Scan() {
   const router = useRouter();
@@ -40,8 +55,8 @@ export default function Scan() {
         <Ads />
       </div>
       <div className="flex flex-col items-center justify-center p-8">
-        <ShinyText className="font-bold" shimmerWidth={100}>
-          Scan the QR code to order
+        <ShinyText className="font-bold flex items-center" shimmerWidth={100}>
+          Scan the QR code to order <HowtoScan />
         </ShinyText>
         <div className="inset-10">
           <Scanner onScan={handleScan} />
@@ -101,5 +116,32 @@ export function Ads() {
         </CarouselItem>
       </CarouselContent>
     </Carousel>
+  );
+}
+
+function HowtoScan() {
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <HelpCircle className="fill-secondary/30 w-4 h-4 ml-1" />
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Find QR code on your table or at outlet.</DrawerTitle>
+          <DrawerDescription>
+            Simply spot the QR scan with any scanner, outlet menu will be
+            visible. Select your favourite meals an order it.
+          </DrawerDescription>
+        </DrawerHeader>
+        <HowtoScanAnimation />
+        <DrawerFooter>
+          <DrawerClose>
+            <Button variant="outline">
+              <ScanQrCode className="w-4 h-4 mr-1" /> Scan Now
+            </Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
