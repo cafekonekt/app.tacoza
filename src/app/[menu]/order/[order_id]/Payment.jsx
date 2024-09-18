@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cashfree } from "@/app/util/cashfree";
+import { RefreshCcw } from "lucide-react";
 
 export function Payment({ order, params }) {
   console.log(order);
@@ -19,5 +20,13 @@ export function Payment({ order, params }) {
       }
     });
   };
-  return <Button onClick={handlePayment}>Payment</Button>;
+  return (
+    <Button
+      onClick={handlePayment}
+      variant="destructive"
+      className="bg-red-600 mt-2"
+    >
+      <RefreshCcw className="w-4 h-4 mr-1.5" /> Retry Payment
+    </Button>
+  );
 }
