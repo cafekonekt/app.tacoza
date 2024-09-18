@@ -38,6 +38,7 @@ import { Star } from "lucide-react";
 import { Customize } from "@/app/components/menu/menuAccordion/Customize";
 // context
 import { useCart } from "@/context/CartContext";
+import { SearchLoadingAnimation } from "../components/lottie/lottie";
 // utils
 const iconMap = {
   veg: "/veg.svg",
@@ -285,14 +286,7 @@ export function SearchMenu({ items }) {
         <div className="flex flex-col gap-4 p-4">
           {loading && (
             <div className="flex justify-center">
-              <Image
-                src="/loader.gif"
-                alt="loading"
-                width={50}
-                height={50}
-                className="opacity-80"
-                draggable={false}
-              />
+              <SearchLoadingAnimation />
             </div>
           )}
 
