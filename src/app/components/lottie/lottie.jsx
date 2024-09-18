@@ -45,3 +45,11 @@ export function FoodPreparingAnimation() {
 export function NotFoundAnimation() {
   return <DotLottieReact src="/lottie/404.lottie" autoplay loop />;
 }
+
+export function HowtoScanAnimation() {
+  return (
+    <div className="w-full">
+      <DotLottieReact src="/lottie/scan.lottie" autoplay loop />
+    </div>
+  );
+}
