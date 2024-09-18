@@ -3,7 +3,7 @@ import { MapPin } from "lucide-react";
 
 export function Footer({ outlet }) {
   return (
-    <section className="bg-muted p-4 pb-20 mb-40">
+    <section className="bg-muted p-4 pb-20">
       <p className="text-muted-foreground/70 text-xs font-bold">Disclaimer:</p>
       <ul className="mx-3 list-disc text-muted-foreground/70 text-xs">
         <li>All prices are set directly by restaurant.</li>
