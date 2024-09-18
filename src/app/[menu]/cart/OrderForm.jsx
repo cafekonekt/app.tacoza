@@ -83,7 +83,7 @@ export function OrderForm({ params, tables, table, session }) {
         console.log("Order created", response);
         const checkoutOptions = {
           paymentSessionId: response.payment_session_id,
-          returnUrl: `http://localhost:3000/${params.menu}/order/${response.order_id}`,
+          returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
         };
         cashfree.checkout(checkoutOptions).then(function (result) {
           if (result.error) {
