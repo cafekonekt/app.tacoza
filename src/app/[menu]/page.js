@@ -7,6 +7,7 @@ import { Header } from "./Header";
 import { Call } from "./Call";
 import { Footer } from "./Footer";
 import { Details } from "./Details";
+import { notFound } from "next/navigation";
 
 export default async function Home({ params }) {
   const itemsPromis = apiGet(`/api/shop/client-menu/${params.menu}`);
@@ -19,6 +20,8 @@ export default async function Home({ params }) {
     outletPromis,
     waitPromisForLoader,
   ]);
+  if (!items) notFound();
+  if (!outlet) notFound();
 
   return (
     <>

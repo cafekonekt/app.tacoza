@@ -237,6 +237,7 @@ export function Promo() {
           <div className="flex aspect-video items-center justify-center">
             <Image
               src="/pizza.jpg"
+              alt="pizza"
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"
@@ -247,6 +248,7 @@ export function Promo() {
           <div className="flex aspect-video items-center justify-center">
             <img
               src="https://b.zmtcdn.com/data/pictures/2/20415942/d8ad25988e906612aea78a82543e25c7.jpg?output-format=webp&fit=around|771.75:416.25&crop=771.75:416.25;*,*"
+              alt="burger"
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"

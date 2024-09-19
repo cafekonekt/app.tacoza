@@ -147,7 +147,7 @@ export function OrderForm({ params, tables, table, session }) {
           </SelectTrigger>
           <SelectContent>
             {tables.map((table, key) => (
-              <SelectItem key={key} value={table.id}>
+              <SelectItem key={key} value={table.table_id}>
                 {table.name}
               </SelectItem>
             ))}
