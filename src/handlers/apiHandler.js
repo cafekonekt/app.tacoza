@@ -1,7 +1,7 @@
 import { logout } from "@/app/lib/auth/session";
 
 // Base URL of the API, use environment variable
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = process.env.SERVER_URL || "http://localhost:8000";
 
 // Default headers for all requests
 const defaultHeaders = {
