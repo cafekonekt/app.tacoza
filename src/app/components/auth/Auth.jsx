@@ -41,7 +41,7 @@ import { updateUser } from "@/app/lib/auth/updateUser";
 
 const AuthContext = createContext();
 
-export function Auth({ menu }) {
+export function Auth({ menu, outlet }) {
   const [step, setStep] = useState(1);
   const [otpTimer, setOtpTimer] = useState(30);
   const [phone, setPhone] = useState("");
@@ -93,7 +93,7 @@ export function Auth({ menu }) {
             </DrawerClose>
           </DrawerHeader>
           <div className="px-4">
-            <Promo />
+            <Promo gallery={outlet?.gallery} />
           </div>
           <Separator className="my-4" />
           {step === 1 && <Phone />}
@@ -108,7 +108,7 @@ export function Auth({ menu }) {
 function Phone() {
   const { phone, setPhone, setStep, setOtp } = useContext(AuthContext);
   const handleNext = async () => {
-    const response = await getOTP(phone)
+    const response = await getOTP(phone);
     if (response) {
       setOtp(response.otp);
       setStep(2);
@@ -220,7 +220,7 @@ function Name({ setDrawer }) {
   );
 }
 
-export function Promo() {
+export function Promo({ gallery }) {
   const plugin = useRef(
     Autoplay({ delay: 2000, stopOnInteraction: false }),
   );
@@ -233,38 +233,20 @@ export function Promo() {
       onMouseLeave={plugin.current.reset}
     >
       <CarouselContent>
-        <CarouselItem>
-          <div className="flex aspect-video items-center justify-center">
-            <Image
-              src="/pizza.jpg"
-              alt="pizza"
-              width={200}
-              height={200}
-              className="w-full h-full object-cover rounded-xl"
-            />
-          </div>
-        </CarouselItem>
-        <CarouselItem>
-          <div className="flex aspect-video items-center justify-center">
-            <img
-              src="https://b.zmtcdn.com/data/pictures/2/20415942/d8ad25988e906612aea78a82543e25c7.jpg?output-format=webp&fit=around|771.75:416.25&crop=771.75:416.25;*,*"
-              alt="burger"
-              width={200}
-              height={200}
-              className="w-full h-full object-cover rounded-xl"
-            />
-          </div>
-        </CarouselItem>
-        <CarouselItem>
-          <div className="flex aspect-video items-center justify-center">
-            <img
-              src="https://b.zmtcdn.com/data/pictures/chains/7/19016907/bedddb08e3eafa541fdec9db26613993.jpg?output-format=webp&fit=around|300:273&crop=300:273;*,*"
-              width={200}
-              height={200}
-              className="w-full h-full object-cover rounded-xl"
-            />
-          </div>
-        </CarouselItem>
+        {gallery &&
+          gallery.map((url, index) => (
+            <CarouselItem key={index}>
+              <div className="flex aspect-video items-center justify-center">
+                <Image
+                  src={url}
+                  alt="Pizza"
+                  width={200}
+                  height={200}
+                  className="w-full h-full object-cover rounded-xl"
+                />
+              </div>
+            </CarouselItem>
+          ))}
       </CarouselContent>
     </Carousel>
   );
