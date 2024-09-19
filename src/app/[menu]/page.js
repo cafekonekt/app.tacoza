@@ -27,11 +27,11 @@ export default async function Home({ params }) {
     <>
       <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden bg-white">
         {/* Header */}
-        <Header params={params} />
+        <Header params={params} outlet={outlet}/>
         {/* Breadcrumb */}
         <BreadCrumb params={params} />
         {/* Outlet Image */}
-        <Gallery />
+        <Gallery outlet={outlet} />
         {/* Restaurant Details */}
         <Details outlet={outlet} />
         {/* Call Waiter, Bookmark, Share */}

@@ -21,7 +21,7 @@ export default async function Orders({ params }) {
   return (
     <main className="grid gap-4 p-6">
       {/* Header */}
-      <Header params={params} session={session} />
+      <Header params={params} session={session} outlet={outlet} />
       {/* Breadcrumb */}
       <BreadCrumb params={params} />
       {/* Restaurant Info */}
