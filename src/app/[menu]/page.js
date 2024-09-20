@@ -23,12 +23,11 @@ export default async function Home({ params }) {
   ]);
   if (!items) notFound();
   if (!outlet) notFound();
-  console.log(items);
   return (
     <>
       <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden bg-white">
         {/* Header */}
-        <Header params={params} outlet={outlet} />
+        <Header />
         {/* Breadcrumb */}
         <BreadCrumb params={params} />
         {/* Outlet Image */}

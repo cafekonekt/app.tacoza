@@ -48,7 +48,7 @@ const apiRequest = async (endpoint, options = {}, timeout = 10000) => {
     if (response.status === 404) {
       throw new HttpError(404, "Not Found", response.url);
     }
-    if (response.status === 200 || response.status === 202) {
+    if (response.status === 200 || response.status === 201) {
       return await response.json();
     }
     throw new HttpError(response.status, response.statusText, response.url);

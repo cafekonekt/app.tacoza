@@ -29,7 +29,7 @@ export default async function Home({ params }) {
     <>
       <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden">
         {/* Header */}
-        <Header params={params} outlet={outlet} />
+        <Header />
         {/* Breadcrumb */}
         <BreadCrumb params={params} />
         {/* Outlet Image */}

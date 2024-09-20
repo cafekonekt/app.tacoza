@@ -113,60 +113,63 @@ export default async function Order({ params }) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      
-        {order.payment_status === "Success" && (
-          <section className="flex flex-col justify-center items-center">
-            <PaymentSuccessAnimation />
-            <span className="text-green-600 font-bold text-lg">
-              Payment Received
-            </span>
-            <span className="text-sm text-center">
-              Rs. 160 via Cashfree <br /> Ref Id: XXXX23423XXXX
-            </span>
-          </section>
-        )}
-  
-        {/* Payment Processing */}
-        {order.payment_status === "Pending" && (
-          <section className="flex flex-col justify-center items-center">
-            <PaymentFailAnimation />
-            <span className="text-blue-600 font-bold text-lg">
-              Your payment is processing.
-            </span>
-            <span className="text-sm text-center">
-              Please wait, do not make another payment until it is complete.
-            </span>
-          </section>
-        )}
-  
-        {/* Payment Failed */}
-        {order.payment_status === "Failed" && (
-          <section className="flex flex-col justify-center items-center">
-            <PaymentFailAnimation />
-            <span className="text-red-600 font-bold text-lg">Payment Failed</span>
-            <span className="text-sm text-center">
-              Customer rejected UPI request or other failure reasons.
-            </span>
-            <Payment order={order} params={params} />
-          </section>
-        )}
 
-      
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-green-600 items-center">
-          <FoodPreparingAnimation />
-          <span className="text-secondary font-bold">Preparing your order</span>
-          <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
-            <Timer className="w-4 h-4 mr-1" />
-            Est.{" "}
-            {Math.floor(
-              (new Date(order.created_at).getTime() -
-                new Date(order.updated_at).getTime()) /
-                (1000 * 60),
-            )}{" "}
-            mins • Ontime
+      {order.payment_status === "success" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentSuccessAnimation />
+          <span className="text-green-600 font-bold text-lg">
+            Payment Received
           </span>
-        </CardHeader>
+          <span className="text-sm text-center">
+            Rs. { order.total }<br /> Ref Id: XXXX23423XXXX
+          </span>
+        </section>
+      )}
+
+      {/* Payment Processing */}
+      {order.payment_status === "pending" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentFailAnimation />
+          <span className="text-blue-600 font-bold text-lg">
+            Your payment is processing.
+          </span>
+          <span className="text-sm text-center">
+            Please wait, do not make another payment until it is complete.
+          </span>
+        </section>
+      )}
+
+      {/* Payment Failed */}
+      {order.payment_status === "failed" || order.payment_status === "active" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentFailAnimation />
+          <span className="text-red-600 font-bold text-lg">Payment Failed</span>
+          <span className="text-sm text-center">
+            Customer rejected UPI request or other failure reasons.
+          </span>
+          <Payment order={order} params={params} />
+        </section>
+      )}
+
+
+      <Card className="overflow-hidden">
+        {
+          order.status === "preparing" && (
+            <CardHeader className="bg-green-600 items-center">
+              <FoodPreparingAnimation />
+              <span className="text-secondary font-bold">Preparing your order</span>
+              <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
+                <Timer className="w-4 h-4 mr-1" />
+                Est.{" "}
+                {Math.floor(
+                  (new Date(order.created_at).getTime() -
+                    new Date(order.updated_at).getTime()) /
+                  (1000 * 60),
+                )}{" "}
+                mins • Ontime
+              </span>
+            </CardHeader>)
+        }
         <CardContent>
           <div className="text-sm mt-4">
             <div className="flex justify-between">

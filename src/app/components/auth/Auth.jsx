@@ -1,15 +1,7 @@
 "use client";
-import { createContext, useContext, useEffect, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useMemo } from "react";
 import Image from "next/image";
-// icons
 import { X } from "lucide-react";
-import Autoplay from "embla-carousel-autoplay";
-// components ui
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -31,23 +23,24 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
-// hooks
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useDrawer } from "@/context/DrawerContext";
-// server actions
 import { getOTP } from "@/app/lib/auth/getOTP";
 import { verifyOTP } from "@/app/lib/auth/verifyOTP";
 import { updateUser } from "@/app/lib/auth/updateUser";
 
+// AuthContext remains unchanged
 const AuthContext = createContext();
 
-export function Auth({ menu, outlet }) {
+// A custom hook to handle the logic related to authentication states
+const useAuthLogic = () => {
   const [step, setStep] = useState(1);
   const [otpTimer, setOtpTimer] = useState(30);
+  const [resendCount, setResendCount] = useState(0); // Track resend attempts
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const { isDrawerOpen, setIsDrawerOpen } = useDrawer();
 
+  // OTP Timer logic moved to custom hook
   useEffect(() => {
     if (step === 2) {
       const interval = setInterval(() => {
@@ -57,28 +50,37 @@ export function Auth({ menu, outlet }) {
     }
   }, [step]);
 
-  useEffect(() => {
-    console.log("step", step);
-    console.log("isDrawerOpen", isDrawerOpen);
-  }, [step, isDrawerOpen]);
+  return {
+    step, setStep, otpTimer, setOtpTimer, phone, setPhone, otp, setOtp, resendCount, setResendCount,
+  };
+};
+
+export function Auth() {
+  const { isDrawerOpen, setIsDrawerOpen } = useDrawer();
+  console.log("Auth component rendered: ", isDrawerOpen);
+
+  // Use a custom hook to encapsulate the auth logic and prevent unnecessary re-renders
+  const authValues = useAuthLogic();
+
+  // Memoize the context value to prevent unnecessary renders
+  const authContextValue = useMemo(() => authValues, [authValues]);
 
   useEffect(() => {
+    console.log("Auth rendered");
     return () => {
-      console.log("Component unmounting");
+      console.log("Drawer Provider Unmounted: ", isDrawerOpen);
     };
-  }, []);
+  })
 
   return (
-    <AuthContext.Provider
-      value={{ step, setStep, phone, setPhone, otp, setOtp, otpTimer }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerTrigger asChild>
           <Button variant="outline" className="h-8 w-fit ml-auto">
             Login
           </Button>
         </DrawerTrigger>
-        <DrawerContent className="h-[69vh]">
+        <DrawerContent className="h-[75vh]">
           <DrawerHeader className="flex items-start w-full">
             <div className="flex flex-col items-start w-full">
               <DrawerDescription className="flex items-center">
@@ -104,12 +106,20 @@ export function Auth({ menu, outlet }) {
             </DrawerClose>
           </DrawerHeader>
           <div className="px-4">
-            <Promo gallery={outlet?.gallery} />
+            <Image
+              src="/banner-thumb.png"
+              alt="banner"
+              width={200}
+              height={200}
+              className="h-40 w-full object-cover rounded-lg"
+            />
           </div>
           <Separator className="my-4" />
-          {step === 1 && <Phone />}
-          {step === 2 && <Otp setDrawer={setIsDrawerOpen} />}
-          {step === 3 && <Name setDrawer={setIsDrawerOpen} />}
+          <div className="h-full px-4 pb-6">
+            {authValues.step === 1 && <Phone />}
+            {authValues.step === 2 && <Otp setDrawer={setIsDrawerOpen} />}
+            {authValues.step === 3 && <Name setDrawer={setIsDrawerOpen} />}
+          </div>
         </DrawerContent>
       </Drawer>
     </AuthContext.Provider>
@@ -118,17 +128,18 @@ export function Auth({ menu, outlet }) {
 
 function Phone() {
   console.log("Current step in Auth component:");
-  const { phone, setPhone, setStep, setOtp } = useContext(AuthContext);
+  const { phone, setPhone, setStep, setOtp, setResendCount } = useContext(AuthContext);
   const handleNext = async () => {
     const response = await getOTP(phone);
     if (response) {
       setOtp(response.otp);
+      setResendCount(0); // Reset resend count on successful OTP request
       setStep(2);
     }
   };
   return (
-    <>
-      <div className="flex flex-col justify-center h-full gap-2 w-full px-4">
+    <div className="flex flex-col justify-between h-full">
+      <div className="flex flex-col justify-center gap-2 w-full">
         <Label>Mobile Number</Label>
         <PhoneInput
           placeholder="Enter Phone Number"
@@ -139,10 +150,8 @@ function Phone() {
           defaultCountry="IN"
         />
       </div>
-      <DrawerFooter>
-        <Button onClick={handleNext}>Get OTP</Button>
-      </DrawerFooter>
-    </>
+      <Button onClick={handleNext}>Get OTP</Button>
+    </div>
   );
 }
 
@@ -150,21 +159,47 @@ function Otp({ setDrawer }) {
   useEffect(() => {
     console.log("Rendering Otp component");
   }, []);
-  const pathname = usePathname();
-  const { phone, otp, setOtp, setStep, otpTimer } = useContext(AuthContext);
+  const {
+    phone,
+    otp,
+    setOtp,
+    setStep,
+    otpTimer,
+    setOtpTimer,
+    resendCount,
+    setResendCount,
+  } = useContext(AuthContext);
+
   const handleNext = async () => {
-    const response = await verifyOTP(phone, otp, pathname);
+    // setStep(3);
+    const response = await verifyOTP(phone, otp);
     if (response) {
+      // Only move to step 3 if name or email is missing
       if (!response.user.name || !response.user.email) {
+        console.log("User data incomplete moving to step 3");
         setStep(3);
       } else {
         setDrawer(false);
       }
     }
   };
+
+  const handleResend = async () => {
+    if (resendCount < 3) {
+      const response = await getOTP(phone);
+      if (response) {
+        setOtp(response.otp);
+        setOtpTimer(30); // Reset timer to 30 seconds
+        setResendCount((prev) => prev + 1); // Increment resend count
+      }
+    } else {
+      alert("You have reached the maximum number of OTP resend attempts.");
+    }
+  };
+
   return (
-    <>
-      <div className="flex flex-col gap-2 items-center w-full px-4">
+    <div className="flex flex-col justify-between h-full">
+      <div className="flex flex-col gap-2 items-center w-full">
         {otp}
         <Label>Enter OTP</Label>
         <InputOTP maxLength={6} value={otp} onChange={setOtp}>
@@ -184,13 +219,25 @@ function Otp({ setDrawer }) {
           </InputOTPGroup>
         </InputOTP>
         <p className="text-xs">
-          Resend in 00:{otpTimer.toString().padStart(2, "0")}
+          {resendCount < 3 ? (
+            <>
+              <button
+                className="text-rose-600 underline disabled:text-black disabled:no-underline"
+                variant="text"
+                onClick={handleResend}
+                disabled={otpTimer > 0}
+              >
+                Resend
+              </button>{" "}
+              in 00:{otpTimer.toString().padStart(2, "0")}
+            </>
+          ) : (
+            <span className="text-red-500">Max OTP attempts reached</span>
+          )}
         </p>
       </div>
-      <DrawerFooter>
-        <Button onClick={handleNext}>Continue</Button>
-      </DrawerFooter>
-    </>
+      <Button onClick={handleNext}>Continue</Button>
+    </div>
   );
 }
 
@@ -198,7 +245,6 @@ function Name({ setDrawer }) {
   useEffect(() => {
     console.log("Rendering Name component");
   }, []);
-  const pathname = usePathname();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -207,15 +253,15 @@ function Name({ setDrawer }) {
       console.error("Name and Email are required");
       return;
     }
-    const response = await updateUser(name, email, pathname);
+    const response = await updateUser(name, email);
     if (response) {
       setDrawer(false);
     }
   };
 
   return (
-    <>
-      <div className="flex flex-col gap-2 w-full px-4">
+    <div className="flex flex-col justify-between h-full">
+      <div className="flex flex-col gap-2 w-full">
         <Label>Name</Label>
         <Input
           placeholder="Rahul Tiwari"
@@ -223,7 +269,6 @@ function Name({ setDrawer }) {
           onChange={(e) => setName(e.target.value)}
           required
         />
-
         <Label>Email</Label>
         <Input
           type="email"
@@ -232,12 +277,18 @@ function Name({ setDrawer }) {
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
-      <DrawerFooter>
-        <Button onClick={handleNext}>Continue</Button>
-      </DrawerFooter>
-    </>
+      <Button onClick={handleNext}>Continue</Button>
+    </div>
   );
 }
+
+import Autoplay from "embla-carousel-autoplay";
+// components ui
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 
 export function Promo({ gallery }) {
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));

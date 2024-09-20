@@ -24,7 +24,7 @@ export function Details({ params, outlet }) {
         <div className="flex items-center gap-4">
           <div className="aspect-square">
             <Image
-              src={outlet.logo ? outlet.logo : ''}
+              src={outlet.logo ? outlet.logo : '/outlet-thumb.jpg'}
               alt="Restaurant"
               height="100"
               width="100"

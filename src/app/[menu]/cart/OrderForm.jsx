@@ -32,6 +32,9 @@ export function OrderForm({ params, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
   const router = useRouter();
+
+  const tableSelectRef = React.useRef(null); // 1. Create a ref for the SelectTrigger
+  
   const [order, setOrder] = React.useState({
     type: "dine_in",
     table_id: table?.id,
@@ -51,6 +54,7 @@ export function OrderForm({ params, tables, table, session }) {
     }
     if (order.type === "dine_in" && !order.table_id) {
       setAlert("Please select a table");
+      tableSelectRef.current?.focus();
       return;
     }
     setLoading(true);
@@ -61,6 +65,7 @@ export function OrderForm({ params, tables, table, session }) {
         table_id: order.table_id,
         instructions: order.instruction,
       });
+      console.log(response);
       if (response) {
         setOrder({ type: "dine_in" });
         const checkoutOptions = {
@@ -70,7 +75,7 @@ export function OrderForm({ params, tables, table, session }) {
         };
         cashfree.checkout(checkoutOptions).then(function (result) {
           if (result.error) {
-            alert(result.error.message);
+            console.error(result.error.message);
           }
           if (result.redirect) {
             console.log("Redirection");
@@ -92,23 +97,31 @@ export function OrderForm({ params, tables, table, session }) {
         <ToggleGroup
           id="type"
           type="single"
-          value="dine_in"
+          defaultValue="dine_in"
           onValueChange={(value) => {
             setOrder({ ...order, type: value });
           }}
         >
-          <ToggleGroupItem value="dine_in" className="border rounded-full">
+          <ToggleGroupItem
+            value="dine_in"
+            className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-50"
+          >
             <UtensilsCrossed className="h-3.5 w-3.5 mr-1" /> DineIn
           </ToggleGroupItem>
-          <ToggleGroupItem value="takeaway" className="border rounded-full">
+          <ToggleGroupItem
+            value="takeaway"
+            className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100"
+          >
             <Package className="h-3.5 w-3.5 mr-1" />
             Takeaway
           </ToggleGroupItem>
-          <ToggleGroupItem value="delivery" className="border rounded-full">
+          <ToggleGroupItem
+            value="delivery"
+            className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100"
+          >
             <Bike className="h-3.5 w-3.5 mr-1" /> Delivery
           </ToggleGroupItem>
         </ToggleGroup>
-
         <Label forhtml="instruction">Add Cooking Instruction</Label>
         <Textarea
           id="instruction"
@@ -116,17 +129,17 @@ export function OrderForm({ params, tables, table, session }) {
           placeholder="Add your cooking instruction"
           onChange={handleOrderType}
         />
-
-        <Label forhtml="table_id">Table</Label>
+        <Label htmlFor="table_id">Table</Label>
         <Select
           id="table_id"
           onValueChange={(value) => {
             setOrder({ ...order, table_id: value });
+            setAlert(null); // Clear alert when a table is selected
           }}
-          value={table?.id}
+          value={order.table_id || table?.id}
         >
-          <SelectTrigger>
-            <SelectValue placeholder={alert ? alert : "Select Table"} />
+          <SelectTrigger ref={tableSelectRef}>
+            <SelectValue placeholder="Select Table" />
           </SelectTrigger>
           <SelectContent>
             {tables.map((table, key) => (
@@ -136,6 +149,7 @@ export function OrderForm({ params, tables, table, session }) {
             ))}
           </SelectContent>
         </Select>
+        {alert && <p className="text-xs text-red-500">{alert}</p>}
       </Card>
       <Summary totalPrice={totalPrice} />
       <Button

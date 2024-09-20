@@ -1,3 +1,4 @@
+"use server"
 import {
   BellRing,
   BookmarkPlus,
@@ -5,7 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function Call() {
+export async function Call() {
   return (
     <div className="flex gap-2">
       <Button>

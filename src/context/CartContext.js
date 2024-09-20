@@ -19,16 +19,20 @@ export const CartProvider = ({ children }) => {
   const pathname = usePathname();
   const outletSlug = pathname.split("/")[1];
 
-  const fetchCartItems = async () => {
-    const cartItems = await getCart(outletSlug);
-    if (cartItems) {
-      setCartItems(cartItems);
-    }
-  };
-
+  
   useEffect(() => {
+    const fetchCartItems = async () => {
+      const cartItems = await getCart(outletSlug);
+      if (cartItems) {
+        setCartItems(cartItems);
+      }
+    };
     fetchCartItems();
-  }, []);
+    console.log("Cart Provider Mounted");
+    return () => {
+      console.log("Cart Provider Unmounted");
+    }
+  }, [outletSlug]);
 
   // Function to add item to cart
   const addToCart = async (item, variant, addons, totalPrice, quantity) => {
@@ -88,18 +92,18 @@ export const CartProvider = ({ children }) => {
       prevItems.map((item) =>
         item.item_id === item_id
           ? {
-              ...item,
-              totalPrice:
-                item.addons.reduce(
-                  (sum, addon) => sum + parseFloat(addon.price),
-                  0,
-                ) +
-                (item.variant
-                  ? parseFloat(item.variant.price)
-                  : parseFloat(item.food_item.price)) *
-                  newQuantity,
-              quantity: newQuantity,
-            }
+            ...item,
+            totalPrice:
+              item.addons.reduce(
+                (sum, addon) => sum + parseFloat(addon.price),
+                0,
+              ) +
+              (item.variant
+                ? parseFloat(item.variant.price)
+                : parseFloat(item.food_item.price)) *
+              newQuantity,
+            quantity: newQuantity,
+          }
           : item,
       ),
     );
@@ -134,7 +138,6 @@ export const CartProvider = ({ children }) => {
   return (
     <CartContext.Provider
       value={{
-        fetchCartItems,
         cartItems,
         addToCart,
         updateQuantity,

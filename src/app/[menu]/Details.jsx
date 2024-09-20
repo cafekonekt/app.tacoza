@@ -1,7 +1,8 @@
+"use server";
 import { Star, MapPin, Phone, LeafyGreen, Timer } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export function Details({ outlet }) {
+export async function Details({ outlet }) {
   return (
     <section className="w-full flex justify-between my-4">
       <div>

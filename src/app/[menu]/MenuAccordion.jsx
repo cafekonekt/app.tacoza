@@ -123,14 +123,13 @@ export function MenuItemComponent({ item }) {
             <Image
               src={item.image_url ? item.image_url : ''}
               alt={item.name}
-              width={50}
-              height={50}
-              className="w-full h-full object-cover rounded-xl"
+              layout="fill"
+              className="object-cover rounded-lg"
             />
+
             <div
-              className={`absolute ${
-                item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
-              } flex flex-col items-center`}
+              className={`absolute ${item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
+                } flex flex-col items-center`}
             >
               <Customize item={item} />
               {item.variants && (
@@ -176,19 +175,19 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-          category.sub_categories.length > 0
+            category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-              category.sub_categories.map((subCategory) => (
-                <CategoryComponent
-                  key={subCategory.name}
-                  category={subCategory}
-                  depth={depth + 1} // Increment the depth for subcategories
-                />
-              ))
+            category.sub_categories.map((subCategory) => (
+              <CategoryComponent
+                key={subCategory.name}
+                category={subCategory}
+                depth={depth + 1} // Increment the depth for subcategories
+              />
+            ))
             : // If no subcategories, render the menu items
-              category.food_items.map((item) => (
-                <MenuItemComponent key={item.name} item={item} />
-              ))}
+            category.food_items.map((item) => (
+              <MenuItemComponent key={item.name} item={item} />
+            ))}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -207,33 +206,34 @@ export function SearchMenu({ items }) {
     ),
   ]);
 
-  // Recursively search through categories and subcategories
-  const searchItems = (category) => {
-    let results = [];
-    // Search food_items in the current category
-    category.food_items.forEach((item) => {
-      if (
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        results.push(item);
-      }
-    });
-    // Search sub_categories recursively
-    if (
-      Array.isArray(category.sub_categories) &&
-      category.sub_categories.length > 0
-    ) {
-      category.sub_categories.forEach((subCategory) => {
-        results = [...results, ...searchItems(subCategory)];
-      });
-    }
-
-    return results;
-  };
 
   // Handle search logic
   useEffect(() => {
+    // Recursively search through categories and subcategories
+    const searchItems = (category) => {
+      let results = [];
+      // Search food_items in the current category
+      category.food_items.forEach((item) => {
+        if (
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        ) {
+          results.push(item);
+        }
+      });
+      // Search sub_categories recursively
+      if (
+        Array.isArray(category.sub_categories) &&
+        category.sub_categories.length > 0
+      ) {
+        category.sub_categories.forEach((subCategory) => {
+          results = [...results, ...searchItems(subCategory)];
+        });
+      }
+
+      return results;
+    };
+
     if (searchQuery === "") {
       setFilteredItems([]);
       return;
@@ -296,15 +296,15 @@ export function SearchMenu({ items }) {
           {/* Display search results */}
           {!loading && filteredItems.length > 0
             ? filteredItems.map((item) => (
-                <div className="overflow-y-scroll" key={item.name}>
-                  <MenuItemComponent item={item} />
-                </div>
-              ))
+              <div className="overflow-y-scroll" key={item.name}>
+                <MenuItemComponent item={item} />
+              </div>
+            ))
             : !loading && (
-                <p className="text-center text-gray-500 text-sm">
-                  Nothing found
-                </p>
-              )}
+              <p className="text-center text-gray-500 text-sm">
+                Nothing found
+              </p>
+            )}
         </div>
       </DrawerContent>
     </Drawer>
@@ -312,6 +312,7 @@ export function SearchMenu({ items }) {
 }
 
 export function MenuAccordion({ items }) {
+  console.log("Menu Accordion")
   const [focusCategory, setFocusCategory] = useState(null);
   const [foodTypeFilter, setFoodTypeFilter] = useState(null);
 
