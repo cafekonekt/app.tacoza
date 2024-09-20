@@ -23,7 +23,8 @@ export default async function Home({ params }) {
     getTable(table_id),
     waitPromisForLoader,
   ]);
-  if (!table) notFound();
+  console.log(table)
+  if (table.status===404) notFound();
 
   return (
     <>

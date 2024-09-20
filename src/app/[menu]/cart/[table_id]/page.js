@@ -19,7 +19,7 @@ export default async function Orders({ params }) {
     getTable(table_id),
     getOutlet(menu),
   ]);
-  if (!table) return notFound();
+  if (table.status===404) notFound();
   const tables = [table];
   return (
     <main className="grid gap-4 p-6">

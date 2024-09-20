@@ -23,7 +23,6 @@ import { Summary } from "@/app/components/orderForm/Summary";
 import { checkout } from "@/app/lib/order/checkout";
 // hooks
 import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation";
 import { useDrawer } from "@/context/DrawerContext";
 
 import { cashfree } from "@/app/util/cashfree";
@@ -31,7 +30,6 @@ import { cashfree } from "@/app/util/cashfree";
 export function OrderForm({ params, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
-  const router = useRouter();
 
   const tableSelectRef = React.useRef(null); // 1. Create a ref for the SelectTrigger
   
@@ -136,7 +134,7 @@ export function OrderForm({ params, tables, table, session }) {
             setOrder({ ...order, table_id: value });
             setAlert(null); // Clear alert when a table is selected
           }}
-          value={order.table_id || table?.id}
+          value={order.table_id || table?.table_id}
         >
           <SelectTrigger ref={tableSelectRef}>
             <SelectValue placeholder="Select Table" />
