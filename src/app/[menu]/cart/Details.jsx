@@ -23,7 +23,7 @@ export function Details({ params, outlet }) {
         <div className="flex items-center gap-4">
           <div className="aspect-square">
             <Image
-              src="/pizza.jpg"
+              src="/outlet-thumb.jpg"
               alt="Restaurant"
               height="100"
               width="100"

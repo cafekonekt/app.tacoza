@@ -6,14 +6,22 @@ export function Gallery({ outlet }) {
   console.log("Gallery", outlet);
   return (
     <div className="relative">
-      {outlet.gallery?.length > 0 && <Promo gallery={outlet.gallery}/>}
+      {(outlet.gallery?.length > 0 && <Promo gallery={outlet.gallery} />) || (
+        <Image
+          src="/banner-thumb.png"
+          alt="banner"
+          width={200}
+          height={200}
+          className="h-40 w-full object-cover rounded-lg"
+        />
+      )}
       <div className="absolute flex items-center bottom-0 right-0 rounded-full text-xs px-1.5 bg-black/30  shadow-md text-white m-2">
         <Images className="h-3-5 w-3.5 mr-1" /> More
       </div>
       <div className="absolute bottom-0 left-0 flex items-end">
         <Image
-          src={outlet?.logo || "/images/food.jpg"}
-          alt="gallery"
+          src={outlet?.logo || "/outlet-thumb.jpg"}
+          alt="logo"
           width={50}
           height={50}
           className=" m-2 h-10 w-10 object-cover rounded-full"

@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { MapPin } from "lucide-react";
+import Image from "next/image";
 
 export function Footer({ outlet }) {
   return (
@@ -18,10 +19,13 @@ export function Footer({ outlet }) {
       <Separator className="my-4" />
 
       <div aria-hidden="true" className="flex items-center gap-2">
-        <img
-          className="h-6"
-          src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_120,h_60/fssai_final_edss9i"
+        <Image
+          className="h-6 w-12"
+          src="/fssai.avif"
           alt="FSSAI"
+          width={120}
+          height={60}
+          draggable={false}
         />
         <p className="text-muted-foreground/70 text-xs">
           License No. XX2235500XXXXX
