@@ -11,6 +11,7 @@ import Link from "next/link";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 export function Details({ params, outlet }) {
+  console.log(outlet)
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-rose-50">
@@ -23,7 +24,7 @@ export function Details({ params, outlet }) {
         <div className="flex items-center gap-4">
           <div className="aspect-square">
             <Image
-              src="/outlet-thumb.jpg"
+              src={outlet.logo ? outlet.logo : '/outlet-thumb.jpg'}
               alt="Restaurant"
               height="100"
               width="100"

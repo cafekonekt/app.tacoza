@@ -1,3 +1,4 @@
+'use server'
 import { ChevronLeft, ChevronRightIcon, RotateCcwSquare } from "lucide-react";
 import {
   Breadcrumb,
@@ -10,9 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+
 import Link from "next/link";
 import Image from "next/image";
-import { getOrders } from "@/app/lib/order/getOrders";
+
+import { notFound } from "next/navigation";
+import { getSession, logout } from "@/app/lib/auth/session";
+import { apiGet } from "@/handlers/apiHandler";
 
 const iconMap = {
   veg: "/veg.svg",
@@ -20,13 +25,18 @@ const iconMap = {
   egg: "/egg.svg",
 };
 
-export default async function Order({ params }) {
-  const outletSlug = params.menu;
-  const orderHistory = await getOrders(params);
+export default async function Order() {
+  const user = await getSession();
+  const orderHistory = await apiGet(`/api/shop/orders/`, {
+    headers: {
+      Authorization: `Bearer ${user?.tokens?.access}`,
+    },
+  });
+  if (orderHistory.status===404 || orderHistory.status===401) notFound();
   return (
     <main className="max-w-lg p-4 gap-4 grid" suppressHydrationWarning>
       <h2 className="text-2xl font-semibold">
-        <Link href={`/${outletSlug}`}>
+        <Link href={`/`}>
           <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -37,12 +47,6 @@ export default async function Order({ params }) {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">HOME</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/${outletSlug}`}>
-              {outletSlug.toUpperCase()}
-            </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -66,12 +70,12 @@ export default async function Order({ params }) {
               </div>
               <div className="text-muted-foreground text-sm">
                 <div className="text-base text-primary font-semibold">
-                  Sagar Gaire, Chhindwara
+                  {order.outlet.name}
                 </div>
-                Liam Johnson1234 Main St.Anytown, CA 12345
+                {order.outlet.location}
                 <div className="flex items-center gap-1">
                   <Link
-                    href="tel:+1234567890"
+                    href={`/${order.outlet.menu_slug}`}
                     className="flex items-center text-blue-500"
                   >
                     View Menu <ChevronRightIcon className="h-4 w-4 mt-1" />
@@ -98,12 +102,12 @@ export default async function Order({ params }) {
               </div>
             ))}
             <Separator />
-            <Link href={`/${outletSlug}/order/${order.order_id}`}>
+            <Link href={`/order/${order.order_id}`}>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-sm font-medium text-muted-foreground truncate">
                   Ordered on {new Date(order.created_at).toLocaleDateString()},{" "}
                   {new Date(order.created_at).toLocaleTimeString()}
-                  <p className="text-base">Completed</p>
+                  <p className="text-base">{order.status.toUpperCase()}</p>
                 </span>
                 <span className="flex items-center text-base font-medium">
                   ₹ {order.total} <ChevronRightIcon className="h-4 w-4" />

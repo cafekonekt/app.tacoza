@@ -1,9 +1,9 @@
+"use server";
 import { Promo } from "@/app/components/auth/Auth";
 import { Images } from "lucide-react";
 import Image from "next/image";
 
-export function Gallery({ outlet }) {
-  console.log("Gallery", outlet);
+export async function Gallery({ outlet }) {
   return (
     <div className="relative">
       {(outlet.gallery?.length > 0 && <Promo gallery={outlet.gallery} />) || (

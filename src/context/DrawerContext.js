@@ -9,6 +9,13 @@ export const DrawerProvider = ({ children }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
 
+  useEffect(() => {
+    console.log("Drawer Provider Mounted");
+    return () => {
+      console.log("Drawer Provider Unmounted");
+    };
+  }, []);
+
   const openDrawer = (item) => {
     setIsDrawerOpen(true);
     setCurrentItem(item);

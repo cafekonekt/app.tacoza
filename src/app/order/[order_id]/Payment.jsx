@@ -4,7 +4,6 @@ import { cashfree } from "@/app/util/cashfree";
 import { RefreshCcw } from "lucide-react";
 
 export function Payment({ order, params }) {
-  console.log(order);
   const handlePayment = async () => {
     const checkoutOptions = {
       paymentSessionId: order.payment_session_id,

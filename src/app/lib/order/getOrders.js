@@ -1,20 +1,27 @@
 "use server";
-import { getSession } from "@/app/lib/auth/session";
+import { getSession, logout } from "@/app/lib/auth/session";
 import { apiGet } from "@/handlers/apiHandler";
 import { revalidatePath } from "next/cache";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-export async function getOrders(params) {
+export async function getOrders() {
   const user = await getSession();
   try {
-    const response = await apiGet(`/api/shop/orders/${params?.menu}`, {
+    const response = await apiGet(`/api/shop/orders/`, {
       headers: {
         Authorization: `Bearer ${user.tokens.access}`,
       },
     });
-    revalidatePath(`/${params?.menu}/order`);
+    // Handle specific status codes
+    if (response.status === 401) {
+      await logout();
+    } else if (response.status === 404) {
+      notFound();
+    }
+    revalidatePath(`/order`);
     return response;
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -26,10 +33,17 @@ export async function getOrder(params) {
       headers: {
         Authorization: `Bearer ${user.tokens.access}`,
       },
-    }); 
-    revalidatePath(`/${params?.menu}/order/${params?.orderId}`);
+    });
+    // Handle specific status codes
+    if (response.status === 401) {
+      logout();
+    } else if (response.status === 404) {
+      notFound();
+    }
+    revalidatePath(`/order/${params?.orderId}`);
     return response;
   } catch (error) {
+    console.error(error, 'error in action');
     return null;
   }
 }

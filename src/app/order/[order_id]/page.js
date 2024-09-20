@@ -65,15 +65,34 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { getPayment } from "@/app/lib/order/getPayment";
 
 export default async function Order({ params }) {
   const order = await getOrder(params);
+  console.log(order);
   if (!order) return notFound();
+  // const orderResponse = await getPayment(params);
+  // const paymentSuccess = orderResponse.some(
+  //   (transaction) =>
+  //     transaction.find(([key, value]) => key === "payment_status")[1] ===
+  //     "SUCCESS",
+  // );
+  // const paymentPending = orderResponse.some(
+  //   (transaction) =>
+  //     transaction.find(([key, value]) => key === "payment_status")[1] ===
+  //     "PENDING",
+  // );
+  // const paymentFailed = orderResponse.every(
+  //   (transaction) =>
+  //     transaction.find(([key, value]) => key === "payment_status")[1] ===
+  //     "FAILED",
+  // );
+
   return (
     <main className="max-w-lg p-4 gap-4 grid">
       <h2 className="text-2xl font-semibold">
         <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
-          <Link href={`/${params.menu}/order`}>
+          <Link href={`/order`}>
             <ChevronLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -82,21 +101,11 @@ export default async function Order({ params }) {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/">
-              <Home className="h-4 w-4" />
-            </BreadcrumbLink>
+            <BreadcrumbLink href="/">HOME</BreadcrumbLink>
           </BreadcrumbItem>
-          {/* <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href={`/${params.menu}`}>
-              {params.menu.toUpperCase()}
-            </BreadcrumbLink>
-          </BreadcrumbItem> */}
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href={`/${params.menu}/order`}>
-              ORDERS
-            </BreadcrumbLink>
+            <BreadcrumbLink href={`/order`}>ORDERS</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -105,42 +114,62 @@ export default async function Order({ params }) {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Payment Success */}
-      <section className="flex flex-col justify-center items-center">
-        <PaymentSuccessAnimation />
-        <span className="text-green-600 font-bold text-lg">
-          Payment Recieved
-        </span>
-        <span className="text-sm text-center">
-          Rs. 160 via Cashfree <br /> Ref Id: XXXX23423XXXX
-        </span>
-      </section>
+      {order.payment_status === "success" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentSuccessAnimation />
+          <span className="text-green-600 font-bold text-lg">
+            Payment Received
+          </span>
+          <span className="text-sm text-center">
+            Rs. { order.total }<br /> Ref Id: XXXX23423XXXX
+          </span>
+        </section>
+      )}
+
+      {/* Payment Processing */}
+      {order.payment_status === "pending" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentFailAnimation />
+          <span className="text-blue-600 font-bold text-lg">
+            Your payment is processing.
+          </span>
+          <span className="text-sm text-center">
+            Please wait, do not make another payment until it is complete.
+          </span>
+        </section>
+      )}
 
       {/* Payment Failed */}
-      <section className="flex flex-col justify-center items-center">
-        <PaymentFailAnimation />
-        <span className="text-red-600 font-bold text-lg">Payment Failed</span>
-        <span className="text-sm text-center">
-          Customer rejected upi request.
-        </span>
-        <Payment order={order} params={params} />
-      </section>
+      {order.payment_status === "failed" || order.payment_status === "active" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentFailAnimation />
+          <span className="text-red-600 font-bold text-lg">Payment Failed</span>
+          <span className="text-sm text-center">
+            Customer rejected UPI request or other failure reasons.
+          </span>
+          <Payment order={order} params={params} />
+        </section>
+      )}
+
 
       <Card className="overflow-hidden">
-        <CardHeader className="bg-green-600 items-center">
-          <FoodPreparingAnimation />
-          <span className="text-secondary font-bold">Preparing your order</span>
-          <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
-            <Timer className="w-4 h-4 mr-1" />
-            Est.{" "}
-            {Math.floor(
-              (new Date(order.created_at).getTime() -
-                new Date(order.updated_at).getTime()) /
-                (1000 * 60),
-            )}{" "}
-            mins • Ontime
-          </span>
-        </CardHeader>
+        {
+          order.status === "preparing" && (
+            <CardHeader className="bg-green-600 items-center">
+              <FoodPreparingAnimation />
+              <span className="text-secondary font-bold">Preparing your order</span>
+              <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
+                <Timer className="w-4 h-4 mr-1" />
+                Est.{" "}
+                {Math.floor(
+                  (new Date(order.created_at).getTime() -
+                    new Date(order.updated_at).getTime()) /
+                  (1000 * 60),
+                )}{" "}
+                mins • Ontime
+              </span>
+            </CardHeader>)
+        }
         <CardContent>
           <div className="text-sm mt-4">
             <div className="flex justify-between">
@@ -177,6 +206,12 @@ export default async function Order({ params }) {
                     <TimelineDot status="done" />
                     <TimelineLine done />
                     <TimelineContent>{order.created_at}</TimelineContent>
+                  </TimelineItem>
+                  <TimelineItem>
+                    <TimelineHeading>Payment</TimelineHeading>
+                    <TimelineDot status="error" />
+                    <TimelineLine />
+                    <TimelineContent>Failed</TimelineContent>
                   </TimelineItem>
                   <TimelineItem>
                     <TimelineHeading>Preparing Food</TimelineHeading>
@@ -255,18 +290,18 @@ export default async function Order({ params }) {
             <dl className="grid gap-3">
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Customer</dt>
-                <dd>Liam Johnson</dd>
+                <dd>{order.user.name}</dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Email</dt>
                 <dd>
-                  <a href="mailto:">liam@acme.com</a>
+                  <a href="mailto:">{order.user.email}</a>
                 </dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Phone</dt>
                 <dd>
-                  <a href="tel:">+1 234 567 890</a>
+                  <a href="tel:">{order.user.phone}</a>
                 </dd>
               </div>
             </dl>

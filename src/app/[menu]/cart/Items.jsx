@@ -19,7 +19,6 @@ const iconMap = {
 
 export function Items() {
   const { cartItems } = useCart();
-  console.log(cartItems, "cartItems");
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-rose-50">

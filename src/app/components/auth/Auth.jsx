@@ -1,7 +1,5 @@
-// Adding a resend count state and fixing third step behavior
-
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,18 +28,19 @@ import { useDrawer } from "@/context/DrawerContext";
 import { getOTP } from "@/app/lib/auth/getOTP";
 import { verifyOTP } from "@/app/lib/auth/verifyOTP";
 import { updateUser } from "@/app/lib/auth/updateUser";
-import Link from "next/link";
 
+// AuthContext remains unchanged
 const AuthContext = createContext();
 
-export function Auth({ menu, outlet }) {
+// A custom hook to handle the logic related to authentication states
+const useAuthLogic = () => {
   const [step, setStep] = useState(1);
   const [otpTimer, setOtpTimer] = useState(30);
   const [resendCount, setResendCount] = useState(0); // Track resend attempts
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const { isDrawerOpen, setIsDrawerOpen } = useDrawer();
 
+  // OTP Timer logic moved to custom hook
   useEffect(() => {
     if (step === 2) {
       const interval = setInterval(() => {
@@ -51,21 +50,30 @@ export function Auth({ menu, outlet }) {
     }
   }, [step]);
 
+  return {
+    step, setStep, otpTimer, setOtpTimer, phone, setPhone, otp, setOtp, resendCount, setResendCount,
+  };
+};
+
+export function Auth() {
+  const { isDrawerOpen, setIsDrawerOpen } = useDrawer();
+  console.log("Auth component rendered: ", isDrawerOpen);
+
+  // Use a custom hook to encapsulate the auth logic and prevent unnecessary re-renders
+  const authValues = useAuthLogic();
+
+  // Memoize the context value to prevent unnecessary renders
+  const authContextValue = useMemo(() => authValues, [authValues]);
+
+  useEffect(() => {
+    console.log("Auth rendered");
+    return () => {
+      console.log("Drawer Provider Unmounted: ", isDrawerOpen);
+    };
+  })
+
   return (
-    <AuthContext.Provider
-      value={{
-        step,
-        setStep,
-        phone,
-        setPhone,
-        otp,
-        setOtp,
-        otpTimer,
-        setOtpTimer,
-        resendCount,
-        setResendCount,
-      }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerTrigger asChild>
           <Button variant="outline" className="h-8 w-fit ml-auto">
@@ -108,9 +116,9 @@ export function Auth({ menu, outlet }) {
           </div>
           <Separator className="my-4" />
           <div className="h-full px-4 pb-6">
-            {step === 1 && <Phone />}
-            {step === 2 && <Otp menu={menu} setDrawer={setIsDrawerOpen} />}
-            {step === 3 && <Name menu={menu} setDrawer={setIsDrawerOpen} />}
+            {authValues.step === 1 && <Phone />}
+            {authValues.step === 2 && <Otp setDrawer={setIsDrawerOpen} />}
+            {authValues.step === 3 && <Name setDrawer={setIsDrawerOpen} />}
           </div>
         </DrawerContent>
       </Drawer>
@@ -119,8 +127,8 @@ export function Auth({ menu, outlet }) {
 }
 
 function Phone() {
-  const { phone, setPhone, setStep, setOtp, setResendCount } =
-    useContext(AuthContext);
+  console.log("Current step in Auth component:");
+  const { phone, setPhone, setStep, setOtp, setResendCount } = useContext(AuthContext);
   const handleNext = async () => {
     const response = await getOTP(phone);
     if (response) {
@@ -148,7 +156,9 @@ function Phone() {
 }
 
 function Otp({ setDrawer }) {
-  const pathname = usePathname();
+  useEffect(() => {
+    console.log("Rendering Otp component");
+  }, []);
   const {
     phone,
     otp,
@@ -161,10 +171,12 @@ function Otp({ setDrawer }) {
   } = useContext(AuthContext);
 
   const handleNext = async () => {
-    const response = await verifyOTP(phone, otp, pathname);
+    // setStep(3);
+    const response = await verifyOTP(phone, otp);
     if (response) {
       // Only move to step 3 if name or email is missing
       if (!response.user.name || !response.user.email) {
+        console.log("User data incomplete moving to step 3");
         setStep(3);
       } else {
         setDrawer(false);
@@ -230,7 +242,9 @@ function Otp({ setDrawer }) {
 }
 
 function Name({ setDrawer }) {
-  const pathname = usePathname();
+  useEffect(() => {
+    console.log("Rendering Name component");
+  }, []);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -239,7 +253,7 @@ function Name({ setDrawer }) {
       console.error("Name and Email are required");
       return;
     }
-    const response = await updateUser(name, email, pathname);
+    const response = await updateUser(name, email);
     if (response) {
       setDrawer(false);
     }
@@ -278,7 +292,6 @@ import {
 
 export function Promo({ gallery }) {
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));
-
   return (
     <Carousel
       plugins={[plugin.current]}

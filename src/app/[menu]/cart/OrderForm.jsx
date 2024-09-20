@@ -23,7 +23,6 @@ import { Summary } from "@/app/components/orderForm/Summary";
 import { checkout } from "@/app/lib/order/checkout";
 // hooks
 import { useCart } from "@/context/CartContext";
-import { useRouter } from "next/navigation";
 import { useDrawer } from "@/context/DrawerContext";
 
 import { cashfree } from "@/app/util/cashfree";
@@ -31,8 +30,9 @@ import { cashfree } from "@/app/util/cashfree";
 export function OrderForm({ params, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
-  const router = useRouter();
+
   const tableSelectRef = React.useRef(null); // 1. Create a ref for the SelectTrigger
+  
   const [order, setOrder] = React.useState({
     type: "dine_in",
     table_id: table?.id,
@@ -45,24 +45,7 @@ export function OrderForm({ params, tables, table, session }) {
     setOrder({ ...order, [e.target.name]: e.target.value });
   };
 
-  const handlePayment = async () => {
-    let checkoutOptions = {
-      paymentSessionId: "payment-session-id",
-      returnUrl:
-        "https://test.cashfree.com/pgappsdemos/v3success.php?myorder={order_id}",
-    };
-    cashfree.checkout(checkoutOptions).then(function (result) {
-      if (result.error) {
-        alert(result.error.message);
-      }
-      if (result.redirect) {
-        console.log("Redirection");
-      }
-    });
-  };
-
   const handleSubmit = async () => {
-    console.log("Order", order, "session", session);
     if (!session) {
       openDrawer();
       return;
@@ -80,16 +63,17 @@ export function OrderForm({ params, tables, table, session }) {
         table_id: order.table_id,
         instructions: order.instruction,
       });
+      console.log(response);
       if (response) {
         setOrder({ type: "dine_in" });
-        console.log("Order created", response);
         const checkoutOptions = {
           paymentSessionId: response.payment_session_id,
-          returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
+          // returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
+          returnUrl: `http://localhost:3000/order/${response.order_id}`,
         };
         cashfree.checkout(checkoutOptions).then(function (result) {
           if (result.error) {
-            alert(result.error.message);
+            console.error(result.error.message);
           }
           if (result.redirect) {
             console.log("Redirection");
@@ -150,7 +134,7 @@ export function OrderForm({ params, tables, table, session }) {
             setOrder({ ...order, table_id: value });
             setAlert(null); // Clear alert when a table is selected
           }}
-          value={order.table_id || table?.id}
+          value={order.table_id || table?.table_id}
         >
           <SelectTrigger ref={tableSelectRef}>
             <SelectValue placeholder="Select Table" />
