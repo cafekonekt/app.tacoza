@@ -120,10 +120,13 @@ export function MenuItemComponent({ item }) {
         </div>
         <div className="col-span-2">
           <div className="relative flex flex-col items-center aspect-square align-top">
-            <img
-              src="https://media-assets.swiggy.com/swiggy/image/upload/f_auto,q_auto,fl_lossy/01cf72fa714c88dfe8d77145d6cf1091"
-              className="w-full h-full object-cover rounded-xl"
+            <Image
+              src="/food-thumb.jpg"
+              alt="Food Item"
+              layout="fill"
+              className="object-cover rounded-lg"
             />
+
             <div
               className={`absolute ${
                 item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"

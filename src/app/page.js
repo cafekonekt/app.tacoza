@@ -91,26 +91,29 @@ export function Ads() {
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"
+              alt="ad"
             />
           </div>
         </CarouselItem>
         <CarouselItem>
           <div className="flex h-20 items-center justify-center">
-            <img
-              src="https://b.zmtcdn.com/data/pictures/2/20415942/d8ad25988e906612aea78a82543e25c7.jpg?output-format=webp&fit=around|771.75:416.25&crop=771.75:416.25;*,*"
+            <Image
+              src="/banner-thumb.png"
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"
+              alt="ad"
             />
           </div>
         </CarouselItem>
         <CarouselItem>
           <div className="flex h-20 items-center justify-center">
-            <img
-              src="https://b.zmtcdn.com/data/pictures/chains/7/19016907/bedddb08e3eafa541fdec9db26613993.jpg?output-format=webp&fit=around|300:273&crop=300:273;*,*"
+            <Image
+              src="/banner-thumb.png"
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"
+              alt="ad"
             />
           </div>
         </CarouselItem>
