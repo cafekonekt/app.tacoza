@@ -44,24 +44,7 @@ export function OrderForm({ params, tables, table, session }) {
     setOrder({ ...order, [e.target.name]: e.target.value });
   };
 
-  const handlePayment = async () => {
-    let checkoutOptions = {
-      paymentSessionId: "payment-session-id",
-      returnUrl:
-        "https://test.cashfree.com/pgappsdemos/v3success.php?myorder={order_id}",
-    };
-    cashfree.checkout(checkoutOptions).then(function (result) {
-      if (result.error) {
-        alert(result.error.message);
-      }
-      if (result.redirect) {
-        console.log("Redirection");
-      }
-    });
-  };
-
   const handleSubmit = async () => {
-    console.log("Order", order, "session", session);
     if (!session) {
       openDrawer();
       return;
@@ -80,10 +63,10 @@ export function OrderForm({ params, tables, table, session }) {
       });
       if (response) {
         setOrder({ type: "dine_in" });
-        console.log("Order created", response);
         const checkoutOptions = {
           paymentSessionId: response.payment_session_id,
-          returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
+          // returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
+          returnUrl: `http://localhost:3000/order/${response.order_id}`,
         };
         cashfree.checkout(checkoutOptions).then(function (result) {
           if (result.error) {

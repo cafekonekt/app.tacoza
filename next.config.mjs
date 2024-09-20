@@ -6,7 +6,7 @@ const nextConfig = {
     },
   },
   images: {
-    domains: ["localhost", "tacoza.co", "*.tacoza.co"],
+    domains: ["localhost", "tacoza.co", "api.tacoza.co"],
   },
 };
 

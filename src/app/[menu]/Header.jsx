@@ -9,7 +9,7 @@ export async function Header({ params, outlet}) {
   return (
     <div className="flex justify-between">
       <Image src="/logo.png" alt="logo" width={150} height={100} />
-      {session ? <Menu menu={params.menu} /> : <Auth outlet={outlet} />}
+      {session ? <Menu /> : <Auth outlet={outlet} />}
     </div>
   );
 }

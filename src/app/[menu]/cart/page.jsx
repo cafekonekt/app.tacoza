@@ -17,7 +17,6 @@ export default async function Orders({ params }) {
     getTables(menu),
     getOutlet(menu),
   ]);
-  console.log("table", session, outlet);
   return (
     <main className="grid gap-4 p-6">
       {/* Header */}

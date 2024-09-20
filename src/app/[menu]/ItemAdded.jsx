@@ -5,7 +5,6 @@ import Link from "next/link";
 
 export function ItemAdded({ params }) {
   const { cartItems } = useCart();
-  console.log(params, 'from ItemAdded');
   const redirect_url = params.table_id ? `/${params.menu}/cart/${params.table_id}` : `/${params.menu}/cart`;
   return (
     cartItems.length > 0 && (

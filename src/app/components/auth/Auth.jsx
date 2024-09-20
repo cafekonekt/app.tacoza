@@ -57,6 +57,17 @@ export function Auth({ menu, outlet }) {
     }
   }, [step]);
 
+  useEffect(() => {
+    console.log("step", step);
+    console.log("isDrawerOpen", isDrawerOpen);
+  }, [step, isDrawerOpen]);
+
+  useEffect(() => {
+    return () => {
+      console.log("Component unmounting");
+    };
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{ step, setStep, phone, setPhone, otp, setOtp, otpTimer }}
@@ -97,8 +108,8 @@ export function Auth({ menu, outlet }) {
           </div>
           <Separator className="my-4" />
           {step === 1 && <Phone />}
-          {step === 2 && <Otp menu={menu} setDrawer={setIsDrawerOpen} />}
-          {step === 3 && <Name menu={menu} setDrawer={setIsDrawerOpen} />}
+          {step === 2 && <Otp setDrawer={setIsDrawerOpen} />}
+          {step === 3 && <Name setDrawer={setIsDrawerOpen} />}
         </DrawerContent>
       </Drawer>
     </AuthContext.Provider>
@@ -106,6 +117,7 @@ export function Auth({ menu, outlet }) {
 }
 
 function Phone() {
+  console.log("Current step in Auth component:");
   const { phone, setPhone, setStep, setOtp } = useContext(AuthContext);
   const handleNext = async () => {
     const response = await getOTP(phone);
@@ -135,6 +147,9 @@ function Phone() {
 }
 
 function Otp({ setDrawer }) {
+  useEffect(() => {
+    console.log("Rendering Otp component");
+  }, []);
   const pathname = usePathname();
   const { phone, otp, setOtp, setStep, otpTimer } = useContext(AuthContext);
   const handleNext = async () => {
@@ -180,6 +195,9 @@ function Otp({ setDrawer }) {
 }
 
 function Name({ setDrawer }) {
+  useEffect(() => {
+    console.log("Rendering Name component");
+  }, []);
   const pathname = usePathname();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -194,6 +212,7 @@ function Name({ setDrawer }) {
       setDrawer(false);
     }
   };
+
   return (
     <>
       <div className="flex flex-col gap-2 w-full px-4">
@@ -221,10 +240,7 @@ function Name({ setDrawer }) {
 }
 
 export function Promo({ gallery }) {
-  const plugin = useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: false }),
-  );
-
+  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));
   return (
     <Carousel
       plugins={[plugin.current]}

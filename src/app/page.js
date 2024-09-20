@@ -1,6 +1,5 @@
 "use client";
-import * as React from "react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { Scanner } from "@yudiel/react-qr-scanner";
@@ -29,15 +28,26 @@ import ShinyText from "@/components/ui/animations/ShinyText";
 import { HelpCircle, ScanQrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HowtoScanAnimation } from "./components/lottie/lottie";
+import { getSession } from "@/app/lib/auth/session";
+import { Menu } from "@/app/components/menu/header/Menu";
+import { DrawerProvider } from "@/context/DrawerContext";
 
 export default function Scan() {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
-
+  // const [session, setSession] = useState(null);
+  
+  // useEffect(() => {
+  //   (async () => {
+  //     const session = await getSession();
+  //     setSession(session);
+  //   })()
+  // }, []);
+  
   const handleScan = (result) => {
     const scannedBarcode = result[0];
     const scannedUrl = scannedBarcode?.rawValue;
-    if (scannedUrl && scannedUrl.startsWith("https://tacoza.co")) {
+    if (scannedUrl && scannedUrl.startsWith("https://api.tacoza.co")) {
       router.push(scannedUrl);
     } else {
       setErrorMessage("Please scan a Tacoza QR code, placed on your table.");
@@ -45,11 +55,12 @@ export default function Scan() {
   };
 
   return (
+    <DrawerProvider>
     <main className="flex max-w-lg min-h-screen bg-gradient-to-tr from-rose-600 to-rose-500 flex-col gap-4 overflow-hidden">
       <div className="rounded-b-3xl shadow-xl bg-white p-6 pb-10 flex flex-col gap-3">
         <div className="flex justify-between">
           <Image src="/logo.png" alt="logo" width={150} height={100} />
-          <Auth />
+
         </div>
         <SearchRestro />
         <Ads />
@@ -68,11 +79,12 @@ export default function Scan() {
         </div>
       </div>
     </main>
+    </DrawerProvider>
   );
 }
 
 export function Ads() {
-  const plugin = React.useRef(
+  const plugin = useRef(
     Autoplay({ delay: 2000, stopOnInteraction: false }),
   );
 
@@ -88,6 +100,7 @@ export function Ads() {
           <div className="flex h-20 items-center justify-center">
             <Image
               src="/pizza.jpg"
+              alt="pizza"
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"
@@ -98,6 +111,7 @@ export function Ads() {
           <div className="flex h-20 items-center justify-center">
             <img
               src="https://b.zmtcdn.com/data/pictures/2/20415942/d8ad25988e906612aea78a82543e25c7.jpg?output-format=webp&fit=around|771.75:416.25&crop=771.75:416.25;*,*"
+              alt="burger"
               width={200}
               height={200}
               className="w-full h-full object-cover rounded-xl"

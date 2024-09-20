@@ -3,10 +3,9 @@ import { Images } from "lucide-react";
 import Image from "next/image";
 
 export function Gallery({ outlet }) {
-  console.log("Gallery", outlet);
   return (
     <div className="relative">
-      {outlet.gallery?.length > 0 && <Promo gallery={outlet.gallery}/>}
+      {outlet?.gallery?.length > 0 && <Promo gallery={outlet.gallery}/>}
       <div className="absolute flex items-center bottom-0 right-0 rounded-full text-xs px-1.5 bg-black/30  shadow-md text-white m-2">
         <Images className="h-3-5 w-3.5 mr-1" /> More
       </div>
