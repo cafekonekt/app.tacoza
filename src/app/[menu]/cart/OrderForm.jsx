@@ -69,7 +69,7 @@ export function OrderForm({ params, tables, table, session }) {
         const checkoutOptions = {
           paymentSessionId: response.payment_session_id,
           // returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
-          returnUrl: `http://localhost:3000/order/${response.order_id}`,
+          returnUrl: `https://app.tacoza.co/order/${response.order_id}`,
         };
         cashfree.checkout(checkoutOptions).then(function (result) {
           if (result.error) {
