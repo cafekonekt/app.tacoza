@@ -117,6 +117,7 @@ export function MenuItemComponent({ item }) {
           <p className="text-muted-foreground text-xs line-clamp-2">
             {item.description}
           </p>
+          <ItemDetailDrawer item={item} />
         </div>
         <div className="col-span-2">
           <div className="relative flex flex-col items-center aspect-square align-top">
@@ -406,5 +407,53 @@ export function MenuAccordion({ items }) {
       {/* Pass setFocusCategory to MenuTab */}
       <MenuTab items={filteredItems} setFocusCategory={setFocusCategory} />
     </>
+  );
+}
+
+export function ItemDetailDrawer({ item }) {
+  return (
+    <Drawer>
+      <DrawerTrigger>Item</DrawerTrigger>
+      <DrawerContent>
+        <div className="relative mt-2 px-4">
+          <Image
+            src="/pizza.jpg"
+            alt="Item"
+            height="300"
+            width="500"
+            className="w-full aspect-video rounded-lg"
+          />
+          <DrawerClose>
+            <Button
+              className="absolute top-2 right-6 h-6 w-6"
+              size="icon"
+              variant="outline"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DrawerClose>
+        </div>
+        <div className="px-4 mb-8">
+          <Image
+            src={iconMap[item.food_type]}
+            alt="Dash"
+            height="16"
+            width="16"
+          />
+          <p className="text-lg font-medium">{item.name}</p>
+          <span className="text-base font-medium text-muted-foreground">
+            ₹ {item.price}
+          </span>
+          <span className="text-green-700 flex gap-1 items-center my-2">
+            <Star className="fill-green-700 w-4 h-4 ml-1" />
+            {item.rating}
+            <p className="text-primary text-xs">(12 Ratings)</p>
+          </span>
+          <p className="text-muted-foreground text-xs line-clamp-2">
+            {item.description}
+          </p>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

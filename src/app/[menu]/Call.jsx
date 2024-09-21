@@ -1,9 +1,4 @@
-"use server"
-import {
-  BellRing,
-  BookmarkPlus,
-  Share2,
-} from "lucide-react";
+import { BellRing, BookmarkPlus, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export async function Call() {

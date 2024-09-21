@@ -18,7 +18,7 @@ export default async function Orders({ params }) {
     getOutlet(menu),
   ]);
   return (
-    <main className="grid gap-4 p-6">
+    <main className="max-w-md grid gap-4 p-4">
       {/* Header */}
       <Header params={params} session={session} outlet={outlet} />
       {/* Breadcrumb */}
