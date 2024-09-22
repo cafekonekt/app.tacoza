@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 // components UI
 import {
   DropdownMenu,
@@ -24,10 +24,13 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import Counter from "@/app/components/menu/menuAccordion/Counter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -35,17 +38,19 @@ import Image from "next/image";
 import { SwatchBook, Settings2, Search, X } from "lucide-react";
 import { Star } from "lucide-react";
 // components
-import { Customize } from "@/app/components/menu/menuAccordion/Customize";
+import { VariantAddon } from "@/app/components/menu/menuAccordion/Customize";
 // context
 import { useCart } from "@/context/CartContext";
 import { SearchLoadingAnimation } from "../components/lottie/lottie";
+import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
 // utils
 const iconMap = {
   veg: "/veg.svg",
   nonveg: "/non-veg.svg",
   egg: "/egg.svg",
 };
-
+import { SquareMinus, SquarePlus } from "lucide-react";
+import { SetQuantity } from "@/app/components/cart/item/SetQuantity";
 export function MenuTab({ items, setFocusCategory }) {
   const { cartItems } = useCart();
 
@@ -95,6 +100,73 @@ export function MenuTab({ items, setFocusCategory }) {
 }
 
 export function MenuItemComponent({ item }) {
+  const [imageSrc, setImageSrc] = useState(item.image_url || '/food-thumb.jpg');
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [addDrawerOpen, setAddDrawerOpen] = useState(false);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
+
+  // Manage variant selection (default to item price match variant)
+  const [selectedVariant, setSelectedVariant] = useState(
+    item?.variants?.find((variant) => variant.price === item.price),
+  );
+  const [selectedAddons, setSelectedAddons] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(item.price);
+
+  const { addToCart, updateQuantity, getItemFromCart } = useCart();
+
+  // Utility to calculate total price based on variant, addons, and quantity
+  const calculateTotalPrice = useCallback(() => {
+    const addonsPrice = selectedAddons.reduce((sum, addon) => sum + parseFloat(addon.price), 0);
+    const variantPrice = selectedVariant ? parseFloat(selectedVariant.price) : parseFloat(item.price);
+    return (variantPrice * quantity) + addonsPrice;
+  }, [selectedVariant, selectedAddons, quantity, item.price]);
+
+  // Update total price when relevant states change
+  useEffect(() => {
+    setTotalPrice(calculateTotalPrice());
+  }, [calculateTotalPrice]);
+
+  // Handlers for UI interactions
+  const handleVariantChange = (variant) => setSelectedVariant(variant);
+  const handleAddonChange = (addon, isChecked) => {
+    setSelectedAddons((prevAddons) =>
+      isChecked ? [...prevAddons, addon] : prevAddons.filter((ad) => ad.id !== addon.id)
+    );
+  };
+
+  const handleAddToCart = () => {
+    addToCart(item, selectedVariant, selectedAddons, totalPrice, quantity);
+    // Reset values after adding to cart
+    setSelectedVariant(item?.variants?.find((variant) => variant.price === item.price));
+    setSelectedAddons([]);
+    setTotalPrice(item.price);
+    setQuantity(1);
+  };
+
+  const handleImageError = () => setImageSrc('/food-thumb.jpg');
+
+  // Get all items in the cart that match the food item id
+  const existingItems = getItemFromCart(item.id);
+
+  const increment = () => {
+    if (item.variants || item.addons?.length > 0) {
+      // For items with variants/addons, open the drawer to customize
+      setAddDrawerOpen(true);
+    } else {
+      // For simple items, update the quantity directly
+      if (existingItems?.length > 0) {
+        updateQuantity(existingItems[0].item_id, existingItems[0].quantity + 1);
+      } else {
+        setQuantity((q) => q + 1);
+      }
+    }
+  };
+
+  const decrement = () => {
+    setEditDrawerOpen(true);
+  };
+
   return (
     <>
       <div className="grid grid-cols-5 gap-2 justify-between py-8">
@@ -117,33 +189,148 @@ export function MenuItemComponent({ item }) {
           <p className="text-muted-foreground text-xs line-clamp-2">
             {item.description}
           </p>
+          <ItemDetailDrawer item={item} isDrawerOpen={detailsOpen} setIsDrawerOpen={setDetailsOpen} />
         </div>
         <div className="col-span-2">
-          <div className="relative flex flex-col items-center aspect-square align-top">
-            <Image
-              src={item.image_url ? item.image_url : ''}
-              alt={item.name}
-              layout="fill"
-              className="object-cover rounded-lg"
-            />
-
-            <div
-              className={`absolute ${item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"} flex flex-col items-center`}
-            >
-              <Customize item={item} />
-              {item.variants || item.addons?.length > 0 && (
-                <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
-                  Customisable
-                </p>
-              )}
+          {existingItems.length > 0 ? (
+            <div className="flex justify-center items-center aspect-square">
+              <div className="flex items-center justify-center w-fit bg-blue-50 rounded-md p-1 text-blue-600">
+                <SquareMinus size={40} onClick={decrement} />
+                <span id="counter" className="font-bold w-8 text-center">
+                  {existingItems?.reduce((acc, item) => acc + item.quantity, 0) || quantity}
+                </span>
+                <SquarePlus size={40} onClick={increment} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="relative flex flex-col items-center aspect-square align-top">
+              <Image
+                src={imageSrc}
+                alt={item.name}
+                onError={handleImageError}
+                layout="fill"
+                className="object-cover rounded-lg"
+                onClick={() => setDetailsOpen(!detailsOpen)}
+              />
+              <div
+                className={`absolute ${item.variants || item.addons?.length > 0 ? "bottom-[-4vh]" : "bottom-[-2vh]"} flex flex-col items-center`}
+              >
+                <Button
+                  className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
+                  variant="outline"
+                  onClick={() => {
+                    if (item.variants || item.addons?.length > 0) {
+                      setAddDrawerOpen(true);
+
+                    } else {
+                      handleAddToCart()
+                    }
+                  }}
+                >
+                  ADD
+                </Button>
+                {item.variants || item.addons?.length > 0 && (
+                  <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
+                    Customisable
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+          <Drawer open={addDrawerOpen} onOpenChange={setAddDrawerOpen}>
+            {item && (
+              <DrawerContent>
+                <DrawerHeader className="flex items-start w-full">
+                  <div className="flex flex-col items-start w-full">
+                    <DrawerDescription>
+                      {item.name} • ₹{item.price}
+                    </DrawerDescription>
+                    <DrawerTitle>Customise as per your taste</DrawerTitle>
+                  </div>
+                  <DrawerClose>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="rounded-full h-6 w-6"
+                    >
+                      <X size={16} />
+                    </Button>
+                  </DrawerClose>
+                </DrawerHeader>
+                <Separator className="my-4" />
+                <VariantAddon
+                  variant={item.variants}
+                  selectedVariant={selectedVariant}
+                  onVariantChange={handleVariantChange}
+                  addons={item.addons}
+                  selectedAddons={selectedAddons}
+                  onAddonChange={handleAddonChange}
+                />
+                <DrawerFooter>
+                  <div className="flex w-full gap-2 justify-between">
+                    <span className="flex items-center gap-4 text-base font-bold">
+                      ₹ {totalPrice}
+                      <Counter count={quantity} setCount={setQuantity} />
+                    </span>
+                    <DrawerClose>
+                      <Button
+                        className="bg-rose-500 text-white text-base font-semibold w-24 shadow-lg"
+                        variant="outline"
+                        onClick={handleAddToCart}
+                      >
+                        ADD
+                      </Button>
+                    </DrawerClose>
+                  </div>
+                </DrawerFooter>
+              </DrawerContent>
+            )}
+          </Drawer>
+
+          <Drawer open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
+            {existingItems.map((item, key) =>
+              <DrawerContent key={key}>
+                <div className="mt-2">
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium flex items-center gap-1">
+                      <Image
+                        src={iconMap[item.food_item.food_type]}
+                        alt="Dash"
+                        height="14"
+                        width="14"
+                      />
+                      {item.food_item?.name}
+                      {item.variant && ` - ${item.variant.name}`}
+                    </p>
+                    <SetQuantity item={item} />
+                  </div>
+                  <div className="flex items-center justify-between text-sm mt-1">
+                    <span className="font-medium text-muted-foreground">
+                      ₹ {item.food_item.price}
+                    </span>
+                    <span className="font-medium">₹ {item.totalPrice}</span>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  {item.addons &&
+                    item.addons.length > 0 &&
+                    item.addons.map((addon, key) => (
+                      <span key={key}>
+                        {addon.name}
+                        {key < item.addons.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                </p>
+              </DrawerContent>
+            )}
+          </Drawer>
         </div>
       </div>
       <Separator className={`${item.variants ? "mt-2" : ""}`} />
     </>
   );
 }
+
 
 function CategoryComponent({ category, depth = 0, focusCategory }) {
   const isSubCategory = depth >= 1;
@@ -205,7 +392,6 @@ export function SearchMenu({ items }) {
     ),
   ]);
 
-
   // Handle search logic
   useEffect(() => {
     // Recursively search through categories and subcategories
@@ -264,9 +450,7 @@ export function SearchMenu({ items }) {
       <DrawerContent className="h-3/4 w-full">
         <DrawerHeader>
           <div className="flex items-center justify-between w-full">
-            <DrawerTitle className="truncate">
-              Search in Kohlis Menu
-            </DrawerTitle>
+            <DrawerTitle className="truncate">Search in Menu</DrawerTitle>
             <DrawerClose>
               <Button
                 size="icon"
@@ -292,18 +476,20 @@ export function SearchMenu({ items }) {
             </div>
           )}
 
-          {/* Display search results */}
-          {!loading && filteredItems.length > 0
-            ? filteredItems.map((item) => (
-              <div className="overflow-y-scroll" key={item.name}>
-                <MenuItemComponent item={item} />
-              </div>
-            ))
-            : !loading && (
-              <p className="text-center text-gray-500 text-sm">
-                Nothing found
-              </p>
-            )}
+          <section className="overflow-y-scroll h-[60vh]">
+            {/* Display search results */}
+            {!loading && filteredItems.length > 0
+              ? filteredItems.map((item) => (
+                <div key={item.name}>
+                  <MenuItemComponent item={item} />
+                </div>
+              ))
+              : !loading && (
+                <p className="text-center text-gray-500 text-sm">
+                  Nothing found
+                </p>
+              )}
+          </section>
         </div>
       </DrawerContent>
     </Drawer>
@@ -311,7 +497,7 @@ export function SearchMenu({ items }) {
 }
 
 export function MenuAccordion({ items }) {
-  console.log("Menu Accordion")
+  console.log("Menu Accordion");
   const [focusCategory, setFocusCategory] = useState(null);
   const [foodTypeFilter, setFoodTypeFilter] = useState(null);
 
@@ -405,5 +591,56 @@ export function MenuAccordion({ items }) {
       {/* Pass setFocusCategory to MenuTab */}
       <MenuTab items={filteredItems} setFocusCategory={setFocusCategory} />
     </>
+  );
+}
+
+export function ItemDetailDrawer({ item, isDrawerOpen, setIsDrawerOpen }) {
+  const [imageSrc, setImageSrc] = useState(item.image_url || '/food-thumb.jpg');
+  const handleImageError = () => {
+    setImageSrc('/food-thumb.jpg'); // Fallback image on error
+  };
+  return (
+    <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <DrawerContent>
+        <div className="relative mt-2 px-4">
+          <Image
+            src={imageSrc}
+            alt="Item"
+            height="300"
+            width="500"
+            onError={handleImageError}
+            className="w-full aspect-video rounded-lg"
+          />
+          <Button
+            className="absolute top-2 right-6 h-6 w-6"
+            size="icon"
+            variant="outline"
+            onClick={() => setIsDrawerOpen(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="px-4 mb-8">
+          <Image
+            src={iconMap[item.food_type]}
+            alt="Dash"
+            height="16"
+            width="16"
+          />
+          <DialogTitle className="text-lg font-medium">{item.name}</DialogTitle>
+          <span className="text-base font-medium text-muted-foreground">
+            ₹ {item.price}
+          </span>
+          <span className="text-green-700 flex gap-1 items-center my-2">
+            <Star className="fill-green-700 w-4 h-4 ml-1" />
+            {item.rating}
+            <p className="text-primary text-xs">(12 Ratings)</p>
+          </span>
+          <p className="text-muted-foreground text-xs line-clamp-2">
+            {item.description}
+          </p>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

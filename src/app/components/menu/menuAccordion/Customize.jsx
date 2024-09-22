@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
-function VariantAddon({
+export function VariantAddon({
   variant,
   selectedVariant,
   onVariantChange,

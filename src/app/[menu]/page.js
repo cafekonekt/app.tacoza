@@ -10,6 +10,21 @@ import { Footer } from "./Footer";
 import { Details } from "./Details";
 import { notFound } from "next/navigation";
 
+// export async function generateMetadata({ params }, parent) {
+//   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
+
+//   const outlet = await Promise.all([
+//     outletPromis,
+//   ]);
+
+//   return {
+//     title: outlet.name,
+//     openGraph: {
+//       images: [ outlet.logo, ...outlet.gallery],
+//     },
+//   }
+// }
+
 export default async function Home({ params }) {
   const itemsPromis = apiGet(`/api/shop/menu/${params.menu}`);
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);

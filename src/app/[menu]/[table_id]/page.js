@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 
 export default async function Home({ params }) {
   const table_id = params.table_id
-  const itemsPromis = apiGet(`/api/shop/client-menu/${params.menu}`);
+  const itemsPromis = apiGet(`/api/shop/menu/${params.menu}`);
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
   const waitPromisForLoader = new Promise((resolve) =>
     setTimeout(resolve, 1000),

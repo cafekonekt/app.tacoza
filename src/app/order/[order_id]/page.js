@@ -67,6 +67,11 @@ import {
 } from "@/components/ui/accordion";
 import { getPayment } from "@/app/lib/order/getPayment";
 
+export const metadata = {
+  title: "Order Summary - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
+
 export default async function Order({ params }) {
   const order = await getOrder(params);
   console.log(order);
@@ -104,7 +109,8 @@ export default async function Order({ params }) {
             Payment Received
           </span>
           <span className="text-sm text-center">
-            Rs. { order.total }<br /> Ref Id: XXXX23423XXXX
+            Rs. {order.total}
+            <br /> Ref Id: XXXX23423XXXX
           </span>
         </section>
       )}
@@ -123,36 +129,39 @@ export default async function Order({ params }) {
       )}
 
       {/* Payment Failed */}
-      {order.payment_status === "failed" || order.payment_status === "active" && (
-        <section className="flex flex-col justify-center items-center">
-          <PaymentFailAnimation />
-          <span className="text-red-600 font-bold text-lg">Payment Failed</span>
-          <span className="text-sm text-center">
-            Customer rejected UPI request or other failure reasons.
-          </span>
-          <Payment order={order} params={params} />
-        </section>
-      )}
-
+      {order.payment_status === "failed" ||
+        (order.payment_status === "active" && (
+          <section className="flex flex-col justify-center items-center">
+            <PaymentFailAnimation />
+            <span className="text-red-600 font-bold text-lg">
+              Payment Failed
+            </span>
+            <span className="text-sm text-center">
+              Customer rejected UPI request or other failure reasons.
+            </span>
+            <Payment order={order} params={params} />
+          </section>
+        ))}
 
       <Card className="overflow-hidden">
-        {
-          order.status === "preparing" && (
-            <CardHeader className="bg-green-600 items-center">
-              <FoodPreparingAnimation />
-              <span className="text-secondary font-bold">Preparing your order</span>
-              <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
-                <Timer className="w-4 h-4 mr-1" />
-                Est.{" "}
-                {Math.floor(
-                  (new Date(order.created_at).getTime() -
-                    new Date(order.updated_at).getTime()) /
+        {order.status === "preparing" && (
+          <CardHeader className="bg-green-600 items-center">
+            <FoodPreparingAnimation />
+            <span className="text-secondary font-bold">
+              Preparing your order
+            </span>
+            <span className="flex items-center p-1 px-2 rounded-full text-secondary text-sm bg-white/20">
+              <Timer className="w-4 h-4 mr-1" />
+              Est.{" "}
+              {Math.floor(
+                (new Date(order.created_at).getTime() -
+                  new Date(order.updated_at).getTime()) /
                   (1000 * 60),
-                )}{" "}
-                mins • Ontime
-              </span>
-            </CardHeader>)
-        }
+              )}{" "}
+              mins • Ontime
+            </span>
+          </CardHeader>
+        )}
         <CardContent>
           <div className="text-sm mt-4">
             <div className="flex justify-between">

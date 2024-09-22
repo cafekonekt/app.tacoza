@@ -41,7 +41,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   
   const [order, setOrder] = React.useState({
     type: "dine_in",
-    table_id: table?.id,
+    table_id: table?.table_id,
   });
   const totalPrice = cartItems?.reduce((acc, item) => acc + item.totalPrice, 0);
   const [alert, setAlert] = React.useState(null);

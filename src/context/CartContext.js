@@ -40,6 +40,7 @@ export const CartProvider = ({ children }) => {
       .map((addon) => addon.id)
       .sort()
       .join("-")}`;
+
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (cartItem) => cartItem.item_id === uniqueItemKey,
@@ -82,6 +83,14 @@ export const CartProvider = ({ children }) => {
     }
     setIsDrawerOpen(false);
   };
+
+  const isItemInCart = (id) => {
+    return cartItems.some((item) => item.food_item.id === id);
+  }
+
+  const getItemFromCart = (id) => {
+    return cartItems.filter((item) => item.food_item.id === id);
+  }
 
   // Function to update item quantity in cart
   const updateQuantity = async (item_id, newQuantity) => {
@@ -139,6 +148,8 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider
       value={{
         cartItems,
+        isItemInCart,
+        getItemFromCart,
         addToCart,
         updateQuantity,
         removeFromCart,
