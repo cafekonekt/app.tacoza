@@ -1,6 +1,5 @@
 "use server";
 import { apiGet } from "@/handlers/apiHandler";
-import { notFound } from "next/navigation";
 
 export async function getTables(menu) {
   try {

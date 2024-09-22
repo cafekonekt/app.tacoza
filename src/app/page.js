@@ -22,10 +22,10 @@ import { getSession } from "./lib/auth/session";
 import { Menu } from "./components/menu/header/Menu";
 import { Auth } from "./components/auth/Auth";
 
-export const metadata = {
-  title: "Home - tacoza (Instant food Ordering)",
-  description: "Scan, Crave and Order superfast",
-};
+// export const metadata = {
+//   title: "Home - tacoza (Instant food Ordering)",
+//   description: "Scan, Crave and Order superfast",
+// };
 
 const restaurants = [
   {

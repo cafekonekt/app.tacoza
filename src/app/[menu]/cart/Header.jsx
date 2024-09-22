@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { Auth } from "@/app/components/auth/Auth";
 
-export async function Header({ params, session, outlet }) {
+export async function Header({ params, session }) {
   return (
     <div className="flex justify-between">
       <h2 className="text-2xl font-semibold">
@@ -14,7 +14,7 @@ export async function Header({ params, session, outlet }) {
         </Link>
         Cart
       </h2>
-      {!session && <Auth outlet={outlet}/>}
+      {!session?.user?.name || !session?.user?.email ? <Auth /> : ''}
     </div>
   );
 }

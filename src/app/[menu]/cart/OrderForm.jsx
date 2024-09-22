@@ -27,7 +27,13 @@ import { useDrawer } from "@/context/DrawerContext";
 
 import { cashfree } from "@/app/util/cashfree";
 
-export function OrderForm({ params, tables, table, session }) {
+const SERVICE_MAP_ICON = {
+  dine_in: <UtensilsCrossed className="h-3.5 w-3.5 mr-1" />,
+  takeaway: <Package className="h-3.5 w-3.5 mr-1" />,
+  delivery: <Bike className="h-3.5 w-3.5 mr-1" />,
+};
+
+export function OrderForm({ params, outlet, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
 
@@ -35,7 +41,7 @@ export function OrderForm({ params, tables, table, session }) {
   
   const [order, setOrder] = React.useState({
     type: "dine_in",
-    table_id: table?.id,
+    table_id: table?.table_id,
   });
   const totalPrice = cartItems?.reduce((acc, item) => acc + item.totalPrice, 0);
   const [alert, setAlert] = React.useState(null);
@@ -100,25 +106,18 @@ export function OrderForm({ params, tables, table, session }) {
             setOrder({ ...order, type: value });
           }}
         >
-          <ToggleGroupItem
-            value="dine_in"
-            className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-50"
-          >
-            <UtensilsCrossed className="h-3.5 w-3.5 mr-1" /> DineIn
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="takeaway"
-            className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100"
-          >
-            <Package className="h-3.5 w-3.5 mr-1" />
-            Takeaway
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="delivery"
-            className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100"
-          >
-            <Bike className="h-3.5 w-3.5 mr-1" /> Delivery
-          </ToggleGroupItem>
+          {
+            outlet.services.map((service, key) => (
+              <ToggleGroupItem
+                key={key}
+                value={service}
+                className={`border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100`}
+              >
+                {SERVICE_MAP_ICON[service]}
+                {service.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+              </ToggleGroupItem>
+            ))
+          }
         </ToggleGroup>
         <Label forhtml="instruction">Add Cooking Instruction</Label>
         <Textarea

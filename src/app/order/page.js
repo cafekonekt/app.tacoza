@@ -19,10 +19,10 @@ import { notFound } from "next/navigation";
 import { getSession, logout } from "@/app/lib/auth/session";
 import { apiGet } from "@/handlers/apiHandler";
 
-export const metadata = {
-  title: "My Orders - tacoza (Instant food Ordering)",
-  description: "Scan, Crave and Order superfast",
-};
+// export const metadata = {
+//   title: "My Orders - tacoza (Instant food Ordering)",
+//   description: "Scan, Crave and Order superfast",
+// };
 
 const iconMap = {
   veg: "/veg.svg",
