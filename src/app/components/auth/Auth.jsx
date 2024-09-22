@@ -1,5 +1,12 @@
 "use client";
-import { createContext, useContext, useEffect, useState, useRef, useMemo } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+} from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,7 +58,16 @@ const useAuthLogic = () => {
   }, [step]);
 
   return {
-    step, setStep, otpTimer, setOtpTimer, phone, setPhone, otp, setOtp, resendCount, setResendCount,
+    step,
+    setStep,
+    otpTimer,
+    setOtpTimer,
+    phone,
+    setPhone,
+    otp,
+    setOtp,
+    resendCount,
+    setResendCount,
   };
 };
 
@@ -70,7 +86,7 @@ export function Auth() {
     return () => {
       console.log("Drawer Provider Unmounted: ", isDrawerOpen);
     };
-  })
+  });
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -128,7 +144,8 @@ export function Auth() {
 
 function Phone() {
   console.log("Current step in Auth component:");
-  const { phone, setPhone, setStep, setOtp, setResendCount } = useContext(AuthContext);
+  const { phone, setPhone, setStep, setOtp, setResendCount } =
+    useContext(AuthContext);
   const handleNext = async () => {
     const response = await getOTP(phone);
     if (response) {
@@ -150,7 +167,21 @@ function Phone() {
           defaultCountry="IN"
         />
       </div>
-      <Button onClick={handleNext}>Get OTP</Button>
+      <div className="flex flex-col gap-2">
+        <span className="text-xs">
+          By continuing, you agree to our{" "}
+          <a href="#" className="text-primary">
+            Terms
+          </a>{" "}
+          and{" "}
+          <a href="#" className="text-primary">
+            Privacy Policy
+          </a>
+        </span>
+        <Button className="w-full" onClick={handleNext}>
+          Get OTP
+        </Button>
+      </div>
     </div>
   );
 }
