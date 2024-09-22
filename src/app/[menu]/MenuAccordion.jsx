@@ -77,8 +77,8 @@ export function MenuTab({ items, setFocusCategory }) {
             Menu
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 mr-6">
-          <DropdownMenuLabel>Menu</DropdownMenuLabel>
+        <DropdownMenuContent className="relative w-56 max-h-64 overflow-y-scroll mr-5">
+          <DropdownMenuLabel className="sticky top">Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {items.map((item) => (
             <DropdownMenuItem
@@ -177,7 +177,7 @@ export function MenuItemComponent({ item }) {
             height="16"
             width="16"
           />
-          <p className="text-lg font-medium">{item.name}</p>
+          <p className="text-base leading-tight font-medium">{item.name}</p>
           <span className="text-base font-medium text-muted-foreground">
             ₹ {item.price}
           </span>
@@ -331,6 +331,45 @@ export function MenuItemComponent({ item }) {
   );
 }
 
+export function MenuDisabledItemComponent({ item }) {
+  return (
+    <>
+      <div className="grid grid-cols-5 gap-2 justify-between py-8">
+        <div className="col-span-3">
+          <Image
+            src={iconMap[item.food_type]}
+            alt="Dash"
+            height="16"
+            width="16"
+          />
+          <p className="text-base leading-tight font-medium">{item.name}</p>
+          <span className="text-base font-medium text-muted-foreground">
+            ₹ {item.price}
+          </span>
+          <p className="text-muted-foreground text-xs line-clamp-2">
+            {item.description}
+          </p>
+          <ItemDetailDrawer item={item} />
+        </div>
+        <div className="col-span-2">
+          <div className="relative flex flex-col items-center aspect-square align-top">
+            <Image
+              src={item.image_url ? item.image_url : "/pizza.jpg"}
+              alt={item.name}
+              layout="fill"
+              className="object-cover rounded-lg grayscale"
+            />
+
+            <div className="absolute bottom-[-2vh] max-w-28 p-1 rounded-md text-center leading-none text-xs text-gray-500 border-2 border-gray-400 shadow bg-white">
+              Item currently unavailable
+            </div>
+          </div>
+        </div>
+      </div>
+      <Separator className={`${item.variants ? "mt-2" : ""}`} />
+    </>
+  );
+}
 
 function CategoryComponent({ category, depth = 0, focusCategory }) {
   const isSubCategory = depth >= 1;
@@ -372,7 +411,7 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
             ))
             : // If no subcategories, render the menu items
             category.food_items.map((item) => (
-              <MenuItemComponent key={item.name} item={item} />
+              item.in_stock ? <MenuItemComponent key={item.name} item={item} /> : <MenuDisabledItemComponent key={item.name} item={item} />
             ))}
         </AccordionContent>
       </AccordionItem>

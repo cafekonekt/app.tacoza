@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Card,
   CardContent,
@@ -31,7 +31,7 @@ export function Items() {
         <CardContent key={key}>
           <div className="mt-2">
             <div className="flex items-center justify-between">
-              <p className="font-medium flex items-center gap-1">
+              <p className="font-medium flex items-start leading-tight gap-1">
                 <Image
                   src={iconMap[item.food_item.food_type]}
                   alt="Dash"
