@@ -19,6 +19,7 @@ export async function updateCartItem(outlet_slug, item_id, quantity) {
         },
       },
     );
+    if (response.error) return null;
     return response;
   } catch (error) {
     console.error("Error updating cart item:", error);
@@ -40,6 +41,7 @@ export async function deleteCartItem(outlet_slug, item_id) {
         },
       },
     );
+    if (response.error) return null;
     return response;
   } catch (error) {
     console.error("Error deleting item from cart:", error);

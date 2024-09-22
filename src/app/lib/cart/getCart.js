@@ -13,6 +13,7 @@ export async function getCart(outlet_slug) {
         Authorization: `Bearer ${session.tokens?.access}`,
       },
     });
+    if (response.error) return null;
     return response;
   } catch (error) {
     console.error("Error getting cart:", error);
@@ -44,6 +45,7 @@ export async function addItemToCart(
         },
       },
     );
+    if (response.error) return null;
     return response;
   } catch (error) {
     console.error("Error adding item to cart:", error);

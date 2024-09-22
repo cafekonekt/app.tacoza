@@ -125,7 +125,7 @@ export function Customize({ item }) {
     } else {
       setTotalPrice(parseFloat(item.price) * count + addonsPrice);
     }
-  }, [selectedVariant, selectedAddons, count]);
+  }, [selectedVariant, selectedAddons, count, item.price]);
 
   const handleVariantChange = (variant) => {
     setSelectedVariant(variant);
@@ -154,7 +154,7 @@ export function Customize({ item }) {
   return (
     <Drawer>
       {
-        item.variants ?
+        item.variants || item.addons?.length > 0 ?
         <DrawerTrigger asChild>
           <Button
             className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"

@@ -32,7 +32,7 @@ export default async function Orders({ params }) {
       {/* List Items */}
       <Items />
       {/* Order Form */}
-      <OrderForm params={params} tables={tables} table={table} />
+      <OrderForm params={params} outlet={outlet} tables={tables} table={table} session={session} />
     </main>
   );
 }

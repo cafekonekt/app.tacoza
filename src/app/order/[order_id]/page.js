@@ -70,24 +70,7 @@ import { getPayment } from "@/app/lib/order/getPayment";
 export default async function Order({ params }) {
   const order = await getOrder(params);
   console.log(order);
-  if (!order) return notFound();
-  // const orderResponse = await getPayment(params);
-  // const paymentSuccess = orderResponse.some(
-  //   (transaction) =>
-  //     transaction.find(([key, value]) => key === "payment_status")[1] ===
-  //     "SUCCESS",
-  // );
-  // const paymentPending = orderResponse.some(
-  //   (transaction) =>
-  //     transaction.find(([key, value]) => key === "payment_status")[1] ===
-  //     "PENDING",
-  // );
-  // const paymentFailed = orderResponse.every(
-  //   (transaction) =>
-  //     transaction.find(([key, value]) => key === "payment_status")[1] ===
-  //     "FAILED",
-  // );
-
+  if (order.status===404) notFound();
   return (
     <main className="max-w-lg p-4 gap-4 grid">
       <h2 className="text-2xl font-semibold">
@@ -301,7 +284,7 @@ export default async function Order({ params }) {
               <div className="flex items-center justify-between">
                 <dt className="text-muted-foreground">Phone</dt>
                 <dd>
-                  <a href="tel:">{order.user.phone}</a>
+                  <a href="tel:">{order.user.phone_number}</a>
                 </dd>
               </div>
             </dl>

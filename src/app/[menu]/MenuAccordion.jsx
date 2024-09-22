@@ -128,11 +128,10 @@ export function MenuItemComponent({ item }) {
             />
 
             <div
-              className={`absolute ${item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
-                } flex flex-col items-center`}
+              className={`absolute ${item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"} flex flex-col items-center`}
             >
               <Customize item={item} />
-              {item.variants && (
+              {item.variants || item.addons?.length > 0 && (
                 <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
                   Customisable
                 </p>
