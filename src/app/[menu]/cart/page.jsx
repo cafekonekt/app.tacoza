@@ -10,6 +10,11 @@ import { getOutlet } from "@/app/lib/outlet/getOutlet";
 import { getTables } from "@/app/lib/tables/getTables";
 import { getSession } from "@/app/lib/auth/session";
 
+export const metadata = {
+  title: "Cart - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
+
 export default async function Orders({ params }) {
   const menu = params.menu;
   const [session, tables, outlet] = await Promise.all([
@@ -18,7 +23,7 @@ export default async function Orders({ params }) {
     getOutlet(menu),
   ]);
   return (
-    <main className="grid gap-4 p-6">
+    <main className="max-w-md grid gap-4 p-4">
       {/* Header */}
       <Header params={params} session={session} outlet={outlet} />
       {/* Breadcrumb */}

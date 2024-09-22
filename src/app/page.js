@@ -1,5 +1,5 @@
 "use server";
-import { SearchRestro } from "./search";
+import { SearchRestaurant, SearchRestro } from "./search";
 import Image from "next/image";
 import {
   Drawer,
@@ -22,6 +22,55 @@ import { getSession } from "./lib/auth/session";
 import { Menu } from "./components/menu/header/Menu";
 import { Auth } from "./components/auth/Auth";
 
+export const metadata = {
+  title: "Home - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
+
+const restaurants = [
+  {
+    id: 1,
+    name: "Kohlis Restaurant",
+    description: "North Indian, Chinese, Fast Food",
+    location: "Dharam Tekri, Chindwara",
+    image: "/outlet-thumb.jpg", // Replace with actual image paths
+    rating: 4.2,
+    ratingCount: 12,
+  },
+  {
+    id: 2,
+    name: "Saffron Spice",
+    description: "Indian, Thai, Continental",
+    location: "MG Road, Indore",
+    rating: 4.5,
+    ratingCount: 50,
+  },
+  {
+    id: 3,
+    name: "Urban Diner",
+    description: "Burgers, Steaks, Beverages",
+    location: "Phoenix Market City, Mumbai",
+    rating: 4.3,
+    ratingCount: 25,
+  },
+  {
+    id: 4,
+    name: "The Royal Feast",
+    description: "Luxury Dining, Multi-cuisine",
+    location: "Connaught Place, Delhi",
+    rating: 4.7,
+    ratingCount: 100,
+  },
+  {
+    id: 5,
+    name: "Green Bowl",
+    description: "Vegan, Healthy, Organic",
+    location: "Brigade Road, Bangalore",
+    rating: 4.1,
+    ratingCount: 30,
+  },
+];
+
 export default async function Scan() {
   const session = await getSession();
   return (
@@ -30,9 +79,13 @@ export default async function Scan() {
         <div className="rounded-b-3xl shadow-xl bg-white p-6 pb-10 flex flex-col gap-3">
           <div className="flex justify-between">
             <Image src="/logo.png" alt="logo" width={150} height={100} />
-            {!session?.user?.name || !session?.user?.email ? <Auth /> : <Menu />}
+            {!session?.user?.name || !session?.user?.email ? (
+              <Auth />
+            ) : (
+              <Menu />
+            )}
           </div>
-          <SearchRestro />
+          <SearchRestaurant restaurants={restaurants} />
           <Ads />
         </div>
         <div className="flex flex-col items-center justify-center p-8">

@@ -117,19 +117,21 @@ export function MenuItemComponent({ item }) {
           <p className="text-muted-foreground text-xs line-clamp-2">
             {item.description}
           </p>
+          <ItemDetailDrawer item={item} />
         </div>
         <div className="col-span-2">
           <div className="relative flex flex-col items-center aspect-square align-top">
             <Image
-              src={item.image_url ? item.image_url : ''}
+              src={item.image_url ? item.image_url : ""}
               alt={item.name}
               layout="fill"
               className="object-cover rounded-lg"
             />
 
             <div
-              className={`absolute ${item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
-                } flex flex-col items-center`}
+              className={`absolute ${
+                item.variants ? "bottom-[-4vh]" : "bottom-[-2vh]"
+              } flex flex-col items-center`}
             >
               <Customize item={item} />
               {item.variants && (
@@ -175,19 +177,19 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-            category.sub_categories.length > 0
+          category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-            category.sub_categories.map((subCategory) => (
-              <CategoryComponent
-                key={subCategory.name}
-                category={subCategory}
-                depth={depth + 1} // Increment the depth for subcategories
-              />
-            ))
+              category.sub_categories.map((subCategory) => (
+                <CategoryComponent
+                  key={subCategory.name}
+                  category={subCategory}
+                  depth={depth + 1} // Increment the depth for subcategories
+                />
+              ))
             : // If no subcategories, render the menu items
-            category.food_items.map((item) => (
-              <MenuItemComponent key={item.name} item={item} />
-            ))}
+              category.food_items.map((item) => (
+                <MenuItemComponent key={item.name} item={item} />
+              ))}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -205,7 +207,6 @@ export function SearchMenu({ items }) {
       (subcategory.food_items || []).map((item) => item.name),
     ),
   ]);
-
 
   // Handle search logic
   useEffect(() => {
@@ -265,9 +266,7 @@ export function SearchMenu({ items }) {
       <DrawerContent className="h-3/4 w-full">
         <DrawerHeader>
           <div className="flex items-center justify-between w-full">
-            <DrawerTitle className="truncate">
-              Search in Kohlis Menu
-            </DrawerTitle>
+            <DrawerTitle className="truncate">Search in Menu</DrawerTitle>
             <DrawerClose>
               <Button
                 size="icon"
@@ -293,18 +292,20 @@ export function SearchMenu({ items }) {
             </div>
           )}
 
-          {/* Display search results */}
-          {!loading && filteredItems.length > 0
-            ? filteredItems.map((item) => (
-              <div className="overflow-y-scroll" key={item.name}>
-                <MenuItemComponent item={item} />
-              </div>
-            ))
-            : !loading && (
-              <p className="text-center text-gray-500 text-sm">
-                Nothing found
-              </p>
-            )}
+          <section className="overflow-y-scroll h-[60vh]">
+            {/* Display search results */}
+            {!loading && filteredItems.length > 0
+              ? filteredItems.map((item) => (
+                  <div key={item.name}>
+                    <MenuItemComponent item={item} />
+                  </div>
+                ))
+              : !loading && (
+                  <p className="text-center text-gray-500 text-sm">
+                    Nothing found
+                  </p>
+                )}
+          </section>
         </div>
       </DrawerContent>
     </Drawer>
@@ -312,7 +313,7 @@ export function SearchMenu({ items }) {
 }
 
 export function MenuAccordion({ items }) {
-  console.log("Menu Accordion")
+  console.log("Menu Accordion");
   const [focusCategory, setFocusCategory] = useState(null);
   const [foodTypeFilter, setFoodTypeFilter] = useState(null);
 
@@ -406,5 +407,53 @@ export function MenuAccordion({ items }) {
       {/* Pass setFocusCategory to MenuTab */}
       <MenuTab items={filteredItems} setFocusCategory={setFocusCategory} />
     </>
+  );
+}
+
+export function ItemDetailDrawer({ item }) {
+  return (
+    <Drawer>
+      <DrawerTrigger>Item</DrawerTrigger>
+      <DrawerContent>
+        <div className="relative mt-2 px-4">
+          <Image
+            src="/pizza.jpg"
+            alt="Item"
+            height="300"
+            width="500"
+            className="w-full aspect-video rounded-lg"
+          />
+          <DrawerClose>
+            <Button
+              className="absolute top-2 right-6 h-6 w-6"
+              size="icon"
+              variant="outline"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DrawerClose>
+        </div>
+        <div className="px-4 mb-8">
+          <Image
+            src={iconMap[item.food_type]}
+            alt="Dash"
+            height="16"
+            width="16"
+          />
+          <p className="text-lg font-medium">{item.name}</p>
+          <span className="text-base font-medium text-muted-foreground">
+            ₹ {item.price}
+          </span>
+          <span className="text-green-700 flex gap-1 items-center my-2">
+            <Star className="fill-green-700 w-4 h-4 ml-1" />
+            {item.rating}
+            <p className="text-primary text-xs">(12 Ratings)</p>
+          </span>
+          <p className="text-muted-foreground text-xs line-clamp-2">
+            {item.description}
+          </p>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
