@@ -332,13 +332,17 @@ export function MenuItemComponent({ item }) {
 }
 
 export function MenuDisabledItemComponent({ item }) {
+  const [imageSrc, setImageSrc] = useState(item.image_url || '/food-thumb.jpg');
+  const handleImageError = () => setImageSrc('/food-thumb.jpg');
+
   return (
     <>
       <div className="grid grid-cols-5 gap-2 justify-between py-8">
         <div className="col-span-3">
           <Image
             src={iconMap[item.food_type]}
-            alt="Dash"
+            alt={item.name}
+            onError={handleImageError}
             height="16"
             width="16"
           />
@@ -354,7 +358,7 @@ export function MenuDisabledItemComponent({ item }) {
         <div className="col-span-2">
           <div className="relative flex flex-col items-center aspect-square align-top">
             <Image
-              src={item.image_url ? item.image_url : "/pizza.jpg"}
+              src={imageSrc}
               alt={item.name}
               layout="fill"
               className="object-cover rounded-lg grayscale"
