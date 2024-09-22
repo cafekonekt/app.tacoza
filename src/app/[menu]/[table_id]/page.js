@@ -40,7 +40,7 @@ export default async function Home({ params }) {
         {/* Call Waiter, Bookmark, Share */}
         <Call />
         {/* Menu and Filters */}
-        <MenuAccordion items={items} />
+        <MenuAccordion items={items} outlet={outlet} />
         {/* Item Added */}
         <ItemAdded params={params} />
       </main>

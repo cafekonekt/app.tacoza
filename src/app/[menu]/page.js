@@ -38,6 +38,7 @@ export default async function Home({ params }) {
   ]);
   if (!items) notFound();
   if (!outlet) notFound();
+  console.log(outlet);
   return (
     <>
       <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden bg-white">
@@ -52,7 +53,7 @@ export default async function Home({ params }) {
         {/* Call Waiter, Bookmark, Share */}
         <Call />
         {/* Menu and Filters */}
-        <MenuAccordion items={items} />
+        <MenuAccordion items={items} outlet={outlet} />
         {/* Item Added */}
         <ItemAdded params={params} />
       </main>

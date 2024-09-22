@@ -173,7 +173,15 @@ export function MenuItemComponent({ item }) {
   };
 
   const decrement = () => {
-    setEditDrawerOpen(true);
+    if (item.variants || item.addons?.length > 0) {
+      setEditDrawerOpen(true);
+    } else {
+      if (existingItems?.length > 0) {
+        updateQuantity(existingItems[0].item_id, existingItems[0].quantity - 1);
+      } else {
+        setQuantity((q) => (q > 1 ? q - 1 : 1));
+      }
+    }
   };
 
   return (
@@ -304,7 +312,6 @@ export function MenuItemComponent({ item }) {
               </DrawerContent>
             )}
           </Drawer>
-
           <Drawer open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
             <DrawerContent className="mb-4">
               <DrawerHeader className="flex items-start w-full">
@@ -334,8 +341,7 @@ export function MenuItemComponent({ item }) {
                           height="14"
                           width="14"
                         />
-                        {item.food_item?.name}
-                        {item.variant && ` - ${item.variant.name}`}
+                        {item.food_item?.name}{item.variant && ` - ${item.variant.name}`}
                       </p>
                       <SetQuantity item={item} />
                     </div>
@@ -444,23 +450,23 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-          category.sub_categories.length > 0
+            category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-              category.sub_categories.map((subCategory) => (
-                <CategoryComponent
-                  key={subCategory.name}
-                  category={subCategory}
-                  depth={depth + 1} // Increment the depth for subcategories
-                />
-              ))
+            category.sub_categories.map((subCategory) => (
+              <CategoryComponent
+                key={subCategory.name}
+                category={subCategory}
+                depth={depth + 1} // Increment the depth for subcategories
+              />
+            ))
             : // If no subcategories, render the menu items
-              category.food_items.map((item) =>
-                item.in_stock ? (
-                  <MenuItemComponent key={item.name} item={item} />
-                ) : (
-                  <MenuDisabledItemComponent key={item.name} item={item} />
-                ),
-              )}
+            category.food_items.map((item) =>
+              item.in_stock ? (
+                <MenuItemComponent key={item.name} item={item} />
+              ) : (
+                <MenuDisabledItemComponent key={item.name} item={item} />
+              ),
+            )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -567,15 +573,15 @@ export function SearchMenu({ items }) {
             {/* Display search results */}
             {!loading && filteredItems.length > 0
               ? filteredItems.map((item) => (
-                  <div key={item.name}>
-                    <MenuItemComponent item={item} />
-                  </div>
-                ))
+                <div key={item.name}>
+                  <MenuItemComponent item={item} />
+                </div>
+              ))
               : !loading && (
-                  <p className="text-center text-gray-500 text-sm">
-                    Nothing found
-                  </p>
-                )}
+                <p className="text-center text-gray-500 text-sm">
+                  Nothing found
+                </p>
+              )}
           </section>
         </div>
       </DrawerContent>
@@ -583,8 +589,7 @@ export function SearchMenu({ items }) {
   );
 }
 
-export function MenuAccordion({ items }) {
-  console.log("Menu Accordion");
+export function MenuAccordion({ items, outlet }) {
   const [focusCategory, setFocusCategory] = useState(null);
   const [foodTypeFilter, setFoodTypeFilter] = useState(null);
 
@@ -627,35 +632,18 @@ export function MenuAccordion({ items }) {
               variant="outline"
               onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
             >
-              <ToggleGroupItem
-                value="veg"
-                aria-label="Veg Filter"
-                className="gap-2 px-4 data-[state=on]:bg-green-100 data-[state=on]:text-green-700"
-              >
-                <Image src="/veg.svg" alt="Veg" height="16" width="16" />
-                <span>Veg</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="egg"
-                aria-label="Egg Filter"
-                className="gap-2 px-4 data-[state=on]:bg-yellow-50 data-[state=on]:text-yellow-400"
-              >
-                <Image src="/egg.svg" alt="Egg" height="16" width="16" />
-                <span>Egg</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem
-                value="nonveg"
-                aria-label="Non-Veg Filter"
-                className="gap-2 px-4 whitespace-nowrap data-[state=on]:bg-red-100 data-[state=on]:text-red-800"
-              >
-                <Image
-                  src="/non-veg.svg"
-                  alt="Non-Veg"
-                  height="16"
-                  width="16"
-                />
-                <span>Non-Veg</span>
-              </ToggleGroupItem>
+              {
+                outlet.type.map((type, key) => (
+                <ToggleGroupItem
+                  key={key}
+                  value="veg"
+                  aria-label="Veg Filter"
+                  className="gap-2 px-4 data-[state=on]:bg-green-100 data-[state=on]:text-green-700 align-left"
+                >
+                  <Image src={iconMap[type]} alt="Veg" height="16" width="16" />
+                  <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                </ToggleGroupItem>))
+              }
             </ToggleGroup>
           </div>
 
