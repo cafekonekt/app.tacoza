@@ -28,7 +28,6 @@ export function VariantAddon({
   selectedAddons,
   onAddonChange,
 }) {
-
   return (
     <div className="mx-4">
       {/* Variant */}
@@ -153,24 +152,24 @@ export function Customize({ item }) {
 
   return (
     <Drawer>
-      {
-        item.variants || item.addons?.length > 0 ?
+      {item.variants || item.addons?.length > 0 ? (
         <DrawerTrigger asChild>
           <Button
-            className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
+            className="border-2 border-rose-500 bg-rose-50 text-rose-500 text-base font-semibold shadow-lg"
             variant="outline"
           >
             ADD
           </Button>
-        </DrawerTrigger> :
+        </DrawerTrigger>
+      ) : (
         <Button
-          className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
+          className="border-2 border-rose-500 bg-rose-50 text-rose-500 text-base font-semibold shadow-lg"
           variant="outline"
           onClick={handleAddToCart}
         >
           ADD
         </Button>
-      }
+      )}
       {item && (
         <DrawerContent>
           <DrawerHeader className="flex items-start w-full">

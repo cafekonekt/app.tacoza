@@ -100,7 +100,7 @@ export function MenuTab({ items, setFocusCategory }) {
 }
 
 export function MenuItemComponent({ item }) {
-  const [imageSrc, setImageSrc] = useState(item.image_url || '/food-thumb.jpg');
+  const [imageSrc, setImageSrc] = useState(item.image_url || "/food-thumb.jpg");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [addDrawerOpen, setAddDrawerOpen] = useState(false);
@@ -117,9 +117,14 @@ export function MenuItemComponent({ item }) {
 
   // Utility to calculate total price based on variant, addons, and quantity
   const calculateTotalPrice = useCallback(() => {
-    const addonsPrice = selectedAddons.reduce((sum, addon) => sum + parseFloat(addon.price), 0);
-    const variantPrice = selectedVariant ? parseFloat(selectedVariant.price) : parseFloat(item.price);
-    return (variantPrice * quantity) + addonsPrice;
+    const addonsPrice = selectedAddons.reduce(
+      (sum, addon) => sum + parseFloat(addon.price),
+      0,
+    );
+    const variantPrice = selectedVariant
+      ? parseFloat(selectedVariant.price)
+      : parseFloat(item.price);
+    return variantPrice * quantity + addonsPrice;
   }, [selectedVariant, selectedAddons, quantity, item.price]);
 
   // Update total price when relevant states change
@@ -131,20 +136,24 @@ export function MenuItemComponent({ item }) {
   const handleVariantChange = (variant) => setSelectedVariant(variant);
   const handleAddonChange = (addon, isChecked) => {
     setSelectedAddons((prevAddons) =>
-      isChecked ? [...prevAddons, addon] : prevAddons.filter((ad) => ad.id !== addon.id)
+      isChecked
+        ? [...prevAddons, addon]
+        : prevAddons.filter((ad) => ad.id !== addon.id),
     );
   };
 
   const handleAddToCart = () => {
     addToCart(item, selectedVariant, selectedAddons, totalPrice, quantity);
     // Reset values after adding to cart
-    setSelectedVariant(item?.variants?.find((variant) => variant.price === item.price));
+    setSelectedVariant(
+      item?.variants?.find((variant) => variant.price === item.price),
+    );
     setSelectedAddons([]);
     setTotalPrice(item.price);
     setQuantity(1);
   };
 
-  const handleImageError = () => setImageSrc('/food-thumb.jpg');
+  const handleImageError = () => setImageSrc("/food-thumb.jpg");
 
   // Get all items in the cart that match the food item id
   const existingItems = getItemFromCart(item.id);
@@ -177,7 +186,9 @@ export function MenuItemComponent({ item }) {
             height="16"
             width="16"
           />
-          <p className="text-base leading-tight font-medium">{item.name}</p>
+          <p className="text-base leading-tight font-medium mt-1">
+            {item.name}
+          </p>
           <span className="text-base font-medium text-muted-foreground">
             ₹ {item.price}
           </span>
@@ -189,29 +200,36 @@ export function MenuItemComponent({ item }) {
           <p className="text-muted-foreground text-xs line-clamp-2">
             {item.description}
           </p>
-          <ItemDetailDrawer item={item} isDrawerOpen={detailsOpen} setIsDrawerOpen={setDetailsOpen} />
+          <ItemDetailDrawer
+            item={item}
+            isDrawerOpen={detailsOpen}
+            setIsDrawerOpen={setDetailsOpen}
+          />
         </div>
         <div className="col-span-2">
-          {existingItems.length > 0 ? (
-            <div className="flex justify-center items-center aspect-square">
-              <div className="flex items-center justify-center w-fit bg-blue-50 rounded-md p-1 text-blue-600">
-                <SquareMinus size={40} onClick={decrement} />
-                <span id="counter" className="font-bold w-8 text-center">
-                  {existingItems?.reduce((acc, item) => acc + item.quantity, 0) || quantity}
-                </span>
-                <SquarePlus size={40} onClick={increment} />
+          <div className="relative flex flex-col items-center aspect-square align-top">
+            <Image
+              src={imageSrc}
+              alt={item.name}
+              onError={handleImageError}
+              layout="fill"
+              className="object-cover rounded-lg"
+              onClick={() => setDetailsOpen(!detailsOpen)}
+            />
+            {existingItems.length > 0 ? (
+              <div className="absolute bottom-[-2vh]">
+                <div className="flex items-center justify-center w-fit bg-rose-50 rounded p-1 text-rose-600">
+                  <SquareMinus size={24} onClick={decrement} />
+                  <span id="counter" className="font-bold w-8 text-center">
+                    {existingItems?.reduce(
+                      (acc, item) => acc + item.quantity,
+                      0,
+                    ) || quantity}
+                  </span>
+                  <SquarePlus size={24} onClick={increment} />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="relative flex flex-col items-center aspect-square align-top">
-              <Image
-                src={imageSrc}
-                alt={item.name}
-                onError={handleImageError}
-                layout="fill"
-                className="object-cover rounded-lg"
-                onClick={() => setDetailsOpen(!detailsOpen)}
-              />
+            ) : (
               <div
                 className={`absolute ${item.variants || item.addons?.length > 0 ? "bottom-[-4vh]" : "bottom-[-2vh]"} flex flex-col items-center`}
               >
@@ -221,22 +239,22 @@ export function MenuItemComponent({ item }) {
                   onClick={() => {
                     if (item.variants || item.addons?.length > 0) {
                       setAddDrawerOpen(true);
-
                     } else {
-                      handleAddToCart()
+                      handleAddToCart();
                     }
                   }}
                 >
                   ADD
                 </Button>
-                {item.variants || item.addons?.length > 0 && (
-                  <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
-                    Customisable
-                  </p>
-                )}
+                {item.variants ||
+                  (item.addons?.length > 0 && (
+                    <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
+                      Customisable
+                    </p>
+                  ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
           <Drawer open={addDrawerOpen} onOpenChange={setAddDrawerOpen}>
             {item && (
               <DrawerContent>
@@ -274,7 +292,7 @@ export function MenuItemComponent({ item }) {
                     </span>
                     <DrawerClose>
                       <Button
-                        className="bg-rose-500 text-white text-base font-semibold w-24 shadow-lg"
+                        className="bg-rose-500 text-white text-base font-semibold w-24 shadow-lg "
                         variant="outline"
                         onClick={handleAddToCart}
                       >
@@ -288,45 +306,65 @@ export function MenuItemComponent({ item }) {
           </Drawer>
 
           <Drawer open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
-            {existingItems.map((item, key) =>
-              <DrawerContent key={key}>
-                <div className="mt-2">
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium flex items-center gap-1">
-                      <Image
-                        src={iconMap[item.food_item.food_type]}
-                        alt="Dash"
-                        height="14"
-                        width="14"
-                      />
-                      {item.food_item?.name}
-                      {item.variant && ` - ${item.variant.name}`}
-                    </p>
-                    <SetQuantity item={item} />
-                  </div>
-                  <div className="flex items-center justify-between text-sm mt-1">
-                    <span className="font-medium text-muted-foreground">
-                      ₹ {item.food_item.price}
-                    </span>
-                    <span className="font-medium">₹ {item.totalPrice}</span>
-                  </div>
+            <DrawerContent className="mb-4">
+              <DrawerHeader className="flex items-start w-full">
+                <div className="flex flex-col items-start w-full">
+                  <DrawerDescription>Add or remove items</DrawerDescription>
+                  <DrawerTitle>Customise as per your taste</DrawerTitle>
                 </div>
-                <p className="text-muted-foreground text-xs">
-                  {item.addons &&
-                    item.addons.length > 0 &&
-                    item.addons.map((addon, key) => (
-                      <span key={key}>
-                        {addon.name}
-                        {key < item.addons.length - 1 ? ", " : ""}
+                <DrawerClose>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="rounded-full h-6 w-6"
+                  >
+                    <X size={16} />
+                  </Button>
+                </DrawerClose>
+              </DrawerHeader>
+              <Separator className="my-4" />
+              {existingItems.map((item, key) => (
+                <>
+                  <div className="px-4 my-2" key={key}>
+                    <div className="flex items-center justify-between">
+                      <p className="font-medium flex items-center gap-1">
+                        <Image
+                          src={iconMap[item.food_item.food_type]}
+                          alt="Dash"
+                          height="14"
+                          width="14"
+                        />
+                        {item.food_item?.name}
+                        {item.variant && ` - ${item.variant.name}`}
+                      </p>
+                      <SetQuantity item={item} />
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-1">
+                      <span className="font-medium text-muted-foreground">
+                        ₹ {item.food_item.price}
                       </span>
-                    ))}
-                </p>
-              </DrawerContent>
-            )}
+                      <span className="font-medium">₹ {item.totalPrice}</span>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground text-xs px-4">
+                    {item.addons &&
+                      item.addons.length > 0 &&
+                      item.addons.map((addon, key) => (
+                        <span key={key}>
+                          {addon.name}
+                          {key < item.addons.length - 1 ? ", " : ""}
+                        </span>
+                      ))}
+                  </p>
+                </>
+              ))}
+            </DrawerContent>
           </Drawer>
         </div>
       </div>
-      <Separator className={`${item.variants ? "mt-2" : ""}`} />
+      <Separator
+        className={`${item.variants || item.addons?.length > 0 ? "mt-2" : ""}`}
+      />
     </>
   );
 }
@@ -342,7 +380,9 @@ export function MenuDisabledItemComponent({ item }) {
             height="16"
             width="16"
           />
-          <p className="text-base leading-tight font-medium">{item.name}</p>
+          <p className="text-base leading-tight font-medium mt-1">
+            {item.name}
+          </p>
           <span className="text-base font-medium text-muted-foreground">
             ₹ {item.price}
           </span>
@@ -400,19 +440,23 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-            category.sub_categories.length > 0
+          category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-            category.sub_categories.map((subCategory) => (
-              <CategoryComponent
-                key={subCategory.name}
-                category={subCategory}
-                depth={depth + 1} // Increment the depth for subcategories
-              />
-            ))
+              category.sub_categories.map((subCategory) => (
+                <CategoryComponent
+                  key={subCategory.name}
+                  category={subCategory}
+                  depth={depth + 1} // Increment the depth for subcategories
+                />
+              ))
             : // If no subcategories, render the menu items
-            category.food_items.map((item) => (
-              item.in_stock ? <MenuItemComponent key={item.name} item={item} /> : <MenuDisabledItemComponent key={item.name} item={item} />
-            ))}
+              category.food_items.map((item) =>
+                item.in_stock ? (
+                  <MenuItemComponent key={item.name} item={item} />
+                ) : (
+                  <MenuDisabledItemComponent key={item.name} item={item} />
+                ),
+              )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -519,15 +563,15 @@ export function SearchMenu({ items }) {
             {/* Display search results */}
             {!loading && filteredItems.length > 0
               ? filteredItems.map((item) => (
-                <div key={item.name}>
-                  <MenuItemComponent item={item} />
-                </div>
-              ))
+                  <div key={item.name}>
+                    <MenuItemComponent item={item} />
+                  </div>
+                ))
               : !loading && (
-                <p className="text-center text-gray-500 text-sm">
-                  Nothing found
-                </p>
-              )}
+                  <p className="text-center text-gray-500 text-sm">
+                    Nothing found
+                  </p>
+                )}
           </section>
         </div>
       </DrawerContent>
@@ -634,21 +678,21 @@ export function MenuAccordion({ items }) {
 }
 
 export function ItemDetailDrawer({ item, isDrawerOpen, setIsDrawerOpen }) {
-  const [imageSrc, setImageSrc] = useState(item.image_url || '/food-thumb.jpg');
+  const [imageSrc, setImageSrc] = useState(item.image_url || "/food-thumb.jpg");
   const handleImageError = () => {
-    setImageSrc('/food-thumb.jpg'); // Fallback image on error
+    setImageSrc("/food-thumb.jpg"); // Fallback image on error
   };
   return (
     <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
       <DrawerContent>
-        <div className="relative mt-2 px-4">
+        <div className="relative my-2 px-4">
           <Image
             src={imageSrc}
             alt="Item"
             height="300"
             width="500"
             onError={handleImageError}
-            className="w-full aspect-video rounded-lg"
+            className="w-full aspect-video rounded-lg object-cover"
           />
           <Button
             className="absolute top-2 right-6 h-6 w-6"
@@ -659,14 +703,16 @@ export function ItemDetailDrawer({ item, isDrawerOpen, setIsDrawerOpen }) {
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className="px-4 mb-8">
+        <div className="px-4 mt-2 mb-8">
           <Image
             src={iconMap[item.food_type]}
             alt="Dash"
             height="16"
             width="16"
           />
-          <DialogTitle className="text-lg font-medium">{item.name}</DialogTitle>
+          <DialogTitle className="text-lg mt-1 leading-none font-medium">
+            {item.name}
+          </DialogTitle>
           <span className="text-base font-medium text-muted-foreground">
             ₹ {item.price}
           </span>
