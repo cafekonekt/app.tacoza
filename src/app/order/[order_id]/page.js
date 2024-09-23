@@ -74,7 +74,7 @@ export const metadata = {
 
 export default async function Order({ params }) {
   const order = await getOrder(params);
-  console.log(order);
+
   if (order.status===404) notFound();
   return (
     <main className="max-w-lg p-4 gap-4 grid">

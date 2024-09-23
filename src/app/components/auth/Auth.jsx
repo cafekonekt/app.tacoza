@@ -73,20 +73,12 @@ const useAuthLogic = () => {
 
 export function Auth() {
   const { isDrawerOpen, setIsDrawerOpen } = useDrawer();
-  console.log("Auth component rendered: ", isDrawerOpen);
 
   // Use a custom hook to encapsulate the auth logic and prevent unnecessary re-renders
   const authValues = useAuthLogic();
 
   // Memoize the context value to prevent unnecessary renders
   const authContextValue = useMemo(() => authValues, [authValues]);
-
-  useEffect(() => {
-    console.log("Auth rendered");
-    return () => {
-      console.log("Drawer Provider Unmounted: ", isDrawerOpen);
-    };
-  });
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -143,13 +135,11 @@ export function Auth() {
 }
 
 function Phone() {
-  console.log("Current step in Auth component:");
-  const { phone, setPhone, setStep, setOtp, setResendCount } =
+  const { phone, setPhone, setStep, setResendCount } =
     useContext(AuthContext);
   const handleNext = async () => {
     const response = await getOTP(phone);
     if (response) {
-      setOtp(response.otp);
       setResendCount(0); // Reset resend count on successful OTP request
       setStep(2);
     }
@@ -187,9 +177,6 @@ function Phone() {
 }
 
 function Otp({ setDrawer }) {
-  useEffect(() => {
-    console.log("Rendering Otp component");
-  }, []);
   const {
     phone,
     otp,
@@ -200,14 +187,20 @@ function Otp({ setDrawer }) {
     resendCount,
     setResendCount,
   } = useContext(AuthContext);
+  const { cartItems, addToCart, clearCart } = useCart();
 
   const handleNext = async () => {
-    // setStep(3);
     const response = await verifyOTP(phone, otp);
     if (response) {
+      if (cartItems.length > 0) {
+        const tempCartItems = [...cartItems];
+        clearCart();
+        tempCartItems.forEach((item) => {
+          addToCart(item.food_item, item.variant, item.addons, item.totalPrice, item.quantity);
+        });
+      }
       // Only move to step 3 if name or email is missing
       if (!response.user.name || !response.user.email) {
-        console.log("User data incomplete moving to step 3");
         setStep(3);
       } else {
         setDrawer(false);
@@ -219,7 +212,6 @@ function Otp({ setDrawer }) {
     if (resendCount < 3) {
       const response = await getOTP(phone);
       if (response) {
-        setOtp(response.otp);
         setOtpTimer(30); // Reset timer to 30 seconds
         setResendCount((prev) => prev + 1); // Increment resend count
       }
@@ -231,7 +223,6 @@ function Otp({ setDrawer }) {
   return (
     <div className="flex flex-col justify-between h-full">
       <div className="flex flex-col gap-2 items-center w-full">
-        {otp}
         <Label>Enter OTP</Label>
         <InputOTP maxLength={6} value={otp} onChange={setOtp}>
           <InputOTPGroup>
@@ -273,9 +264,6 @@ function Otp({ setDrawer }) {
 }
 
 function Name({ setDrawer }) {
-  useEffect(() => {
-    console.log("Rendering Name component");
-  }, []);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -320,6 +308,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { useCart } from "@/context/CartContext";
 
 export function Promo({ gallery }) {
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));

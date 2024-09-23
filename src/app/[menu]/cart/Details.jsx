@@ -11,7 +11,7 @@ import Link from "next/link";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 export function Details({ params, outlet }) {
-  console.log(outlet)
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="bg-rose-50">
