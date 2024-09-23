@@ -24,8 +24,6 @@ export default async function Orders({ params }) {
     getOutlet(menu),
   ]);
 
-  console.log(tables)
-  console.log(outlet)
   if (!tables.status==404 || !outlet.status==404) return null
   
   return (

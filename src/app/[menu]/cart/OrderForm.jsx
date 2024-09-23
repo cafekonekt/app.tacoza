@@ -69,7 +69,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         table_id: order.table_id,
         instructions: order.instruction,
       });
-      console.log(response);
+ 
       if (response) {
         setOrder({ type: "dine_in" });
         const checkoutOptions = {
@@ -83,7 +83,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
           }
           if (result.redirect) {
             console.log("Redirection");
-            console.log(result);
+            // console.log(result);
           }
         });
       }

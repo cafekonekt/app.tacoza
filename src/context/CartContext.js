@@ -28,10 +28,6 @@ export const CartProvider = ({ children }) => {
       }
     };
     fetchCartItems();
-    console.log("Cart Provider Mounted");
-    return () => {
-      console.log("Cart Provider Unmounted");
-    }
   }, [outletSlug]);
 
   // Function to add item to cart
@@ -83,6 +79,10 @@ export const CartProvider = ({ children }) => {
     }
     setIsDrawerOpen(false);
   };
+
+  const clearCart = async () => {
+    setCartItems([]);
+  }
 
   const isItemInCart = (id) => {
     return cartItems.some((item) => item.food_item.id === id);
@@ -149,6 +149,7 @@ export const CartProvider = ({ children }) => {
       value={{
         cartItems,
         isItemInCart,
+        clearCart,
         getItemFromCart,
         addToCart,
         updateQuantity,

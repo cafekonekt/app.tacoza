@@ -254,11 +254,11 @@ export function MenuItemComponent({ item }) {
                 >
                   ADD
                 </Button>
-                {item.variants && (item.addons?.length > 0 && (
-                    <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
-                      Customisable
-                    </p>
-                  ))}
+                {(item.variants !== null && typeof item.variants === 'object' || (item.addons?.length > 0)) && (
+                  <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
+                    Customisable
+                  </p>
+                )}
               </div>
             )}
           </div>

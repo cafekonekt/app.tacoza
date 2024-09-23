@@ -15,7 +15,7 @@ export function Payment({ order, params }) {
       }
       if (result.redirect) {
         console.log("Redirection");
-        console.log(result);
+        // console.log(result);
       }
     });
   };

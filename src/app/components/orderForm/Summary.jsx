@@ -41,11 +41,11 @@ export function Summary({ totalPrice }) {
           <ul className="grid gap-3">
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>₹ {totalPrice - Gst}</span>
+              <span>₹ {(totalPrice - Gst).toFixed(2)}</span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">GST</span>
-              <span>₹ {Gst}</span>
+              <span>₹ {Gst.toFixed(2)}</span>
             </li>
             <li className="flex items-center justify-between">
               <span className="text-muted-foreground">Platform Fee</span>
