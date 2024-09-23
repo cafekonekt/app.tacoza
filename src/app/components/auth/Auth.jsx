@@ -135,8 +135,7 @@ export function Auth() {
 }
 
 function Phone() {
-  const { phone, setPhone, setStep, setResendCount } =
-    useContext(AuthContext);
+  const { phone, setPhone, setStep, setResendCount } = useContext(AuthContext);
   const handleNext = async () => {
     const response = await getOTP(phone);
     if (response) {
@@ -196,7 +195,13 @@ function Otp({ setDrawer }) {
         const tempCartItems = [...cartItems];
         clearCart();
         tempCartItems.forEach(async (item) => {
-          await addToCart(item.food_item, item.variant, item.addons, item.totalPrice, item.quantity);
+          await addToCart(
+            item.food_item,
+            item.variant,
+            item.addons,
+            item.totalPrice,
+            item.quantity,
+          );
         });
       }
       // Only move to step 3 if name or email is missing
@@ -266,12 +271,39 @@ function Otp({ setDrawer }) {
 function Name({ setDrawer }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   const handleNext = async () => {
-    if (!name || !email) {
-      console.error("Name and Email are required");
+    // Reset errors
+    let isValid = true;
+
+    // Validate name
+    if (!name || name.length < 3) {
+      setNameError("Name must be at least 3 characters long.");
+      isValid = false;
+    } else {
+      setNameError(""); // Clear error if valid
+    }
+
+    // Validate email
+    if (!email) {
+      setEmailError("Email is required.");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
+    } else {
+      setEmailError(""); // Clear error if valid
+    }
+
+    // Stop if any validation fails
+    if (!isValid) {
+      console.error("Name and Email are required and must be valid");
       return;
     }
+
+    // Proceed if validation passes
     const response = await updateUser(name, email);
     if (response) {
       setDrawer(false);
@@ -281,20 +313,69 @@ function Name({ setDrawer }) {
   return (
     <div className="flex flex-col justify-between h-full">
       <div className="flex flex-col gap-2 w-full">
+        {/* Name Input */}
         <Label>Name</Label>
         <Input
           placeholder="Rahul Tiwari"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => {
+            const regex = /^[A-Za-z ]*$/; // Allow letters and spaces
+            const value = e.target.value;
+            // Allow only letters and spaces
+            if (regex.test(value)) {
+              setName(value);
+            }
+            // Clear error as the user types if valid
+            if (value.length >= 3) {
+              setNameError("");
+            }
+          }}
+          onKeyPress={(event) => {
+            const charCode = event.charCode;
+            // Allow only letters (A-Z, a-z) and spaces (charCode 32)
+            if (
+              !(charCode >= 65 && charCode <= 90) && // A-Z
+              !(charCode >= 97 && charCode <= 122) && // a-z
+              !(charCode === 32) // space
+            ) {
+              event.preventDefault();
+            }
+          }}
+          onBlur={() => {
+            // Validate minimum length of 3 when leaving the input field
+            if (name.length < 3) {
+              setNameError("Name must be at least 3 characters long.");
+            }
+          }}
           required
         />
+        {/* Show Name Error */}
+        {nameError && <p className="text-xs text-red-500">{nameError}</p>}
+
+        {/* Email Input */}
         <Label>Email</Label>
         <Input
           type="email"
-          placeholder="name@restro.com"
+          placeholder="rahul@gmail.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            // Clear error as the user types if valid
+            if (/\S+@\S+\.\S+/.test(e.target.value)) {
+              setEmailError("");
+            }
+          }}
+          onBlur={() => {
+            // Check if email is valid when leaving the field
+            if (!email) {
+              setEmailError("Email is required.");
+            } else if (!/\S+@\S+\.\S+/.test(email)) {
+              setEmailError("Please enter a valid email address.");
+            }
+          }}
         />
+        {/* Show Email Error */}
+        {emailError && <p className="text-xs text-red-500">{emailError}</p>}
       </div>
       <Button onClick={handleNext}>Continue</Button>
     </div>

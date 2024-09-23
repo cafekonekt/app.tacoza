@@ -24,8 +24,8 @@ export default async function Orders({ params }) {
     getTables(menu),
     getOutlet(menu),
   ]);
-  if (tables.status==404 || outlet.status==404) return notFound();
 
+  if (tables.status == 404 || outlet.status == 404) return notFound();
   return (
     <main className="max-w-md grid gap-4 p-4">
       {/* Header */}
@@ -37,7 +37,12 @@ export default async function Orders({ params }) {
       {/* List Items */}
       <Items />
       {/* Order Form */}
-      <OrderForm params={params} outlet={outlet} tables={tables} session={session} />
+      <OrderForm
+        params={params}
+        outlet={outlet}
+        tables={tables}
+        session={session}
+      />
     </main>
   );
 }

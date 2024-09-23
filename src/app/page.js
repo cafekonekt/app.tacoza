@@ -115,7 +115,7 @@ function HowtoScan() {
         </DrawerHeader>
         <HowtoScanAnimation />
         <DrawerFooter>
-          <DrawerClose>
+          <DrawerClose asChild>
             <Button variant="outline">
               <ScanQrCode className="w-4 h-4 mr-1" /> Scan Now
             </Button>

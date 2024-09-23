@@ -35,7 +35,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 // icons
-import { SwatchBook, Settings2, Search, X } from "lucide-react";
+import { SwatchBook, Settings2, Search, X, LeafyGreen } from "lucide-react";
 import { Star } from "lucide-react";
 // components
 import { VariantAddon } from "@/app/components/menu/menuAccordion/Customize";
@@ -77,22 +77,24 @@ export function MenuTab({ items, setFocusCategory }) {
             Menu
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="relative w-56 max-h-64 overflow-y-scroll mr-5">
-          <DropdownMenuLabel className="sticky top">Menu</DropdownMenuLabel>
+        <DropdownMenuContent className="relative w-56 max-h-64 mr-5">
+          <DropdownMenuLabel>Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {items.map((item) => (
-            <DropdownMenuItem
-              key={item.id}
-              onClick={() => setFocusCategory(item.name)}
-            >
-              {item.name}
-              <DropdownMenuShortcut>
-                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                  {getFoodItemCount(item)}
-                </Badge>
-              </DropdownMenuShortcut>
-            </DropdownMenuItem>
-          ))}
+          <div className="overflow-y-scroll no-scrollbar">
+            {items.map((item) => (
+              <DropdownMenuItem
+                key={item.id}
+                onClick={() => setFocusCategory(item.name)}
+              >
+                {item.name}
+                <DropdownMenuShortcut>
+                  <div className="bg-black opacity-100 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                    {getFoodItemCount(item)}
+                  </div>
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            ))}
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -254,7 +256,9 @@ export function MenuItemComponent({ item }) {
                 >
                   ADD
                 </Button>
-                {(item.variants !== null && typeof item.variants === 'object' || (item.addons?.length > 0)) && (
+                {((item.variants !== null &&
+                  typeof item.variants === "object") ||
+                  item.addons?.length > 0) && (
                   <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
                     Customisable
                   </p>
@@ -340,7 +344,8 @@ export function MenuItemComponent({ item }) {
                           height="14"
                           width="14"
                         />
-                        {item.food_item?.name}{item.variant && ` - ${item.variant.name}`}
+                        {item.food_item?.name}
+                        {item.variant && ` - ${item.variant.name}`}
                       </p>
                       <SetQuantity item={item} />
                     </div>
@@ -375,8 +380,8 @@ export function MenuItemComponent({ item }) {
 }
 
 export function MenuDisabledItemComponent({ item }) {
-  const [imageSrc, setImageSrc] = useState(item.image_url || '/food-thumb.jpg');
-  const handleImageError = () => setImageSrc('/food-thumb.jpg');
+  const [imageSrc, setImageSrc] = useState(item.image_url || "/food-thumb.jpg");
+  const handleImageError = () => setImageSrc("/food-thumb.jpg");
 
   return (
     <>
@@ -449,23 +454,23 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-            category.sub_categories.length > 0
+          category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-            category.sub_categories.map((subCategory) => (
-              <CategoryComponent
-                key={subCategory.name}
-                category={subCategory}
-                depth={depth + 1} // Increment the depth for subcategories
-              />
-            ))
+              category.sub_categories.map((subCategory) => (
+                <CategoryComponent
+                  key={subCategory.name}
+                  category={subCategory}
+                  depth={depth + 1} // Increment the depth for subcategories
+                />
+              ))
             : // If no subcategories, render the menu items
-            category.food_items.map((item) =>
-              item.in_stock ? (
-                <MenuItemComponent key={item.name} item={item} />
-              ) : (
-                <MenuDisabledItemComponent key={item.name} item={item} />
-              ),
-            )}
+              category.food_items.map((item) =>
+                item.in_stock ? (
+                  <MenuItemComponent key={item.name} item={item} />
+                ) : (
+                  <MenuDisabledItemComponent key={item.name} item={item} />
+                ),
+              )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -568,19 +573,19 @@ export function SearchMenu({ items }) {
             </div>
           )}
 
-          <section className="overflow-y-scroll h-[60vh]">
+          <section className="overflow-y-scroll no-scrollbar h-[60vh]">
             {/* Display search results */}
             {!loading && filteredItems.length > 0
               ? filteredItems.map((item) => (
-                <div key={item.name}>
-                  <MenuItemComponent item={item} />
-                </div>
-              ))
+                  <div key={item.name}>
+                    <MenuItemComponent item={item} />
+                  </div>
+                ))
               : !loading && (
-                <p className="text-center text-gray-500 text-sm">
-                  Nothing found
-                </p>
-              )}
+                  <p className="text-center text-gray-500 text-sm">
+                    Nothing found
+                  </p>
+                )}
           </section>
         </div>
       </DrawerContent>
@@ -622,30 +627,41 @@ export function MenuAccordion({ items, outlet }) {
     <>
       <section className="w-full">
         <div className="">
-          <div className="flex justify-between">
-            <span className="flex items-center text-muted-foreground text-sm">
+          <div className="flex">
+            <div className="flex items-center text-muted-foreground text-sm">
               Filters <Settings2 className="w-3.5 h-3.5 ml-1" />{" "}
               <Separator orientation="vertical" className="mx-2" />
-            </span>
-            {/* Toggle Group to select the filter */}
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
-            >
-              {
-                outlet.type.map((type, key) => (
-                <ToggleGroupItem
-                  key={key}
-                  value="veg"
-                  aria-label="Veg Filter"
-                  className="gap-2 px-4 data-[state=on]:bg-green-100 data-[state=on]:text-green-700 align-left"
-                >
-                  <Image src={iconMap[type]} alt="Veg" height="16" width="16" />
-                  <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-                </ToggleGroupItem>))
-              }
-            </ToggleGroup>
+            </div>
+
+            <div className="flex items-center gap-1 overflow-x-scroll no-scrollbar">
+              <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">
+                <LeafyGreen className="h-3.5 w-3.5 fill-green-200" /> Pure Veg
+              </p>
+
+              {/* Toggle Group to select the filter */}
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
+              >
+                {outlet.type.map((type, key) => (
+                  <ToggleGroupItem
+                    key={key}
+                    value={type}
+                    aria-label="Veg Filter"
+                    className="gap-2 px-4 data-[state=on]:bg-gray-100 align-left"
+                  >
+                    <Image
+                      src={iconMap[type]}
+                      alt="Veg"
+                      height="16"
+                      width="16"
+                    />
+                    <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
           </div>
 
           {/* Search Menu */}
@@ -714,9 +730,7 @@ export function ItemDetailDrawer({ item, isDrawerOpen, setIsDrawerOpen }) {
             {item.rating}
             <p className="text-primary text-xs">(12 Ratings)</p>
           </span>
-          <p className="text-muted-foreground text-xs line-clamp-2">
-            {item.description}
-          </p>
+          <p className="text-muted-foreground text-xs">{item.description}</p>
         </div>
       </DrawerContent>
     </Drawer>
