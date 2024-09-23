@@ -37,6 +37,7 @@ export function Items() {
                   alt="Dash"
                   height="14"
                   width="14"
+                  className="mt-[2px]"
                 />
                 {item.food_item?.name}
                 {item.variant && ` - ${item.variant.name}`}

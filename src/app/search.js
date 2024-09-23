@@ -96,7 +96,7 @@ export function SearchRestaurant({ restaurants }) {
               <SearchLoadingAnimation />
             </div>
           )}
-          <section className="overflow-y-scroll h-[60vh]">
+          <section className="overflow-y-scroll no-scrollbar h-[60vh]">
             {/* Display search results */}
             {!loading && filteredRestaurants.length > 0
               ? filteredRestaurants.map((restaurant) => (
