@@ -24,9 +24,8 @@ export default async function Orders({ params }) {
     getTables(menu),
     getOutlet(menu),
   ]);
-
   if (tables.status==404 || outlet.status==404) return notFound();
-  console.log(session);
+
   return (
     <main className="max-w-md grid gap-4 p-4">
       {/* Header */}
