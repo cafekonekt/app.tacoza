@@ -9,7 +9,6 @@ export async function verifyOTP(phone_number, otp) {
       'phone_number': phone_number,
       'otp': otp
     });
-    
     const session = await encrypt(response);
     cookies().set('session', session);
     return response;

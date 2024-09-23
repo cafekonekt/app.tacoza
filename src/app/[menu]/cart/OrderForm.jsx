@@ -26,6 +26,7 @@ import { useCart } from "@/context/CartContext";
 import { useDrawer } from "@/context/DrawerContext";
 
 import { cashfree } from "@/app/util/cashfree";
+import { logout } from "@/app/lib/auth/session";
 
 const SERVICE_MAP_ICON = {
   dine_in: <UtensilsCrossed className="h-3.5 w-3.5 mr-1" />,
@@ -61,6 +62,10 @@ export function OrderForm({ params, outlet, tables, table, session }) {
       tableSelectRef.current?.focus();
       return;
     }
+    if (cartItems.length === 0) {
+      setAlert("Empty cart");
+      return;
+    }
     setLoading(true);
     try {
       const response = await checkout({
@@ -69,7 +74,9 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         table_id: order.table_id,
         instructions: order.instruction,
       });
- 
+      if (response.error) {
+        logout();
+      }
       if (response) {
         setOrder({ type: "dine_in" });
         const checkoutOptions = {

@@ -195,8 +195,8 @@ function Otp({ setDrawer }) {
       if (cartItems.length > 0) {
         const tempCartItems = [...cartItems];
         clearCart();
-        tempCartItems.forEach((item) => {
-          addToCart(item.food_item, item.variant, item.addons, item.totalPrice, item.quantity);
+        tempCartItems.forEach(async (item) => {
+          await addToCart(item.food_item, item.variant, item.addons, item.totalPrice, item.quantity);
         });
       }
       // Only move to step 3 if name or email is missing

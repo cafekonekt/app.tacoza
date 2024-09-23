@@ -1,0 +1,32 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - main
+env:
+  AWS_PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
+  AWS_INSTANCE_USERNAME: ${{ secrets.AWS_INSTANCE_USERNAME }}
+  AWS_INSTANCE_IP: ${{ secrets.AWS_INSTANCE_IP }}
+
+permissions: write-all
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set permissions for private key
+      run: |
+        echo "${{ env.AWS_PRIVATE_KEY }}" > key.pem
+        chmod 600 key.pem
+    
+    - name: Pull Recent git changes
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'cd client/app.tacoza/ && git pull origin main'
+
+    - name: Stop running container
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'docker compose -f "/home/ubuntu/client/docker-compose.yml" down'
+
+    - name: Run new container
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'docker compose -f "/home/ubuntu/client/docker-compose.yml" up -d --build'
