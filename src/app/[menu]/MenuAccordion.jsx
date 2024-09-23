@@ -108,7 +108,7 @@ export function MenuItemComponent({ item }) {
 
   // Manage variant selection (default to item price match variant)
   const [selectedVariant, setSelectedVariant] = useState(
-    item?.variants?.find((variant) => variant.price === item.price),
+    item?.variants?.type?.find((variant) => variant.price === item.price),
   );
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [totalPrice, setTotalPrice] = useState(item.price);
@@ -146,7 +146,7 @@ export function MenuItemComponent({ item }) {
     addToCart(item, selectedVariant, selectedAddons, totalPrice, quantity);
     // Reset values after adding to cart
     setSelectedVariant(
-      item?.variants?.find((variant) => variant.price === item.price),
+      item?.variants?.type.find((variant) => variant.price === item.price),
     );
     setSelectedAddons([]);
     setTotalPrice(item.price);
@@ -254,8 +254,7 @@ export function MenuItemComponent({ item }) {
                 >
                   ADD
                 </Button>
-                {item.variants ||
-                  (item.addons?.length > 0 && (
+                {item.variants && (item.addons?.length > 0 && (
                     <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
                       Customisable
                     </p>
