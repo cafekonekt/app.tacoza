@@ -23,8 +23,11 @@ export default async function Home({ params }) {
     getTable(table_id),
     waitPromisForLoader,
   ]);
-  if (table.status===404) notFound();
-
+  
+  if (items.status === 404) notFound()
+  if (outlet.status === 404) notFound()
+  if (table.status === 404) notFound()
+  
   return (
     <>
       <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden">
