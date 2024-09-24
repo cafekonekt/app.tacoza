@@ -77,7 +77,7 @@ export function MenuTab({ items, setFocusCategory }) {
             Menu
           </div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="relative w-56 max-h-64 mr-5">
+        <DropdownMenuContent className="relative w-56 max-h-64 mr-5 overflow-y-scroll no-scrollbar">
           <DropdownMenuLabel>Menu</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="overflow-y-scroll no-scrollbar">
@@ -88,7 +88,7 @@ export function MenuTab({ items, setFocusCategory }) {
               >
                 {item.name}
                 <DropdownMenuShortcut>
-                  <div className="bg-black opacity-100 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
+                  <div className="bg-rose-600 opacity-100 text-white flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                     {getFoodItemCount(item)}
                   </div>
                 </DropdownMenuShortcut>
@@ -259,10 +259,10 @@ export function MenuItemComponent({ item }) {
                 {((item.variants !== null &&
                   typeof item.variants === "object") ||
                   item.addons?.length > 0) && (
-                  <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
-                    Customisable
-                  </p>
-                )}
+                    <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
+                      Customisable
+                    </p>
+                  )}
               </div>
             )}
           </div>
@@ -454,23 +454,23 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-          category.sub_categories.length > 0
+            category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-              category.sub_categories.map((subCategory) => (
-                <CategoryComponent
-                  key={subCategory.name}
-                  category={subCategory}
-                  depth={depth + 1} // Increment the depth for subcategories
-                />
-              ))
+            category.sub_categories.map((subCategory) => (
+              <CategoryComponent
+                key={subCategory.name}
+                category={subCategory}
+                depth={depth + 1} // Increment the depth for subcategories
+              />
+            ))
             : // If no subcategories, render the menu items
-              category.food_items.map((item) =>
-                item.in_stock ? (
-                  <MenuItemComponent key={item.name} item={item} />
-                ) : (
-                  <MenuDisabledItemComponent key={item.name} item={item} />
-                ),
-              )}
+            category.food_items.map((item) =>
+              item.in_stock ? (
+                <MenuItemComponent key={item.name} item={item} />
+              ) : (
+                <MenuDisabledItemComponent key={item.name} item={item} />
+              ),
+            )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -577,15 +577,15 @@ export function SearchMenu({ items }) {
             {/* Display search results */}
             {!loading && filteredItems.length > 0
               ? filteredItems.map((item) => (
-                  <div key={item.name}>
-                    <MenuItemComponent item={item} />
-                  </div>
-                ))
+                <div key={item.name}>
+                  <MenuItemComponent item={item} />
+                </div>
+              ))
               : !loading && (
-                  <p className="text-center text-gray-500 text-sm">
-                    Nothing found
-                  </p>
-                )}
+                <p className="text-center text-gray-500 text-sm">
+                  Nothing found
+                </p>
+              )}
           </section>
         </div>
       </DrawerContent>
@@ -634,33 +634,35 @@ export function MenuAccordion({ items, outlet }) {
             </div>
 
             <div className="flex items-center gap-1 overflow-x-scroll no-scrollbar">
-              <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">
-                <LeafyGreen className="h-3.5 w-3.5 fill-green-200" /> Pure Veg
-              </p>
-
-              {/* Toggle Group to select the filter */}
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
-              >
-                {outlet.type.map((type, key) => (
-                  <ToggleGroupItem
-                    key={key}
-                    value={type}
-                    aria-label="Veg Filter"
-                    className="gap-2 px-4 data-[state=on]:bg-gray-100 align-left"
+              {
+                outlet.type?.length === 1 ? (
+                  <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">
+                    <LeafyGreen className="h-3.5 w-3.5 fill-green-200" /> Pure Veg
+                  </p>) : (
+                  <ToggleGroup
+                    type="single"
+                    variant="outline"
+                    onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
                   >
-                    <Image
-                      src={iconMap[type]}
-                      alt="Veg"
-                      height="16"
-                      width="16"
-                    />
-                    <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
+                    {outlet.type.map((type, key) => (
+                      <ToggleGroupItem
+                        key={key}
+                        value={type}
+                        aria-label="Veg Filter"
+                        className="gap-2 px-4 data-[state=on]:bg-gray-100 align-left"
+                      >
+                        <Image
+                          src={iconMap[type]}
+                          alt="Veg"
+                          height="16"
+                          width="16"
+                        />
+                        <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                      </ToggleGroupItem>
+                    ))}
+                  </ToggleGroup>
+                )
+              }
             </div>
           </div>
 
