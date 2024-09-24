@@ -10,7 +10,11 @@ export async function verifyOTP(phone_number, otp) {
       'otp': otp
     });
     const session = await encrypt(response);
-    cookies().set('session', session);
+    cookies().set('session', session, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
     return response;
   } catch (error) {
     return null;
