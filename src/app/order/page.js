@@ -1,4 +1,3 @@
-"use server";
 import { ChevronLeft, ChevronRightIcon, RotateCcwSquare } from "lucide-react";
 import {
   Breadcrumb,
@@ -19,10 +18,10 @@ import { notFound } from "next/navigation";
 import { getSession, logout } from "@/app/lib/auth/session";
 import { apiGet } from "@/handlers/apiHandler";
 
-// export const metadata = {
-//   title: "My Orders - tacoza (Instant food Ordering)",
-//   description: "Scan, Crave and Order superfast",
-// };
+export const metadata = {
+  title: "My Orders - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
 
 const iconMap = {
   veg: "/veg.svg",
@@ -38,6 +37,7 @@ export default async function Order() {
     },
   });
   if (orderHistory.status === 404 || orderHistory.status === 401) notFound();
+
   return (
     <main className="max-w-lg p-4 gap-4 grid" suppressHydrationWarning>
       <h2 className="text-2xl font-semibold">

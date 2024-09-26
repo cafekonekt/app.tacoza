@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+export const metadata = {
+  title: "404 - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
+
 export default function NotFound() {
   return (
     <main className="relative max-w-screen h-screen flex flex-col items-center">

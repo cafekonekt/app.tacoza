@@ -30,7 +30,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { usePathname } from "next/navigation";
 import { useDrawer } from "@/context/DrawerContext";
 import { getOTP } from "@/app/lib/auth/getOTP";
 import { verifyOTP } from "@/app/lib/auth/verifyOTP";
