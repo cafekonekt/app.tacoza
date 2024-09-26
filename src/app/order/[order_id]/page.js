@@ -65,7 +65,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { getPayment } from "@/app/lib/order/getPayment";
 
 export const metadata = {
   title: "Order Summary - tacoza (Instant food Ordering)",

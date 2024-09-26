@@ -10,31 +10,30 @@ import { Footer } from "./Footer";
 import { Details } from "./Details";
 import { notFound } from "next/navigation";
 
-// export async function generateMetadata({ params }, parent) {
-//   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
+export async function generateMetadata({ params }, parent) {
+  const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
 
-//   const outlet = await Promise.all([
-//     outletPromis,
-//   ]);
+  const response = await Promise.all([
+    outletPromis,
+  ]);
+  const outlet = response[0]
+  if (outlet.status === 404) notFound()
 
-//   return {
-//     title: outlet.name,
-//     openGraph: {
-//       images: [ outlet.logo, ...outlet.gallery],
-//     },
-//   }
-// }
+  return {
+    title: outlet.name,
+    openGraph: {
+      images: [ outlet.logo, ...outlet?.gallery],
+    },
+  }
+}
 
 export default async function Home({ params }) {
   const itemsPromis = apiGet(`/api/shop/menu/${params.menu}`);
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
-  const waitPromisForLoader = new Promise((resolve) =>
-    setTimeout(resolve, 1000),
-  );
+
   const [items, outlet] = await Promise.all([
     itemsPromis,
     outletPromis,
-    waitPromisForLoader,
   ]);
   if (items.status === 404) notFound()
   if (outlet.status === 404) notFound()

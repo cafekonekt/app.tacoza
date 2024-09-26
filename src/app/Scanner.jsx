@@ -6,7 +6,7 @@ import { Scanner } from "@yudiel/react-qr-scanner";
 export function QRScanner() {
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState("");
-    
+
     const handleScan = (result) => {
         const scannedBarcode = result[0];
         const scannedUrl = scannedBarcode?.rawValue;
