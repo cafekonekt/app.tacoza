@@ -168,7 +168,6 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         </Select>
         {alert && <p className="text-xs text-red-500">{alert}</p>}
       </Card>
-      <PaymentMethod />
       <Summary totalPrice={totalPrice} />
 
       <ShinyButton
@@ -186,22 +185,12 @@ export function OrderForm({ params, outlet, tables, table, session }) {
 export function PaymentMethod() {
   return (
     <Drawer>
-      <DrawerTrigger>Pay</DrawerTrigger>
       <DrawerContent className="mb-4">
         <DrawerHeader className="flex items-start w-full">
           <div className="flex flex-col items-start w-full">
             <DrawerDescription>Pay ₹149 to Place your order</DrawerDescription>
             <DrawerTitle>Select Payment Method</DrawerTitle>
           </div>
-          <DrawerClose>
-            <Button
-              size="icon"
-              variant="outline"
-              className="rounded-full h-6 w-6"
-            >
-              <X size={16} />
-            </Button>
-          </DrawerClose>
         </DrawerHeader>
         <ToggleGroup
           className="w-full flex-col gap-4 p-4"
