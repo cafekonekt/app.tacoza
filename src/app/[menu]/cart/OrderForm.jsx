@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 // icons
-import { Bike, Package, UtensilsCrossed } from "lucide-react";
+import { Bike, X, Package, UtensilsCrossed } from "lucide-react";
 // animations
 import ShinyText from "@/components/ui/animations/ShinyText";
 // components
@@ -27,6 +27,18 @@ import { useDrawer } from "@/context/DrawerContext";
 
 import { cashfree } from "@/app/util/cashfree";
 import { logout } from "@/app/lib/auth/session";
+import ShinyButton from "@/components/ui/animations/ShinyButton";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import Image from "next/image";
 
 const SERVICE_MAP_ICON = {
   dine_in: <UtensilsCrossed className="h-3.5 w-3.5 mr-1" />,
@@ -39,7 +51,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   const { openDrawer } = useDrawer();
 
   const tableSelectRef = React.useRef(null); // 1. Create a ref for the SelectTrigger
-  
+
   const [order, setOrder] = React.useState({
     type: "dine_in",
     table_id: table?.table_id,
@@ -113,18 +125,19 @@ export function OrderForm({ params, outlet, tables, table, session }) {
             setOrder({ ...order, type: value });
           }}
         >
-          {
-            outlet.services.map((service, key) => (
-              <ToggleGroupItem
-                key={key}
-                value={service}
-                className={`border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100`}
-              >
-                {SERVICE_MAP_ICON[service]}
-                {service.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-              </ToggleGroupItem>
-            ))
-          }
+          {outlet.services.map((service, key) => (
+            <ToggleGroupItem
+              key={key}
+              value={service}
+              className={`border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100`}
+            >
+              {SERVICE_MAP_ICON[service]}
+              {service
+                .split("_")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+            </ToggleGroupItem>
+          ))}
         </ToggleGroup>
         <Label forhtml="instruction">Add Cooking Instruction</Label>
         <Textarea
@@ -155,19 +168,77 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         </Select>
         {alert && <p className="text-xs text-red-500">{alert}</p>}
       </Card>
+      <PaymentMethod />
       <Summary totalPrice={totalPrice} />
-      <Button
+
+      <ShinyButton
         onClick={handleSubmit}
-        className="sticky bottom-5 right-0 p-6 rounded-xl shadow-xl"
+        className="sticky bottom-5 right-0 w-full p-6 rounded-xl text-lg font-bold text-white shadow-xl"
         disabled={loading}
+        shimmerWidth={150}
       >
-        <ShinyText
-          shimmerWidth={300}
-          className="drop-shadow-lg text-lg font-bold"
-        >
-          Proceed to Pay ₹{totalPrice}
-        </ShinyText>
-      </Button>
+        Proceed to Pay ₹{totalPrice}
+      </ShinyButton>
     </>
+  );
+}
+
+export function PaymentMethod() {
+  return (
+    <Drawer>
+      <DrawerTrigger>Pay</DrawerTrigger>
+      <DrawerContent className="mb-4">
+        <DrawerHeader className="flex items-start w-full">
+          <div className="flex flex-col items-start w-full">
+            <DrawerDescription>Pay ₹149 to Place your order</DrawerDescription>
+            <DrawerTitle>Select Payment Method</DrawerTitle>
+          </div>
+          <DrawerClose>
+            <Button
+              size="icon"
+              variant="outline"
+              className="rounded-full h-6 w-6"
+            >
+              <X size={16} />
+            </Button>
+          </DrawerClose>
+        </DrawerHeader>
+        <ToggleGroup
+          className="w-full flex-col gap-4 p-4"
+          type="single"
+          variant="outline"
+        >
+          <ToggleGroupItem
+            className="w-full flex justify-between h-16 text-base font-bold data-[state=on]:border-2  data-[state=on]:border-primary  data-[state=on]:text-primary  data-[state=on]:bg-rose-50"
+            value="online"
+          >
+            <Image
+              src="/payonline.png"
+              width={400}
+              height={100}
+              alt="online"
+              className="h-10 w-40"
+            />
+            Pay Now
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            className="w-full flex justify-between h-16 text-base font-bold  data-[state=on]:border-2  data-[state=on]:border-primary  data-[state=on]:text-primary  data-[state=on]:bg-rose-50"
+            value="cash"
+          >
+            <Image
+              src="/rupee.png"
+              width={60}
+              height={16}
+              alt="cash"
+              className="object-cover h-8 w-12 rounded-[5px]"
+            />
+            Pay Cash
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <DrawerFooter className="hidden">
+          <Button className="text-lg font-bold h-12">Place Order</Button>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
