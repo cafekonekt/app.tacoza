@@ -20,29 +20,83 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
+// Dummy Data for the Item
+const item = {
+  id: 1,
+  name: "Deluxe Veggie Pizza",
+  basePrice: 249, // Base price without any variants
+  description: "A delicious veggie pizza with fresh toppings",
+  image: "/images/deluxe_veggie_pizza.jpg", // Image path
+
+  // Variant categories
+  variantCategories: [
+    {
+      variantCategoryId: 101,
+      name: "Crust Type",
+      variantOptions: [
+        { variantOptionId: 1011, name: "Thin Crust", additionalPrice: 0 }, // Base price
+        { variantOptionId: 1012, name: "Hand Tossed", additionalPrice: 20 },
+        { variantOptionId: 1013, name: "Cheese Burst", additionalPrice: 50 },
+      ],
+    },
+    {
+      variantCategoryId: 102,
+      name: "Size",
+      variantOptions: [
+        { variantOptionId: 1021, name: "Small", additionalPrice: 0 }, // Base price
+        { variantOptionId: 1022, name: "Medium", additionalPrice: 50 },
+        { variantOptionId: 1023, name: "Large", additionalPrice: 100 },
+      ],
+    },
+  ],
+
+  // Add-ons
+  addons: [
+    { addonId: 201, name: "Extra Cheese", price: 25 },
+    { addonId: 202, name: "Garlic Bread", price: 49 },
+    { addonId: 203, name: "Dips", price: 19 },
+  ],
+
+  // Combinations (mapped to the selected variant option IDs and their final price)
+  combinationPrices: [
+    { combination: [1011, 1021], price: 249 }, // Thin Crust + Small
+    { combination: [1011, 1022], price: 299 }, // Thin Crust + Medium
+    { combination: [1011, 1023], price: 349 }, // Thin Crust + Large
+    { combination: [1012, 1021], price: 269 }, // Hand Tossed + Small
+    { combination: [1012, 1022], price: 319 }, // Hand Tossed + Medium
+    { combination: [1012, 1023], price: 369 }, // Hand Tossed + Large
+    { combination: [1013, 1021], price: 299 }, // Cheese Burst + Small
+    { combination: [1013, 1022], price: 349 }, // Cheese Burst + Medium
+    { combination: [1013, 1023], price: 399 }, // Cheese Burst + Large
+  ],
+};
+
 export function VariantAddon({
-  variant,
-  selectedVariant,
+  variantCategories,
+  selectedVariants,
   onVariantChange,
   addons,
   selectedAddons,
   onAddonChange,
+  showAddons,
 }) {
   return (
     <div className="mx-4">
-      {/* Variant */}
-      {variant && (
-        <>
-          <Label forhtml="size">{variant?.name}</Label>
+      {/* Variants */}
+      {variantCategories.map((variantCategory, index) => (
+        <div key={index} className="mb-4">
+          <Label forhtml={variantCategory.name}>{variantCategory.name}</Label>
           <RadioGroup
             className="flex flex-col gap-2 bg-accent rounded-xl p-4"
-            value={selectedVariant}
-            onValueChange={(value) => onVariantChange(value)}
+            value={selectedVariants[variantCategory.variantCategoryId] || ""}
+            onValueChange={(value) =>
+              onVariantChange(variantCategory.variantCategoryId, value)
+            }
           >
-            {variant?.type?.map((option, index) => (
+            {variantCategory.variantOptions.map((option) => (
               <div
                 className="flex items-center justify-between w-full"
-                key={index}
+                key={option.variantOptionId}
               >
                 <div className="w-full flex items-center justify-between">
                   <p className="font-medium flex items-center gap-2">
@@ -50,22 +104,21 @@ export function VariantAddon({
                     {option.name}
                   </p>
                   <span className="text-muted-foreground mr-4">
-                    ₹{option.price}
+                    ₹{option.additionalPrice}
                   </span>
                 </div>
                 <RadioGroupItem
-                  value={option}
-                  id={option.variant}
-                  checked={selectedVariant.price === option.price}
+                  value={option.variantOptionId}
+                  id={option.name}
                 />
               </div>
             ))}
           </RadioGroup>
-        </>
-      )}
+        </div>
+      ))}
 
-      {/* Add-on */}
-      {addons && addons.length > 0 && (
+      {/* Add-ons */}
+      {showAddons && addons && addons.length > 0 && (
         <>
           <Label forhtml="addon">Add-on</Label>
           <section className="flex flex-col gap-2 bg-accent rounded-xl p-4">
@@ -98,52 +151,59 @@ export function VariantAddon({
   );
 }
 
-export function Customize({ item }) {
+export function Customize() {
   const { addToCart } = useCart();
 
-  // State to manage selected variant and add-ons
-  // default variant should be the the one which has same price as item price
-  const [selectedVariant, setSelectedVariant] = useState(
-    item?.variants?.type.find((variant) => variant.price === item.price),
-  );
+  const [selectedVariants, setSelectedVariants] = useState({});
   const [selectedAddons, setSelectedAddons] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(item.price);
-  const [count, setCount] = React.useState(1);
+  const [totalPrice, setTotalPrice] = useState(item.basePrice || 0);
+  const [count, setCount] = useState(1);
+  const [showAddons, setShowAddons] = useState(false);
 
-  // Calculate total price whenever the selected variant or add-ons change
-  useEffect(() => {
-    if (count <= 0) {
-      setCount(1);
+  // Handle variant selection change
+  const handleVariantChange = (categoryId, optionId) => {
+    setSelectedVariants((prev) => ({ ...prev, [categoryId]: optionId }));
+  };
+
+  // Handle addon change
+  const handleAddonChange = (addon, isChecked) => {
+    if (isChecked) {
+      setSelectedAddons((prev) => [...prev, addon]);
+    } else {
+      setSelectedAddons((prev) => prev.filter((item) => item !== addon));
     }
+  };
+
+  // Calculate the total price based on selected variants and addons
+  useEffect(() => {
+    let selectedVariantIds = Object.values(selectedVariants);
+
+    // Find the price for the selected variant combination
+    let selectedCombination = item.combinationPrices.find((comb) =>
+      selectedVariantIds.every((id) => comb.combination.includes(id)),
+    );
+    let combinationPrice = selectedCombination
+      ? selectedCombination.price
+      : item.basePrice;
+
+    // Calculate addons price
     let addonsPrice = selectedAddons.reduce(
       (sum, addon) => sum + parseFloat(addon.price),
       0,
     );
-    if (selectedVariant) {
-      setTotalPrice(parseFloat(selectedVariant.price) * count + addonsPrice);
-    } else {
-      setTotalPrice(parseFloat(item.price) * count + addonsPrice);
-    }
-  }, [selectedVariant, selectedAddons, count, item.price]);
 
-  const handleVariantChange = (variant) => {
-    setSelectedVariant(variant);
-  };
+    setTotalPrice(combinationPrice * count + addonsPrice);
 
-  const handleAddonChange = (addonPrice, isChecked) => {
-    if (isChecked) {
-      setSelectedAddons((prev) => [...prev, addonPrice]);
-    } else {
-      setSelectedAddons((prev) => prev.filter((price) => price !== addonPrice));
-    }
-  };
+    // Show addons only after all variants are selected
+    setShowAddons(selectedVariantIds.length === item.variantCategories.length);
+  }, [selectedVariants, selectedAddons, count]);
 
   const handleAddToCart = () => {
     addToCart(
       {
         ...item,
       },
-      selectedVariant,
+      selectedVariants,
       selectedAddons,
       totalPrice,
       count,
@@ -152,7 +212,7 @@ export function Customize({ item }) {
 
   return (
     <Drawer>
-      {item.variants || item.addons?.length > 0 ? (
+      {item.variantCategories || item.addons?.length > 0 ? (
         <DrawerTrigger asChild>
           <Button
             className="border-2 border-rose-500 bg-rose-50 text-rose-500 text-base font-semibold shadow-lg"
@@ -175,7 +235,7 @@ export function Customize({ item }) {
           <DrawerHeader className="flex items-start w-full">
             <div className="flex flex-col items-start w-full">
               <DrawerDescription>
-                {item.name} • ₹{item.price}
+                {item.name} • ₹{item.basePrice || item.price}
               </DrawerDescription>
               <DrawerTitle>Customise as per your taste</DrawerTitle>
             </div>
@@ -191,12 +251,13 @@ export function Customize({ item }) {
           </DrawerHeader>
           <Separator className="my-4" />
           <VariantAddon
-            variant={item.variants}
-            selectedVariant={selectedVariant}
+            variantCategories={item.variantCategories}
+            selectedVariants={selectedVariants}
             onVariantChange={handleVariantChange}
             addons={item.addons}
             selectedAddons={selectedAddons}
             onAddonChange={handleAddonChange}
+            showAddons={showAddons}
           />
           <DrawerFooter>
             <div className="flex w-full gap-2 justify-between">
