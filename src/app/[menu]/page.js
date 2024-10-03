@@ -35,8 +35,8 @@ export default async function Home({ params }) {
     itemsPromis,
     outletPromis,
   ]);
-  if (items.status === 404) notFound()
-  if (outlet.status === 404) notFound()
+  if (items.status === 404) notFound();
+  if (outlet.status === 404) notFound();
 
   return (
     <>
