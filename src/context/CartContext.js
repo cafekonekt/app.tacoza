@@ -33,10 +33,9 @@ export const CartProvider = ({ children }) => {
   // Function to add item to cart
   const addToCart = async (item, variant, addons, totalPrice, quantity) => {
     const uniqueItemKey = `${item.id}-${variant?.id || "default"}-${addons
-      .map((addon) => addon.id)
+      ?.map((addon) => addon.id)
       .sort()
       .join("-")}`;
-
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (cartItem) => cartItem.item_id === uniqueItemKey,

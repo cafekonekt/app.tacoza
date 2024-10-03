@@ -5,9 +5,11 @@ import React from "react";
 
 function Counter({ count, setCount }) {
   const decrement = () => {
+    if (count === 1) {
+      return;
+    }
     setCount(count - 1)
   };
-
   const increment = () => {
     setCount(count + 1);
   };
