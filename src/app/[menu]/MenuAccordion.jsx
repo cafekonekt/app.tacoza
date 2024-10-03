@@ -597,8 +597,6 @@ export function MenuAccordion({ items, outlet }) {
   const [focusCategory, setFocusCategory] = useState(null);
   const [foodTypeFilter, setFoodTypeFilter] = useState(null);
 
-  console.log(items);
-
   // Filter items based on the selected food type
   const filteredItems = items.map((category) => {
     // Filter food_items in the category

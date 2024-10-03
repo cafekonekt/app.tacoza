@@ -1,4 +1,3 @@
-"use server";
 // components
 import { Header } from "./Header";
 import { BreadCrumb } from "./Breadcrumb";
@@ -11,10 +10,10 @@ import { getTables } from "@/app/lib/tables/getTables";
 import { getSession } from "@/app/lib/auth/session";
 import { notFound } from "next/navigation";
 
-// export const metadata = {
-//   title: "Cart - tacoza (Instant food Ordering)",
-//   description: "Scan, Crave and Order superfast",
-// };
+export const metadata = {
+  title: "Cart - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
 
 export default async function Orders({ params }) {
   const menu = params.menu;

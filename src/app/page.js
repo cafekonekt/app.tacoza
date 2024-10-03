@@ -1,4 +1,3 @@
-"use server";
 import { SearchRestaurant, SearchRestro } from "./search";
 import Image from "next/image";
 import {
@@ -19,13 +18,13 @@ import { DrawerProvider } from "@/context/DrawerContext";
 import { QRScanner } from "./Scanner";
 import { Ads } from "./Ads";
 import { getSession } from "./lib/auth/session";
-import { Menu } from "./components/menu/header/Menu";
-import { Auth } from "./components/auth/Auth";
+import { Menu } from "@/app/components/menu/header/Menu";
+import { Auth } from "@/app/components/auth/Auth";
 
-// export const metadata = {
-//   title: "Home - tacoza (Instant food Ordering)",
-//   description: "Scan, Crave and Order superfast",
-// };
+export const metadata = {
+  title: "Home - tacoza (Instant food Ordering)",
+  description: "Scan, Crave and Order superfast",
+};
 
 const restaurants = [
   {
@@ -79,11 +78,7 @@ export default async function Scan() {
         <div className="rounded-b-3xl shadow-xl bg-white p-6 pb-10 flex flex-col gap-3">
           <div className="flex justify-between">
             <Image src="/logo.png" alt="logo" width={150} height={100} />
-            {!session?.user?.name || !session?.user?.email ? (
-              <Auth />
-            ) : (
-              <Menu />
-            )}
+            {!session?.user?.name || !session?.user?.email ? <Auth /> : <Menu />}
           </div>
           <SearchRestaurant restaurants={restaurants} />
           <Ads />
