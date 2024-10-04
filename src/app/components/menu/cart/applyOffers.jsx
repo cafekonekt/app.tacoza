@@ -118,7 +118,7 @@ export function ApplyOffers({
           <div className="flex justify-between items-center">
             <div>
               <div className="flex gap-1 text-base font-semibold">
-                '{bestOffer.code}' applied
+              &apos{bestOffer.code}&apos applied
               </div>
               <div className="flex -mt-1 text-sm text-muted-foreground">
                 <Check size={16} className="text-primary" />
