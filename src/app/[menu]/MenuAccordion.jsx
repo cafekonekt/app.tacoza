@@ -38,7 +38,7 @@ import Image from "next/image";
 import { SwatchBook, Settings2, Search, X, LeafyGreen } from "lucide-react";
 import { Star } from "lucide-react";
 // components
-import { VariantAddon } from "@/app/components/menu/menuAccordion/Customize";
+import { Customize } from "@/app/components/menu/menuAccordion/Customize";
 // context
 import { useCart } from "@/context/CartContext";
 import { SearchLoadingAnimation } from "../components/lottie/lottie";
@@ -108,64 +108,20 @@ export function MenuItemComponent({ item }) {
   const [addDrawerOpen, setAddDrawerOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
-  // Manage variant selection (default to item price match variant)
-  const [selectedVariant, setSelectedVariant] = useState(
-    item?.variants?.type?.find((variant) => variant.price === item.price),
-  );
-  const [selectedAddons, setSelectedAddons] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(item.price);
-
   const { addToCart, updateQuantity, getItemFromCart } = useCart();
 
-  // Utility to calculate total price based on variant, addons, and quantity
-  const calculateTotalPrice = useCallback(() => {
-    const addonsPrice = selectedAddons.reduce(
-      (sum, addon) => sum + parseFloat(addon.price),
-      0,
-    );
-    const variantPrice = selectedVariant
-      ? parseFloat(selectedVariant.price)
-      : parseFloat(item.price);
-    return variantPrice * quantity + addonsPrice;
-  }, [selectedVariant, selectedAddons, quantity, item.price]);
-
-  // Update total price when relevant states change
-  useEffect(() => {
-    setTotalPrice(calculateTotalPrice());
-  }, [calculateTotalPrice]);
-
-  // Handlers for UI interactions
-  const handleVariantChange = (variant) => setSelectedVariant(variant);
-  const handleAddonChange = (addon, isChecked) => {
-    setSelectedAddons((prevAddons) =>
-      isChecked
-        ? [...prevAddons, addon]
-        : prevAddons.filter((ad) => ad.id !== addon.id),
-    );
-  };
-
   const handleAddToCart = () => {
-    addToCart(item, selectedVariant, selectedAddons, totalPrice, quantity);
-    // Reset values after adding to cart
-    setSelectedVariant(
-      item?.variants?.type.find((variant) => variant.price === item.price),
-    );
-    setSelectedAddons([]);
-    setTotalPrice(item.price);
+    addToCart(item, null, [], item.price, quantity);
     setQuantity(1);
   };
 
   const handleImageError = () => setImageSrc("/food-thumb.jpg");
-
-  // Get all items in the cart that match the food item id
   const existingItems = getItemFromCart(item.id);
 
   const increment = () => {
-    if (item.variants || item.addons?.length > 0) {
-      // For items with variants/addons, open the drawer to customize
+    if (item.variant || item.addons) {
       setAddDrawerOpen(true);
     } else {
-      // For simple items, update the quantity directly
       if (existingItems?.length > 0) {
         updateQuantity(existingItems[0].item_id, existingItems[0].quantity + 1);
       } else {
@@ -175,7 +131,7 @@ export function MenuItemComponent({ item }) {
   };
 
   const decrement = () => {
-    if (item.variants || item.addons?.length > 0) {
+    if (item.variant || item.addons) {
       setEditDrawerOpen(true);
     } else {
       if (existingItems?.length > 0) {
@@ -200,7 +156,7 @@ export function MenuItemComponent({ item }) {
             {item.name}
           </p>
           <span className="text-base font-medium text-muted-foreground">
-            ₹ {item.price}
+            {item.price}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />
@@ -233,7 +189,7 @@ export function MenuItemComponent({ item }) {
                   <span id="counter" className="font-bold w-8 text-center">
                     {existingItems?.reduce(
                       (acc, item) => acc + item.quantity,
-                      0,
+                      0
                     ) || quantity}
                   </span>
                   <SquarePlus size={24} onClick={increment} />
@@ -241,13 +197,16 @@ export function MenuItemComponent({ item }) {
               </div>
             ) : (
               <div
-                className={`absolute ${item.variants || item.addons?.length > 0 ? "bottom-[-4vh]" : "bottom-[-2vh]"} flex flex-col items-center`}
+                className={`absolute ${item.variant || item.addons
+                  ? "bottom-[-4vh]"
+                  : "bottom-[-2vh]"
+                  } flex flex-col items-center`}
               >
                 <Button
                   className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
                   variant="outline"
                   onClick={() => {
-                    if (item.variants || item.addons?.length > 0) {
+                    if (item.variant || item.addons) {
                       setAddDrawerOpen(true);
                     } else {
                       handleAddToCart();
@@ -256,65 +215,22 @@ export function MenuItemComponent({ item }) {
                 >
                   ADD
                 </Button>
-                {((item.variants !== null &&
-                  typeof item.variants === "object") ||
-                  item.addons?.length > 0) && (
-                    <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
-                      Customisable
-                    </p>
-                  )}
+                {(item.variant || item.addons) && (
+                  <p className="text-xs text-muted-foreground/50 font-semibold mt-1">
+                    Customisable
+                  </p>
+                )}
               </div>
             )}
           </div>
-          <Drawer open={addDrawerOpen} onOpenChange={setAddDrawerOpen}>
-            {item && (
-              <DrawerContent>
-                <DrawerHeader className="flex items-start w-full">
-                  <div className="flex flex-col items-start w-full">
-                    <DrawerDescription>
-                      {item.name} • ₹{item.price}
-                    </DrawerDescription>
-                    <DrawerTitle>Customise as per your taste</DrawerTitle>
-                  </div>
-                  <DrawerClose>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="rounded-full h-6 w-6"
-                    >
-                      <X size={16} />
-                    </Button>
-                  </DrawerClose>
-                </DrawerHeader>
-                <Separator className="my-4" />
-                <VariantAddon
-                  variant={item.variants}
-                  selectedVariant={selectedVariant}
-                  onVariantChange={handleVariantChange}
-                  addons={item.addons}
-                  selectedAddons={selectedAddons}
-                  onAddonChange={handleAddonChange}
-                />
-                <DrawerFooter>
-                  <div className="flex w-full gap-2 justify-between">
-                    <span className="flex items-center gap-4 text-base font-bold">
-                      ₹ {totalPrice}
-                      <Counter count={quantity} setCount={setQuantity} />
-                    </span>
-                    <DrawerClose>
-                      <Button
-                        className="bg-rose-500 text-white text-base font-semibold w-24 shadow-lg "
-                        variant="outline"
-                        onClick={handleAddToCart}
-                      >
-                        ADD
-                      </Button>
-                    </DrawerClose>
-                  </div>
-                </DrawerFooter>
-              </DrawerContent>
-            )}
-          </Drawer>
+          {/* Add Drawer */}
+          {(item.variant || item.addons) &&
+            <Customize
+              item={item}
+              addDrawerOpen={addDrawerOpen}
+              setAddDrawerOpen={setAddDrawerOpen}
+            />}
+          {/* Edit Drawer */}
           <Drawer open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
             <DrawerContent className="mb-4">
               <DrawerHeader className="flex items-start w-full">
@@ -334,47 +250,33 @@ export function MenuItemComponent({ item }) {
               </DrawerHeader>
               <Separator className="my-4" />
               {existingItems.map((item, key) => (
-                <>
-                  <div className="px-4 my-2" key={key}>
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium flex items-center gap-1">
-                        <Image
-                          src={iconMap[item.food_item.food_type]}
-                          alt="Dash"
-                          height="14"
-                          width="14"
-                        />
-                        {item.food_item?.name}
-                        {item.variant && ` - ${item.variant.name}`}
-                      </p>
-                      <SetQuantity item={item} />
-                    </div>
-                    <div className="flex items-center justify-between text-sm mt-1">
-                      <span className="font-medium text-muted-foreground">
-                        ₹ {item.food_item.price}
-                      </span>
-                      <span className="font-medium">₹ {item.totalPrice}</span>
-                    </div>
+                <div className="px-4 my-2" key={key}>
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium flex items-center gap-1">
+                      <Image
+                        src={iconMap[item.food_item.food_type]}
+                        alt="Dash"
+                        height="14"
+                        width="14"
+                      />
+                      {item.food_item?.name}
+                      {item.variant && ` - ${item.variant.name}`}
+                    </p>
+                    <SetQuantity item={item} />
                   </div>
-                  <p className="text-muted-foreground text-xs px-4">
-                    {item.addons &&
-                      item.addons.length > 0 &&
-                      item.addons.map((addon, key) => (
-                        <span key={key}>
-                          {addon.name}
-                          {key < item.addons.length - 1 ? ", " : ""}
-                        </span>
-                      ))}
-                  </p>
-                </>
+                  <div className="flex items-center justify-between text-sm mt-1">
+                    <span className="font-medium text-muted-foreground">
+                      ₹ {item.food_item.price}
+                    </span>
+                    <span className="font-medium">₹ {item.totalPrice}</span>
+                  </div>
+                </div>
               ))}
             </DrawerContent>
           </Drawer>
         </div>
       </div>
-      <Separator
-        className={`${item.variants || item.addons?.length > 0 ? "mt-2" : ""}`}
-      />
+      <Separator className={`${item.variant || item.addons ? "mt-2" : ""}`} />
     </>
   );
 }
@@ -420,7 +322,7 @@ export function MenuDisabledItemComponent({ item }) {
           </div>
         </div>
       </div>
-      <Separator className={`${item.variants ? "mt-2" : ""}`} />
+      <Separator className={`${item.variant ? "mt-2" : ""}`} />
     </>
   );
 }

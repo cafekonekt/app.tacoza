@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -8,7 +9,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,251 +20,196 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 
-// Dummy Data for the Item
-const item = {
-  id: 1,
-  name: "Deluxe Veggie Pizza",
-  basePrice: 249, // Base price without any variants
-  description: "A delicious veggie pizza with fresh toppings",
-  image: "/images/deluxe_veggie_pizza.jpg", // Image path
-
-  // Variant categories
-  variantCategories: [
-    {
-      variantCategoryId: 101,
-      name: "Crust Type",
-      variantOptions: [
-        { variantOptionId: 1011, name: "Thin Crust", additionalPrice: 0 }, // Base price
-        { variantOptionId: 1012, name: "Hand Tossed", additionalPrice: 20 },
-        { variantOptionId: 1013, name: "Cheese Burst", additionalPrice: 50 },
-      ],
-    },
-    {
-      variantCategoryId: 102,
-      name: "Size",
-      variantOptions: [
-        { variantOptionId: 1021, name: "Small", additionalPrice: 0 }, // Base price
-        { variantOptionId: 1022, name: "Medium", additionalPrice: 50 },
-        { variantOptionId: 1023, name: "Large", additionalPrice: 100 },
-      ],
-    },
-  ],
-
-  // Add-ons
-  addons: [
-    { addonId: 201, name: "Extra Cheese", price: 25 },
-    { addonId: 202, name: "Garlic Bread", price: 49 },
-    { addonId: 203, name: "Dips", price: 19 },
-  ],
-
-  // Combinations (mapped to the selected variant option IDs and their final price)
-  combinationPrices: [
-    { combination: [1011, 1021], price: 249 }, // Thin Crust + Small
-    { combination: [1011, 1022], price: 299 }, // Thin Crust + Medium
-    { combination: [1011, 1023], price: 349 }, // Thin Crust + Large
-    { combination: [1012, 1021], price: 269 }, // Hand Tossed + Small
-    { combination: [1012, 1022], price: 319 }, // Hand Tossed + Medium
-    { combination: [1012, 1023], price: 369 }, // Hand Tossed + Large
-    { combination: [1013, 1021], price: 299 }, // Cheese Burst + Small
-    { combination: [1013, 1022], price: 349 }, // Cheese Burst + Medium
-    { combination: [1013, 1023], price: 399 }, // Cheese Burst + Large
-  ],
-};
-
-export function VariantAddon({
-  variantCategories,
-  selectedVariants,
+// Reusable Component for displaying variants and options
+function VariantSelection({
+  variant,
+  selectedOption,
+  onSelectOption,
   onVariantChange,
-  addons,
-  selectedAddons,
-  onAddonChange,
-  showAddons,
 }) {
+  const handleOptionChange = (value) => {
+    onSelectOption(variant.id, value);
+    const selectedVariantOption = variant.options.find(
+      (option) => option.id === parseInt(value)
+    );
+    const nextVariant = selectedVariantOption?.variant; // Handle nested variant
+    onVariantChange(variant.id, value, nextVariant);
+  };
+
   return (
     <div className="mx-4">
-      {/* Variants */}
-      {variantCategories.map((variantCategory, index) => (
-        <div key={index} className="mb-4">
-          <Label forhtml={variantCategory.name}>{variantCategory.name}</Label>
-          <RadioGroup
-            className="flex flex-col gap-2 bg-accent rounded-xl p-4"
-            value={selectedVariants[variantCategory.variantCategoryId] || ""}
-            onValueChange={(value) =>
-              onVariantChange(variantCategory.variantCategoryId, value)
-            }
-          >
-            {variantCategory.variantOptions.map((option) => (
-              <div
-                className="flex items-center justify-between w-full"
-                key={option.variantOptionId}
-              >
-                <div className="w-full flex items-center justify-between">
-                  <p className="font-medium flex items-center gap-2">
-                    <Image src="/veg.svg" alt="Dash" height="16" width="16" />
-                    {option.name}
-                  </p>
-                  <span className="text-muted-foreground mr-4">
-                    ₹{option.additionalPrice}
-                  </span>
-                </div>
-                <RadioGroupItem
-                  value={option.variantOptionId}
-                  id={option.name}
-                />
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-      ))}
-
-      {/* Add-ons */}
-      {showAddons && addons && addons.length > 0 && (
-        <>
-          <Label forhtml="addon">Add-on</Label>
-          <section className="flex flex-col gap-2 bg-accent rounded-xl p-4">
-            {addons.map((addon, index) => (
-              <div
-                className="flex items-center justify-between w-full"
-                key={index}
-              >
-                <div className="w-full flex items-center justify-between mr-4">
-                  <p className="font-medium flex items-center gap-2">
-                    <Image src="/egg.svg" alt="Dash" height="16" width="16" />
-                    {addon.name}
-                  </p>
-                  <span className="text-muted-foreground">
-                    + ₹{addon.price}
-                  </span>
-                </div>
-                <Checkbox
-                  value={addon}
-                  id={addon.name}
-                  checked={selectedAddons.includes(addon)}
-                  onCheckedChange={(checked) => onAddonChange(addon, checked)}
-                />
-              </div>
-            ))}
-          </section>
-        </>
-      )}
+      <Label htmlFor={variant.name}>{variant.name}</Label>
+      <RadioGroup
+        className="flex flex-col gap-2 bg-accent rounded-xl p-4"
+        onValueChange={handleOptionChange}
+        value={selectedOption?.[variant.id]}
+      >
+        {variant.options.map((option) => (
+          <div className="flex items-center justify-between w-full" key={option.id}>
+            <p className="font-medium flex items-center gap-2">
+              <Image src="/veg.svg" alt="Veg" height="16" width="16" />
+              {option.name}
+            </p>
+            <span className="text-muted-foreground mr-4">
+              {option.price && `₹ ${option.price}`}
+            </span>
+            <RadioGroupItem value={option.id} id={option.name} />
+          </div>
+        ))}
+      </RadioGroup>
     </div>
   );
 }
 
-export function Customize() {
+// Reusable Component for handling Addons
+function AddonSelection({ addons, selectedAddons, onAddonChange }) {
+  return (
+    <>
+      <Label htmlFor="addon">Add-on</Label>
+      <section className="flex flex-col gap-2 bg-accent rounded-xl p-4">
+        {addons.map((addon) => (
+          <div className="flex items-center justify-between w-full" key={addon.id}>
+            <p className="font-medium flex items-center gap-2">
+              <Image src="/egg.svg" alt="Dash" height="16" width="16" />
+              {addon.name}
+            </p>
+            <span className="text-muted-foreground">+ ₹{addon.price}</span>
+            <Checkbox
+              checked={selectedAddons.includes(addon)}
+              onCheckedChange={(checked) => onAddonChange(addon, checked)}
+            />
+          </div>
+        ))}
+      </section>
+    </>
+  );
+}
+
+// Main Customize Component
+export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
   const { addToCart } = useCart();
-
-  const [selectedVariants, setSelectedVariants] = useState({});
-  const [selectedAddons, setSelectedAddons] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(item.basePrice || 0);
   const [count, setCount] = useState(1);
-  const [showAddons, setShowAddons] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [selectedOptions, setSelectedOptions] = useState(
+    item.steps === 1
+      ? { [item.variant.id]: item.variant.options.find((option) => parseFloat(option.price) === parseFloat(item.price))?.id }
+      : {}
+  );
+  const [selectedAddons, setSelectedAddons] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(parseFloat(item.price) || 0);
+  const [selectedVariant, setSelectedVariant] = useState(item.variant); // Root variant
+  const [availableAddons, setAvailableAddons] = useState(
+    item.addons?.filter((addon) => addon.applied_variant.length === 0)
+  );
+  const [previousVariants, setPreviousVariants] = useState([]);
 
-  // Handle variant selection change
-  const handleVariantChange = (categoryId, optionId) => {
-    setSelectedVariants((prev) => ({ ...prev, [categoryId]: optionId }));
+  console.log(availableAddons, item.name);
+
+  useEffect(() => {
+    const addonsPrice = selectedAddons.reduce((sum, addon) => sum + parseFloat(addon.price), 0);
+    const variantPrice =
+      selectedVariant &&
+      selectedOptions &&
+      selectedVariant.options.find((option) => option.id === parseInt(selectedOptions[selectedVariant.id]))?.price;
+    const finalPrice = (parseFloat(variantPrice || item.price) * count) + addonsPrice;
+    setTotalPrice(finalPrice);
+
+    console.log(currentStep, selectedOptions, item.steps);
+    if (currentStep === item.steps) {
+      const variantSlug = Object.values(selectedOptions).join("-");
+      const matchedVariant = item.item_variants.find((variant) => variant.variant_slug === variantSlug);
+      console.log("Selected Variant", variantSlug, matchedVariant, item.name);
+      setAvailableAddons(item.addons?.filter((addon) => addon.applied_variant.includes(matchedVariant?.id)));
+    }
+  }, [selectedVariant, selectedAddons, count, item, selectedOptions, currentStep]);
+
+  const handleAddToCart = () => {
+    const variantSlug = Object.values(selectedOptions).join("-");
+    const matchedVariant = item.item_variants.find((variant) => variant.variant_slug === variantSlug);
+    addToCart(item, matchedVariant, selectedAddons, totalPrice, count);
   };
 
-  // Handle addon change
-  const handleAddonChange = (addon, isChecked) => {
-    if (isChecked) {
-      setSelectedAddons((prev) => [...prev, addon]);
-    } else {
-      setSelectedAddons((prev) => prev.filter((item) => item !== addon));
+  const handleVariantChange = (variantId, value, nextVariant) => {
+    setSelectedOptions({
+      ...selectedOptions,
+      [variantId]: value
+    });
+    if (nextVariant) {
+      setPreviousVariants((prev) => [...prev, selectedVariant]);
+      setSelectedVariant(nextVariant);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
-  // Calculate the total price based on selected variants and addons
-  useEffect(() => {
-    let selectedVariantIds = Object.values(selectedVariants);
-
-    // Find the price for the selected variant combination
-    let selectedCombination = item.combinationPrices.find((comb) =>
-      selectedVariantIds.every((id) => comb.combination.includes(id)),
-    );
-    let combinationPrice = selectedCombination
-      ? selectedCombination.price
-      : item.basePrice;
-
-    // Calculate addons price
-    let addonsPrice = selectedAddons.reduce(
-      (sum, addon) => sum + parseFloat(addon.price),
-      0,
-    );
-
-    setTotalPrice(combinationPrice * count + addonsPrice);
-
-    // Show addons only after all variants are selected
-    setShowAddons(selectedVariantIds.length === item.variantCategories.length);
-  }, [selectedVariants, selectedAddons, count]);
-
-  const handleAddToCart = () => {
-    addToCart(
-      {
-        ...item,
-      },
-      selectedVariants,
-      selectedAddons,
-      totalPrice,
-      count,
+  const handleAddonChange = (addon, isChecked) => {
+    setSelectedAddons((prev) =>
+      isChecked ? [...prev, addon] : prev.filter((a) => a.id !== addon.id)
     );
   };
 
+  const handleGoBack = (variant) => {
+    setCurrentStep((prev) => prev - 1);
+    setPreviousVariants((prev) => prev.filter((v) => v.id !== variant.id));
+    setSelectedVariant(variant);
+  };
+
   return (
-    <Drawer>
-      {item.variantCategories || item.addons?.length > 0 ? (
-        <DrawerTrigger asChild>
-          <Button
-            className="border-2 border-rose-500 bg-rose-50 text-rose-500 text-base font-semibold shadow-lg"
-            variant="outline"
-          >
-            ADD
-          </Button>
-        </DrawerTrigger>
-      ) : (
-        <Button
-          className="border-2 border-rose-500 bg-rose-50 text-rose-500 text-base font-semibold shadow-lg"
-          variant="outline"
-          onClick={handleAddToCart}
-        >
-          ADD
-        </Button>
-      )}
-      {item && (
-        <DrawerContent>
-          <DrawerHeader className="flex items-start w-full">
-            <div className="flex flex-col items-start w-full">
-              <DrawerDescription>
-                {item.name} • ₹{item.basePrice || item.price}
-              </DrawerDescription>
-              <DrawerTitle>Customise as per your taste</DrawerTitle>
+    <Drawer open={addDrawerOpen} onOpenChange={setAddDrawerOpen}>
+      <DrawerContent>
+        <DrawerHeader>
+          <div className="flex w-full justify-between">
+            <div>
+              <DrawerDescription>{item.name} • ₹ {item.price}</DrawerDescription>
+              <DrawerTitle>Customize your selection</DrawerTitle>
             </div>
             <DrawerClose>
-              <Button
-                size="icon"
-                variant="outline"
-                className="rounded-full h-6 w-6"
-              >
+              <Button size="icon" variant="outline" className="rounded-full h-6 w-6">
                 <X size={16} />
               </Button>
             </DrawerClose>
-          </DrawerHeader>
-          <Separator className="my-4" />
-          <VariantAddon
-            variantCategories={item.variantCategories}
-            selectedVariants={selectedVariants}
+          </div>
+        </DrawerHeader>
+        <Separator className="my-4" />
+
+        {previousVariants.map((variant) => (
+          <div key={variant.id} className="mb-4 flex justify-between items-center">
+            <span>{`${variant.name} - ${variant.options.find((opt) => opt.id === selectedOptions[variant.id])?.name}`}</span>
+            <Button variant="link" onClick={() => handleGoBack(variant)}>Change</Button>
+          </div>
+        ))}
+
+        {selectedVariant && (
+          <VariantSelection
+            variant={selectedVariant}
+            selectedOption={selectedOptions}
+            onSelectOption={setSelectedOptions}
             onVariantChange={handleVariantChange}
-            addons={item.addons}
+          />
+        )}
+
+        {(currentStep === item.steps || !item.steps) && availableAddons?.length>0 && (
+          <AddonSelection
+            addons={availableAddons}
             selectedAddons={selectedAddons}
             onAddonChange={handleAddonChange}
-            showAddons={showAddons}
           />
-          <DrawerFooter>
-            <div className="flex w-full gap-2 justify-between">
-              <span className="flex items-center gap-4 text-base font-bold">
-                ₹ {totalPrice}
-                <Counter count={count} setCount={setCount} />
-              </span>
+        )}
+
+        <DrawerFooter>
+          <div className="flex w-full gap-2 justify-between">
+            <span className="flex items-center gap-4 text-base font-bold">
+              {(currentStep === item.steps || !item.steps) ? (
+                <>
+                  ₹ {totalPrice}
+                  <Counter count={count} setCount={setCount} />
+                </>
+              ) : (
+                <div className="flex justify-center my-4">
+                  <span>Step {currentStep} of {item.steps}</span>
+                </div>
+              )}
+            </span>
+            {(currentStep === item.steps || !item.steps) && (
               <DrawerClose>
                 <Button
                   className="bg-rose-500 text-white text-base font-semibold w-24 shadow-lg"
@@ -274,10 +219,10 @@ export function Customize() {
                   ADD
                 </Button>
               </DrawerClose>
-            </div>
-          </DrawerFooter>
-        </DrawerContent>
-      )}
+            )}
+          </div>
+        </DrawerFooter>
+      </DrawerContent>
     </Drawer>
   );
 }
