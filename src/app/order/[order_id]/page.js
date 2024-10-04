@@ -38,9 +38,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { StarRating } from "@/components/ui/ratings";
 import {
   Timeline,
   TimelineContent,
@@ -73,7 +71,6 @@ export const metadata = {
 
 export default async function Order({ params }) {
   const order = await getOrder(params);
-  console.log(order);
   if (order.status === 404) notFound();
   return (
     <main className="max-w-lg p-4 gap-4 grid">
@@ -101,7 +98,7 @@ export default async function Order({ params }) {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {order.payment_status === "success" && (
+      {order.payment_status === "paid" && (
         <section className="flex flex-col justify-center items-center">
           <PaymentSuccessAnimation />
           <span className="text-green-600 font-bold text-lg">
@@ -115,7 +112,7 @@ export default async function Order({ params }) {
       )}
 
       {/* Payment Processing */}
-      {(order.payment_status === "pending" || "active") && (
+      {(order.payment_status === "active" || "pending") && (
         <section className="flex flex-col justify-center items-center">
           <span className="text-blue-600 font-bold text-lg">
             Your payment is processing.
@@ -198,9 +195,9 @@ export default async function Order({ params }) {
                   </TimelineItem>
                   <TimelineItem>
                     <TimelineHeading>Payment</TimelineHeading>
-                    <TimelineDot status="error" />
-                    <TimelineLine />
-                    <TimelineContent>Failed</TimelineContent>
+                    <TimelineDot status="done" />
+                    <TimelineLine done />
+                    <TimelineContent>Success</TimelineContent>
                   </TimelineItem>
                   <TimelineItem>
                     <TimelineHeading>Preparing Food</TimelineHeading>
