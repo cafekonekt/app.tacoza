@@ -1,5 +1,5 @@
 "use server";
-import { Star, MapPin, Phone, LeafyGreen, Timer } from "lucide-react";
+import { Star, MapPin, Phone, LeafyGreen, Timer, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export async function Details({ outlet }) {
@@ -18,7 +18,8 @@ export async function Details({ outlet }) {
         <div className="text-sm flex gap-2 items-center mt-2">
           <span className="flex items-center">
             <Timer className="h-3.5 w-3.5 mr-1" />{" "}
-            {outlet.average_preparation_time} mins • ₹300 for 2
+            {outlet.average_preparation_time} mins • ₹300 for 2{" "}
+            <Users className="h-3.5 w-3.5 ml-1" />
           </span>
         </div>
       </div>
