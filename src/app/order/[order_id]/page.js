@@ -98,7 +98,7 @@ export default async function Order({ params }) {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {order.payment_status === "paid" && (
+      {order.payment_status === "success" && (
         <section className="flex flex-col justify-center items-center">
           <PaymentSuccessAnimation />
           <span className="text-green-600 font-bold text-lg">
