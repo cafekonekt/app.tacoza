@@ -99,10 +99,10 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
   const [selectedOptions, setSelectedOptions] = useState(
     item.steps === 1
       ? {
-          [item.variant.id]: item.variant.options.find(
-            (option) => parseFloat(option.price) === parseFloat(item.price),
-          )?.id,
-        }
+        [item.variant.id]: item.variant.options.find(
+          (option) => parseFloat(option.price) === parseFloat(item.price),
+        )?.id,
+      }
       : {},
   );
   const [selectedAddons, setSelectedAddons] = useState([]);
@@ -112,8 +112,6 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
     item.addons?.filter((addon) => addon.applied_variant.length === 0),
   );
   const [previousVariants, setPreviousVariants] = useState([]);
-
-  console.log(availableAddons, item.name);
 
   useEffect(() => {
     const addonsPrice = selectedAddons.reduce(
@@ -130,13 +128,11 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
       parseFloat(variantPrice || item.price) * count + addonsPrice;
     setTotalPrice(finalPrice);
 
-    console.log(currentStep, selectedOptions, item.steps);
     if (currentStep === item.steps) {
       const variantSlug = Object.values(selectedOptions).join("-");
       const matchedVariant = item.item_variants.find(
         (variant) => variant.variant_slug === variantSlug,
       );
-      console.log("Selected Variant", variantSlug, matchedVariant, item.name);
       setAvailableAddons(
         item.addons?.filter((addon) =>
           addon.applied_variant.includes(matchedVariant?.id),
@@ -170,6 +166,8 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
       setSelectedVariant(nextVariant);
       setCurrentStep((prev) => prev + 1);
     }
+    // Reset Addons
+    setSelectedAddons([]);
   };
 
   const handleAddonChange = (addon, isChecked) => {
@@ -191,7 +189,9 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
           <div className="flex w-full justify-between">
             <div>
               <DrawerDescription className="text-left">
-                {item.name} • ₹ {item.price}
+                {item.name} • {item.variant ?
+                  `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
+                  `₹${item.price}`}
               </DrawerDescription>
               <DrawerTitle>Customize your selection</DrawerTitle>
             </div>
@@ -242,7 +242,7 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
             <span className="flex items-center gap-4 text-base font-bold">
               {currentStep === item.steps || !item.steps ? (
                 <>
-                  ₹ {totalPrice}
+                  ₹{totalPrice}
                   <Counter count={count} setCount={setCount} />
                 </>
               ) : (

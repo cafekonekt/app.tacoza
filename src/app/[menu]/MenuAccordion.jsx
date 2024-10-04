@@ -132,7 +132,13 @@ export function MenuItemComponent({ item }) {
 
   const decrement = () => {
     if (item.variant || item.addons) {
-      setEditDrawerOpen(true);
+      const itemIds = existingItems.map((item) => item.item_id);      
+      const isSameItem = itemIds.every((val, i, arr) => val === arr[0]);
+      if (isSameItem) {
+        updateQuantity(existingItems[0].item_id, existingItems[0].quantity - 1);
+      } else {
+        setEditDrawerOpen(true);
+      }
     } else {
       if (existingItems?.length > 0) {
         updateQuantity(existingItems[0].item_id, existingItems[0].quantity - 1);
@@ -156,7 +162,9 @@ export function MenuItemComponent({ item }) {
             {item.name}
           </p>
           <span className="text-base font-medium text-muted-foreground">
-            {item.price}
+            {item.variant ?
+              `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
+              `₹${item.price}`}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />
@@ -266,9 +274,9 @@ export function MenuItemComponent({ item }) {
                   </div>
                   <div className="flex items-center justify-between text-sm mt-1">
                     <span className="font-medium text-muted-foreground">
-                      ₹ {item.food_item.price}
+                      ₹{item.food_item.price}
                     </span>
-                    <span className="font-medium">₹ {item.totalPrice}</span>
+                    <span className="font-medium">₹{item.totalPrice}</span>
                   </div>
                 </div>
               ))}
@@ -300,7 +308,9 @@ export function MenuDisabledItemComponent({ item }) {
             {item.name}
           </p>
           <span className="text-base font-medium text-muted-foreground">
-            ₹ {item.price}
+            {item.variant ?
+              `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
+              `₹${item.price}`}
           </span>
           <p className="text-muted-foreground text-xs line-clamp-2">
             {item.description}
@@ -625,7 +635,9 @@ export function ItemDetailDrawer({ item, isDrawerOpen, setIsDrawerOpen }) {
             {item.name}
           </DialogTitle>
           <span className="text-base font-medium text-muted-foreground">
-            ₹ {item.price}
+            {item.variant ?
+              `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
+              `₹${item.price}`}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />

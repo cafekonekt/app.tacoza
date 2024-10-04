@@ -115,7 +115,7 @@ export default async function Order() {
                   <p className="text-base">{order.status.toUpperCase()}</p>
                 </span>
                 <span className="flex items-center text-base font-medium">
-                  ₹ {order.total} <ChevronRightIcon className="h-4 w-4" />
+                  ₹{order.total} <ChevronRightIcon className="h-4 w-4" />
                 </span>
               </div>
             </Link>
