@@ -171,7 +171,10 @@ export function MenuItemComponent({ item }) {
             {item.rating}
             <p className="text-primary text-xs">(12 Ratings)</p>
           </span>
-          <p className="text-muted-foreground text-xs line-clamp-2">
+          <p
+            className="text-muted-foreground text-xs line-clamp-2"
+            onClick={() => setDetailsOpen(!detailsOpen)}
+          >
             {item.description}
           </p>
           <ItemDetailDrawer
@@ -192,7 +195,7 @@ export function MenuItemComponent({ item }) {
             />
             {existingItems.length > 0 ? (
               <div className="absolute bottom-[-2vh]">
-                <div className="flex items-center justify-center w-fit bg-rose-50 rounded p-1 text-rose-600">
+                <div className="flex items-center justify-center w-24 bg-rose-50 p-1.5 rounded-[10px] text-rose-600 shadow-lg border border-rose-600">
                   <SquareMinus size={24} onClick={decrement} />
                   <span id="counter" className="font-bold w-8 text-center">
                     {existingItems?.reduce(
@@ -211,7 +214,7 @@ export function MenuItemComponent({ item }) {
                   } flex flex-col items-center`}
               >
                 <Button
-                  className="border-2 border-rose-500 text-rose-500 text-base font-semibold shadow-lg"
+                  className="bg-rose-50 w-24 border border-rose-600 text-rose-600 hover:text-rose-300 text-base rounded-[10px] font-bold shadow-lg"
                   variant="outline"
                   onClick={() => {
                     if (item.variant || item.addons) {
@@ -326,7 +329,7 @@ export function MenuDisabledItemComponent({ item }) {
               className="object-cover rounded-lg grayscale"
             />
 
-            <div className="absolute bottom-[-2vh] max-w-28 p-1 rounded-md text-center leading-none text-xs text-gray-500 border-2 border-gray-400 shadow bg-white">
+            <div className="absolute bottom-[-2vh] max-w-28 p-1.5 rounded-[10px] text-center leading-none text-xs text-gray-500 border-2 border-gray-400 shadow bg-white">
               Item currently unavailable
             </div>
           </div>
@@ -366,23 +369,23 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-            category.sub_categories.length > 0
+          category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-            category.sub_categories.map((subCategory) => (
-              <CategoryComponent
-                key={subCategory.name}
-                category={subCategory}
-                depth={depth + 1} // Increment the depth for subcategories
-              />
-            ))
+              category.sub_categories.map((subCategory) => (
+                <CategoryComponent
+                  key={subCategory.name}
+                  category={subCategory}
+                  depth={depth + 1} // Increment the depth for subcategories
+                />
+              ))
             : // If no subcategories, render the menu items
-            category.food_items.map((item) =>
-              item.in_stock ? (
-                <MenuItemComponent key={item.name} item={item} />
-              ) : (
-                <MenuDisabledItemComponent key={item.name} item={item} />
-              ),
-            )}
+              category.food_items.map((item) =>
+                item.in_stock ? (
+                  <MenuItemComponent key={item.name} item={item} />
+                ) : (
+                  <MenuDisabledItemComponent key={item.name} item={item} />
+                ),
+              )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -489,15 +492,15 @@ export function SearchMenu({ items }) {
             {/* Display search results */}
             {!loading && filteredItems.length > 0
               ? filteredItems.map((item) => (
-                <div key={item.name}>
-                  <MenuItemComponent item={item} />
-                </div>
-              ))
+                  <div key={item.name}>
+                    <MenuItemComponent item={item} />
+                  </div>
+                ))
               : !loading && (
-                <p className="text-center text-gray-500 text-sm">
-                  Nothing found
-                </p>
-              )}
+                  <p className="text-center text-gray-500 text-sm">
+                    Nothing found
+                  </p>
+                )}
           </section>
         </div>
       </DrawerContent>
@@ -533,10 +536,46 @@ export function MenuAccordion({ items, outlet }) {
     };
   });
 
+  const divRef = useRef(null); // Reference to the div
+  const sectionRef = useRef(null); // Reference to the section
+  const [isFixed, setIsFixed] = useState(false);
+  const [divTop, setDivTop] = useState(0); // To store the original top position of the div
+
+  useEffect(() => {
+    // Function to handle the scroll event
+    const handleScroll = () => {
+      const div = divRef.current;
+      const divRect = div.getBoundingClientRect();
+
+      // Check if the top of the div is going to be out of the viewport (scrolling up)
+      if (divRect.top <= 0 && !isFixed) {
+        setIsFixed(true); // Fix the div to the top
+      } else if (window.scrollY < divTop && isFixed) {
+        setIsFixed(false); // Restore the div to its original position
+      }
+    };
+
+    // Set the initial top position of the div when the component mounts
+    const divPosition =
+      divRef.current.getBoundingClientRect().top + window.scrollY;
+    setDivTop(divPosition);
+
+    // Attach the scroll event listener
+    window.addEventListener("scroll", handleScroll);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isFixed, divTop]);
+
   return (
     <>
-      <section className="w-full">
-        <div className="">
+      <section className="relative w-full" ref={sectionRef}>
+        <div
+          ref={divRef}
+          className={`animate-in slide-in-from-top-0 duration-300 ${isFixed ? "fixed top-0 left-0 w-full bg-white px-4 py-2 shadow z-40" : "relative"}`}
+        >
           <div className="flex">
             <div className="flex items-center text-muted-foreground text-sm">
               Filters <Settings2 className="w-3.5 h-3.5 ml-1" />{" "}
@@ -544,51 +583,52 @@ export function MenuAccordion({ items, outlet }) {
             </div>
 
             <div className="flex items-center gap-1 overflow-x-scroll no-scrollbar">
-              {
-                outlet.type?.length === 1 ? (
-                  <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">
-                    <LeafyGreen className="h-3.5 w-3.5 fill-green-200" /> Pure Veg
-                  </p>) : (
-                  <ToggleGroup
-                    type="single"
-                    variant="outline"
-                    onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
-                  >
-                    {outlet.type.map((type, key) => (
-                      <ToggleGroupItem
-                        key={key}
-                        value={type}
-                        aria-label="Veg Filter"
-                        className="gap-2 px-4 data-[state=on]:bg-gray-100 align-left"
-                      >
-                        <Image
-                          src={iconMap[type]}
-                          alt="Veg"
-                          height="16"
-                          width="16"
-                        />
-                        <span>{type.charAt(0).toUpperCase() + type.slice(1)}</span>
-                      </ToggleGroupItem>
-                    ))}
-                  </ToggleGroup>
-                )
-              }
+              {outlet.type?.length === 1 ? (
+                <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">
+                  <LeafyGreen className="h-3.5 w-3.5 fill-green-200" /> Pure Veg
+                </p>
+              ) : (
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  onValueChange={(value) => setFoodTypeFilter(value)} // Set filter state
+                >
+                  {outlet.type.map((type, key) => (
+                    <ToggleGroupItem
+                      key={key}
+                      value={type}
+                      aria-label="Veg Filter"
+                      className="gap-2 px-4 data-[state=on]:bg-gray-100 align-left"
+                    >
+                      <Image
+                        src={iconMap[type]}
+                        alt="Veg"
+                        height="16"
+                        width="16"
+                      />
+                      <span>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </span>
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              )}
             </div>
           </div>
 
           {/* Search Menu */}
           <SearchMenu items={filteredItems} />
+        </div>
 
-          {/* Menu */}
-          <div className="space-y-4">
-            {filteredItems.map((category) => (
-              <CategoryComponent
-                key={category.name}
-                category={category}
-                focusCategory={focusCategory}
-              />
-            ))}
-          </div>
+        {/* Menu */}
+        <div className="space-y-4">
+          {filteredItems.map((category) => (
+            <CategoryComponent
+              key={category.name}
+              category={category}
+              focusCategory={focusCategory}
+            />
+          ))}
         </div>
       </section>
 
