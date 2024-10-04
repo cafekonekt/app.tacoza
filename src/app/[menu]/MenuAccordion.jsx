@@ -132,7 +132,7 @@ export function MenuItemComponent({ item }) {
 
   const decrement = () => {
     if (item.variant || item.addons) {
-      const itemIds = existingItems.map((item) => item.item_id);      
+      const itemIds = existingItems.map((item) => item.item_id);
       const isSameItem = itemIds.every((val, i, arr) => val === arr[0]);
       if (isSameItem) {
         updateQuantity(existingItems[0].item_id, existingItems[0].quantity - 1);
@@ -162,9 +162,9 @@ export function MenuItemComponent({ item }) {
             {item.name}
           </p>
           <span className="text-base font-medium text-muted-foreground">
-            {item.variant ?
-              `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
-              `₹${item.price}`}
+            {item.variant
+              ? `₹${Math.min(...item.item_variants.map((variant) => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map((variant) => parseFloat(variant.price)))}`
+              : `₹${item.price}`}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />
@@ -200,7 +200,7 @@ export function MenuItemComponent({ item }) {
                   <span id="counter" className="font-bold w-8 text-center">
                     {existingItems?.reduce(
                       (acc, item) => acc + item.quantity,
-                      0
+                      0,
                     ) || quantity}
                   </span>
                   <SquarePlus size={24} onClick={increment} />
@@ -208,10 +208,11 @@ export function MenuItemComponent({ item }) {
               </div>
             ) : (
               <div
-                className={`absolute ${item.variant || item.addons
-                  ? "bottom-[-4vh]"
-                  : "bottom-[-2vh]"
-                  } flex flex-col items-center`}
+                className={`absolute ${
+                  item.variant || item.addons
+                    ? "bottom-[-4vh]"
+                    : "bottom-[-2vh]"
+                } flex flex-col items-center`}
               >
                 <Button
                   className="bg-rose-50 w-24 border border-rose-600 text-rose-600 hover:text-rose-300 text-base rounded-[10px] font-bold shadow-lg"
@@ -235,15 +236,16 @@ export function MenuItemComponent({ item }) {
             )}
           </div>
           {/* Add Drawer */}
-          {(item.variant || item.addons) &&
+          {(item.variant || item.addons) && (
             <Customize
               item={item}
               addDrawerOpen={addDrawerOpen}
               setAddDrawerOpen={setAddDrawerOpen}
-            />}
+            />
+          )}
           {/* Edit Drawer */}
           <Drawer open={editDrawerOpen} onOpenChange={setEditDrawerOpen}>
-            <DrawerContent className="mb-4">
+            <DrawerContent>
               <DrawerHeader className="flex items-start w-full">
                 <div className="flex flex-col items-start w-full">
                   <DrawerDescription>Add or remove items</DrawerDescription>
@@ -259,30 +261,34 @@ export function MenuItemComponent({ item }) {
                   </Button>
                 </DrawerClose>
               </DrawerHeader>
-              <Separator className="my-4" />
-              {existingItems.map((item, key) => (
-                <div className="px-4 my-2" key={key}>
-                  <div className="flex items-center justify-between">
-                    <p className="font-medium flex items-center gap-1">
-                      <Image
-                        src={iconMap[item.food_item.food_type]}
-                        alt="Dash"
-                        height="14"
-                        width="14"
-                      />
-                      {item.food_item?.name}
-                      {item.variant && ` - ${item.variant.name}`}
-                    </p>
-                    <SetQuantity item={item} />
-                  </div>
-                  <div className="flex items-center justify-between text-sm mt-1">
-                    <span className="font-medium text-muted-foreground">
-                      ₹{item.food_item.price}
-                    </span>
-                    <span className="font-medium">₹{item.totalPrice}</span>
-                  </div>
+              <div className="bg-gray-100 shadow p-4 max-h-[50vh] overflow-y-scroll">
+                <div className="p-4 my-2 rounded-lg shadow bg-white">
+                  {existingItems.map((item, key) => (
+                    <div className="mb-2" key={key}>
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium flex items-start leading-tight gap-1">
+                          <Image
+                            src={iconMap[item.food_item.food_type]}
+                            alt="Dash"
+                            height="14"
+                            width="14"
+                            className="mt-[2px]"
+                          />
+                          {item.food_item?.name}
+                          {item.variant && ` - ${item.variant.name}`}
+                        </p>
+                        <SetQuantity item={item} />
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-1">
+                        <span className="font-medium text-muted-foreground">
+                          ₹{item.food_item.price}
+                        </span>
+                        <span className="font-medium">₹{item.totalPrice}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </DrawerContent>
           </Drawer>
         </div>
@@ -311,9 +317,9 @@ export function MenuDisabledItemComponent({ item }) {
             {item.name}
           </p>
           <span className="text-base font-medium text-muted-foreground">
-            {item.variant ?
-              `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
-              `₹${item.price}`}
+            {item.variant
+              ? `₹${Math.min(...item.item_variants.map((variant) => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map((variant) => parseFloat(variant.price)))}`
+              : `₹${item.price}`}
           </span>
           <p className="text-muted-foreground text-xs line-clamp-2">
             {item.description}
@@ -456,7 +462,7 @@ export function SearchMenu({ items }) {
           className="w-full justify-start items-center text-muted-foreground mt-2"
         >
           <Search className="w-4 h-4 mr-2" /> Search for
-          <TextRotate className="ml-1" duration={2000} words={words} />
+          <TextRotate className="ml-1 truncate" duration={2000} words={words} />
         </Button>
       </DrawerTrigger>
       <DrawerContent className="h-3/4 w-full">
@@ -675,9 +681,9 @@ export function ItemDetailDrawer({ item, isDrawerOpen, setIsDrawerOpen }) {
             {item.name}
           </DialogTitle>
           <span className="text-base font-medium text-muted-foreground">
-            {item.variant ?
-              `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
-              `₹${item.price}`}
+            {item.variant
+              ? `₹${Math.min(...item.item_variants.map((variant) => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map((variant) => parseFloat(variant.price)))}`
+              : `₹${item.price}`}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />

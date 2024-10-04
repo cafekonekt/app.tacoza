@@ -87,7 +87,7 @@ export function Auth() {
             Login
           </Button>
         </DrawerTrigger>
-        <DrawerContent className="h-[75vh]">
+        <DrawerContent>
           <DrawerHeader className="flex items-start w-full">
             <div className="flex flex-col items-start w-full">
               <DrawerDescription className="flex items-center">
@@ -113,16 +113,10 @@ export function Auth() {
             </DrawerClose>
           </DrawerHeader>
           <div className="px-4">
-            <Image
-              src="/banner-thumb.png"
-              alt="banner"
-              width={200}
-              height={200}
-              className="h-40 w-full object-cover rounded-lg"
-            />
+            <LargeAds />
           </div>
           <Separator className="my-4" />
-          <div className="h-full px-4 pb-6">
+          <div className="h-[40vh] px-4 pb-6">
             {authValues.step === 1 && <Phone />}
             {authValues.step === 2 && <Otp setDrawer={setIsDrawerOpen} />}
             {authValues.step === 3 && <Name setDrawer={setIsDrawerOpen} />}
@@ -389,15 +383,17 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import { useCart } from "@/context/CartContext";
+import { LargeAds } from "@/app/Ads";
+import Fade from "embla-carousel-fade";
 
 export function Promo({ gallery }) {
-  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: false }));
+  const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }));
   return (
     <Carousel
-      plugins={[plugin.current]}
+      plugins={[plugin.current, Fade()]}
       className="w-full"
       onMouseEnter={plugin.current.stop}
-      onMouseLeave={plugin.current.reset}
+      onMouseLeave={plugin.current.play}
     >
       <CarouselContent>
         {gallery &&

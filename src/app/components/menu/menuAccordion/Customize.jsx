@@ -99,10 +99,10 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
   const [selectedOptions, setSelectedOptions] = useState(
     item.steps === 1
       ? {
-        [item.variant.id]: item.variant.options.find(
-          (option) => parseFloat(option.price) === parseFloat(item.price),
-        )?.id,
-      }
+          [item.variant.id]: item.variant.options.find(
+            (option) => parseFloat(option.price) === parseFloat(item.price),
+          )?.id,
+        }
       : {},
   );
   const [selectedAddons, setSelectedAddons] = useState([]);
@@ -187,11 +187,12 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
       <DrawerContent>
         <DrawerHeader className="border-b">
           <div className="flex w-full justify-between">
-            <div>
-              <DrawerDescription className="text-left">
-                {item.name} • {item.variant ?
-                  `₹${Math.min(...item.item_variants.map(variant => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map(variant => parseFloat(variant.price)))}` :
-                  `₹${item.price}`}
+            <div className="text-left">
+              <DrawerDescription>
+                {item.name} •{" "}
+                {item.variant
+                  ? `₹${Math.min(...item.item_variants.map((variant) => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map((variant) => parseFloat(variant.price)))}`
+                  : `₹${item.price}`}
               </DrawerDescription>
               <DrawerTitle>Customize your selection</DrawerTitle>
             </div>
