@@ -30,7 +30,7 @@ function VariantSelection({
   const handleOptionChange = (value) => {
     onSelectOption(variant.id, value);
     const selectedVariantOption = variant.options.find(
-      (option) => option.id === parseInt(value)
+      (option) => option.id === parseInt(value),
     );
     const nextVariant = selectedVariantOption?.variant; // Handle nested variant
     onVariantChange(variant.id, value, nextVariant);
@@ -40,19 +40,21 @@ function VariantSelection({
     <div className="mx-4">
       <Label htmlFor={variant.name}>{variant.name}</Label>
       <RadioGroup
-        className="flex flex-col gap-2 bg-accent rounded-xl p-4"
+        className="bg-white shadow flex flex-col gap-2 rounded-xl p-4"
         onValueChange={handleOptionChange}
         value={selectedOption?.[variant.id]}
       >
         {variant.options.map((option) => (
-          <div className="flex items-center justify-between w-full" key={option.id}>
-            <p className="font-medium flex items-center gap-2">
-              <Image src="/veg.svg" alt="Veg" height="16" width="16" />
-              {option.name}
-            </p>
-            <span className="text-muted-foreground mr-4">
-              {option.price && `₹ ${option.price}`}
-            </span>
+          <div className="flex items-center" key={option.id}>
+            <div className="flex items-center justify-between w-full">
+              <p className="font-medium flex items-center gap-2">
+                <Image src="/veg.svg" alt="Veg" height="16" width="16" />
+                {option.name}
+              </p>
+              <span className="text-muted-foreground mr-2">
+                {option.price && `₹${option.price}`}
+              </span>
+            </div>
             <RadioGroupItem value={option.id} id={option.name} />
           </div>
         ))}
@@ -64,16 +66,20 @@ function VariantSelection({
 // Reusable Component for handling Addons
 function AddonSelection({ addons, selectedAddons, onAddonChange }) {
   return (
-    <>
+    <div className="mx-4">
       <Label htmlFor="addon">Add-on</Label>
-      <section className="flex flex-col gap-2 bg-accent rounded-xl p-4">
+      <section className="flex flex-col gap-2 bg-white shadow rounded-xl p-4">
         {addons.map((addon) => (
-          <div className="flex items-center justify-between w-full" key={addon.id}>
-            <p className="font-medium flex items-center gap-2">
-              <Image src="/egg.svg" alt="Dash" height="16" width="16" />
-              {addon.name}
-            </p>
-            <span className="text-muted-foreground">+ ₹{addon.price}</span>
+          <div className="flex items-center" key={addon.id}>
+            <div className="flex items-center justify-between w-full">
+              <p className="font-medium flex items-center gap-2">
+                <Image src="/veg.svg" alt="Dash" height="16" width="16" />
+                {addon.name}
+              </p>
+              <span className="text-muted-foreground mr-2">
+                +₹{addon.price}
+              </span>
+            </div>
             <Checkbox
               checked={selectedAddons.includes(addon)}
               onCheckedChange={(checked) => onAddonChange(addon, checked)}
@@ -81,7 +87,7 @@ function AddonSelection({ addons, selectedAddons, onAddonChange }) {
           </div>
         ))}
       </section>
-    </>
+    </div>
   );
 }
 
@@ -92,47 +98,72 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState(
     item.steps === 1
-      ? { [item.variant.id]: item.variant.options.find((option) => parseFloat(option.price) === parseFloat(item.price))?.id }
-      : {}
+      ? {
+          [item.variant.id]: item.variant.options.find(
+            (option) => parseFloat(option.price) === parseFloat(item.price),
+          )?.id,
+        }
+      : {},
   );
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [totalPrice, setTotalPrice] = useState(parseFloat(item.price) || 0);
   const [selectedVariant, setSelectedVariant] = useState(item.variant); // Root variant
   const [availableAddons, setAvailableAddons] = useState(
-    item.addons?.filter((addon) => addon.applied_variant.length === 0)
+    item.addons?.filter((addon) => addon.applied_variant.length === 0),
   );
   const [previousVariants, setPreviousVariants] = useState([]);
 
   console.log(availableAddons, item.name);
 
   useEffect(() => {
-    const addonsPrice = selectedAddons.reduce((sum, addon) => sum + parseFloat(addon.price), 0);
+    const addonsPrice = selectedAddons.reduce(
+      (sum, addon) => sum + parseFloat(addon.price),
+      0,
+    );
     const variantPrice =
       selectedVariant &&
       selectedOptions &&
-      selectedVariant.options.find((option) => option.id === parseInt(selectedOptions[selectedVariant.id]))?.price;
-    const finalPrice = (parseFloat(variantPrice || item.price) * count) + addonsPrice;
+      selectedVariant.options.find(
+        (option) => option.id === parseInt(selectedOptions[selectedVariant.id]),
+      )?.price;
+    const finalPrice =
+      parseFloat(variantPrice || item.price) * count + addonsPrice;
     setTotalPrice(finalPrice);
 
     console.log(currentStep, selectedOptions, item.steps);
     if (currentStep === item.steps) {
       const variantSlug = Object.values(selectedOptions).join("-");
-      const matchedVariant = item.item_variants.find((variant) => variant.variant_slug === variantSlug);
+      const matchedVariant = item.item_variants.find(
+        (variant) => variant.variant_slug === variantSlug,
+      );
       console.log("Selected Variant", variantSlug, matchedVariant, item.name);
-      setAvailableAddons(item.addons?.filter((addon) => addon.applied_variant.includes(matchedVariant?.id)));
+      setAvailableAddons(
+        item.addons?.filter((addon) =>
+          addon.applied_variant.includes(matchedVariant?.id),
+        ),
+      );
     }
-  }, [selectedVariant, selectedAddons, count, item, selectedOptions, currentStep]);
+  }, [
+    selectedVariant,
+    selectedAddons,
+    count,
+    item,
+    selectedOptions,
+    currentStep,
+  ]);
 
   const handleAddToCart = () => {
     const variantSlug = Object.values(selectedOptions).join("-");
-    const matchedVariant = item.item_variants.find((variant) => variant.variant_slug === variantSlug);
+    const matchedVariant = item.item_variants.find(
+      (variant) => variant.variant_slug === variantSlug,
+    );
     addToCart(item, matchedVariant, selectedAddons, totalPrice, count);
   };
 
   const handleVariantChange = (variantId, value, nextVariant) => {
     setSelectedOptions({
       ...selectedOptions,
-      [variantId]: value
+      [variantId]: value,
     });
     if (nextVariant) {
       setPreviousVariants((prev) => [...prev, selectedVariant]);
@@ -143,7 +174,7 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
 
   const handleAddonChange = (addon, isChecked) => {
     setSelectedAddons((prev) =>
-      isChecked ? [...prev, addon] : prev.filter((a) => a.id !== addon.id)
+      isChecked ? [...prev, addon] : prev.filter((a) => a.id !== addon.id),
     );
   };
 
@@ -156,63 +187,76 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
   return (
     <Drawer open={addDrawerOpen} onOpenChange={setAddDrawerOpen}>
       <DrawerContent>
-        <DrawerHeader>
+        <DrawerHeader className="border-b">
           <div className="flex w-full justify-between">
             <div>
-              <DrawerDescription>{item.name} • ₹ {item.price}</DrawerDescription>
+              <DrawerDescription className="text-left">
+                {item.name} • ₹ {item.price}
+              </DrawerDescription>
               <DrawerTitle>Customize your selection</DrawerTitle>
             </div>
             <DrawerClose>
-              <Button size="icon" variant="outline" className="rounded-full h-6 w-6">
+              <Button
+                size="icon"
+                variant="outline"
+                className="rounded-full h-6 w-6"
+              >
                 <X size={16} />
               </Button>
             </DrawerClose>
           </div>
         </DrawerHeader>
-        <Separator className="my-4" />
+        <div className="bg-gray-100 shadow-inner py-4 flex flex-col gap-2 h-[50vh] overflow-y-scroll no-scrollbar">
+          {previousVariants.map((variant) => (
+            <div
+              key={variant.id}
+              className="bg-white border shadow rounded-md flex justify-between items-center mx-4 pl-4 py-2"
+            >
+              <span>{`${variant.name} • ${variant.options.find((opt) => opt.id === selectedOptions[variant.id])?.name}`}</span>
+              <Button variant="link" onClick={() => handleGoBack(variant)}>
+                Change
+              </Button>
+            </div>
+          ))}
 
-        {previousVariants.map((variant) => (
-          <div key={variant.id} className="mb-4 flex justify-between items-center">
-            <span>{`${variant.name} - ${variant.options.find((opt) => opt.id === selectedOptions[variant.id])?.name}`}</span>
-            <Button variant="link" onClick={() => handleGoBack(variant)}>Change</Button>
-          </div>
-        ))}
+          {selectedVariant && (
+            <VariantSelection
+              variant={selectedVariant}
+              selectedOption={selectedOptions}
+              onSelectOption={setSelectedOptions}
+              onVariantChange={handleVariantChange}
+            />
+          )}
 
-        {selectedVariant && (
-          <VariantSelection
-            variant={selectedVariant}
-            selectedOption={selectedOptions}
-            onSelectOption={setSelectedOptions}
-            onVariantChange={handleVariantChange}
-          />
-        )}
-
-        {(currentStep === item.steps || !item.steps) && availableAddons?.length>0 && (
-          <AddonSelection
-            addons={availableAddons}
-            selectedAddons={selectedAddons}
-            onAddonChange={handleAddonChange}
-          />
-        )}
-
-        <DrawerFooter>
+          {(currentStep === item.steps || !item.steps) &&
+            availableAddons?.length > 0 && (
+              <AddonSelection
+                addons={availableAddons}
+                selectedAddons={selectedAddons}
+                onAddonChange={handleAddonChange}
+              />
+            )}
+        </div>
+        <DrawerFooter className="h-16 border-t">
           <div className="flex w-full gap-2 justify-between">
             <span className="flex items-center gap-4 text-base font-bold">
-              {(currentStep === item.steps || !item.steps) ? (
+              {currentStep === item.steps || !item.steps ? (
                 <>
                   ₹ {totalPrice}
                   <Counter count={count} setCount={setCount} />
                 </>
               ) : (
-                <div className="flex justify-center my-4">
-                  <span>Step {currentStep} of {item.steps}</span>
+                <div className="flex justify-center items-center">
+                  <span>
+                    Step {currentStep} of {item.steps}
+                  </span>
                 </div>
               )}
             </span>
             {(currentStep === item.steps || !item.steps) && (
               <DrawerClose>
                 <Button
-                  className="bg-rose-500 text-white text-base font-semibold w-24 shadow-lg"
+                  className="bg-rose-500 text-white text-base rounded-[10px] font-semibold w-24 shadow-lg"
                   variant="outline"
                   onClick={handleAddToCart}
                 >

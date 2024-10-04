@@ -8,14 +8,14 @@ function Counter({ count, setCount }) {
     if (count === 1) {
       return;
     }
-    setCount(count - 1)
+    setCount(count - 1);
   };
   const increment = () => {
     setCount(count + 1);
   };
 
   return (
-    <div className="flex items-center justify-center w-fit bg-blue-50 rounded-md p-1 text-blue-600">
+    <div className="flex items-center justify-center bg-rose-50 rounded p-1 text-rose-600">
       <SquareMinus size={24} onClick={decrement} />
       <span id="counter" className="font-bold w-8 text-center">
         {count}
@@ -25,4 +25,4 @@ function Counter({ count, setCount }) {
   );
 }
 
-export default Counter; 
+export default Counter;
