@@ -53,3 +53,20 @@ export function HowtoScanAnimation() {
     </div>
   );
 }
+
+export function DiscountBadge() {
+  return <DotLottieReact src="/lottie/discount-red.lottie" autoplay loop />;
+}
+
+export function HeartLabelBadge() {
+  return (
+    <div className="h-14">
+      <DotLottieReact
+        src="/lottie/heartbadge.lottie"
+        autoplay
+        playOnHover
+        segment={[1, 70]}
+      />
+    </div>
+  );
+}

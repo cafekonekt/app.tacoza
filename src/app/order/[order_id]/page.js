@@ -73,8 +73,8 @@ export const metadata = {
 
 export default async function Order({ params }) {
   const order = await getOrder(params);
-
-  if (order.status===404) notFound();
+  console.log(order);
+  if (order.status === 404) notFound();
   return (
     <main className="max-w-lg p-4 gap-4 grid">
       <h2 className="text-2xl font-semibold">
@@ -115,9 +115,8 @@ export default async function Order({ params }) {
       )}
 
       {/* Payment Processing */}
-      {order.payment_status === "pending" && (
+      {(order.payment_status === "pending" || "active") && (
         <section className="flex flex-col justify-center items-center">
-          <PaymentFailAnimation />
           <span className="text-blue-600 font-bold text-lg">
             Your payment is processing.
           </span>
@@ -128,19 +127,18 @@ export default async function Order({ params }) {
       )}
 
       {/* Payment Failed */}
-      {order.payment_status === "failed" ||
-        (order.payment_status === "active" && (
-          <section className="flex flex-col justify-center items-center">
-            <PaymentFailAnimation />
-            <span className="text-red-600 font-bold text-lg">
-              Payment Failed
-            </span>
-            <span className="text-sm text-center">
-              Customer rejected UPI request or other failure reasons.
-            </span>
-            <Payment order={order} params={params} />
-          </section>
-        ))}
+      {order.payment_status === "failed" && (
+        <section className="flex flex-col justify-center items-center">
+          <PaymentFailAnimation />
+          <span className="text-red-600 font-bold text-lg">
+            Payment Failed
+          </span>
+          <span className="text-sm text-center">
+            Customer rejected UPI request or other failure reasons.
+          </span>
+          <Payment order={order} params={params} />
+        </section>
+      )}
 
       <Card className="overflow-hidden">
         {order.status === "preparing" && (
@@ -155,7 +153,7 @@ export default async function Order({ params }) {
               {Math.floor(
                 (new Date(order.created_at).getTime() -
                   new Date(order.updated_at).getTime()) /
-                  (1000 * 60),
+                (1000 * 60),
               )}{" "}
               mins • Ontime
             </span>

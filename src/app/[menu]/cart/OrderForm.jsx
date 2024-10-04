@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-// components ui
 import {
   Select,
   SelectContent,
@@ -13,20 +12,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-// icons
 import { Bike, Package, UtensilsCrossed } from "lucide-react";
-// animations
-import ShinyText from "@/components/ui/animations/ShinyText";
-// components
 import { Summary } from "@/app/components/orderForm/Summary";
-// server actions
 import { checkout } from "@/app/lib/order/checkout";
-// hooks
 import { useCart } from "@/context/CartContext";
 import { useDrawer } from "@/context/DrawerContext";
-
 import { cashfree } from "@/app/util/cashfree";
 import { logout } from "@/app/lib/auth/session";
+import ShinyButton from "@/components/ui/animations/ShinyButton";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const SERVICE_MAP_ICON = {
   dine_in: <UtensilsCrossed className="h-3.5 w-3.5 mr-1" />,
@@ -37,35 +40,43 @@ const SERVICE_MAP_ICON = {
 export function OrderForm({ params, outlet, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
+  const router = useRouter();
 
-  const tableSelectRef = React.useRef(null); // 1. Create a ref for the SelectTrigger
-  
+  const tableSelectRef = React.useRef(null);
+
+  const [paymentDrawer, setPaymentDrawer] = React.useState(false);
   const [order, setOrder] = React.useState({
     type: "dine_in",
     table_id: table?.table_id,
   });
-  const totalPrice = cartItems?.reduce((acc, item) => acc + item.totalPrice, 0);
   const [alert, setAlert] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [paymentMethod, setPaymentMethod] = React.useState("online");
 
-  const handleOrderType = (e) => {
-    setOrder({ ...order, [e.target.name]: e.target.value });
-  };
+  const totalPrice = cartItems?.reduce((acc, item) => acc + item.totalPrice, 0);
 
-  const handleSubmit = async () => {
-    if (!session) {
-      openDrawer();
-      return;
-    }
+  const handleOrderType = ({ target: { name, value } }) =>
+    setOrder((prev) => ({ ...prev, [name]: value }));
+
+  const showAlert = (message) => setAlert(message);
+
+  const validateOrder = () => {
+    if (!session) return openDrawer();
+    if (!order.type) return showAlert("Please select an order type");
     if (order.type === "dine_in" && !order.table_id) {
-      setAlert("Please select a table");
+      showAlert("Please select a table");
       tableSelectRef.current?.focus();
       return;
     }
-    if (cartItems.length === 0) {
-      setAlert("Empty cart");
-      return;
-    }
+    if (cartItems.length === 0) return showAlert("Empty cart");
+    return true;
+  };
+
+  const selectPaymentMethod = () => {
+    if (validateOrder()) setPaymentDrawer(true);
+  };
+
+  const handlePayment = async () => {
     setLoading(true);
     try {
       const response = await checkout({
@@ -73,27 +84,18 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         order_type: order.type,
         table_id: order.table_id,
         instructions: order.instruction,
+        payment_method: paymentMethod,
       });
-      if (response.error) {
-        logout();
+      if (response?.error) return logout();
+      if (response?.payment_session_id) {
+        cashfree
+          .checkout({
+            paymentSessionId: response.payment_session_id,
+            returnUrl: `https://app.tacoza.co/order/${response.order_id}`,
+          })
+          .catch((err) => console.error(err));
       }
-      if (response) {
-        setOrder({ type: "dine_in" });
-        const checkoutOptions = {
-          paymentSessionId: response.payment_session_id,
-          // returnUrl: `${process.env.SERVER_URL}/${params.menu}/order/${response.order_id}`,
-          returnUrl: `https://app.tacoza.co/order/${response.order_id}`,
-        };
-        cashfree.checkout(checkoutOptions).then(function (result) {
-          if (result.error) {
-            console.error(result.error.message);
-          }
-          if (result.redirect) {
-            console.log("Redirection");
-            // console.log(result);
-          }
-        });
-      }
+      router.push(`/order/${response.order_id}`);
     } catch (error) {
       console.error(error);
     } finally {
@@ -101,73 +103,133 @@ export function OrderForm({ params, outlet, tables, table, session }) {
     }
   };
 
+  const placeOrder = async () => {
+    setPaymentDrawer(false);
+    await handlePayment();
+  };
+
+  const renderToggleGroupItem = (value, label, icon = null) => (
+    <ToggleGroupItem
+      className="w-full flex justify-between h-16 text-base font-bold  data-[state=on]:border-2  data-[state=on]:border-primary  data-[state=on]:text-primary  data-[state=on]:bg-rose-50"
+      value={value}
+    >
+      {icon} {label}
+    </ToggleGroupItem>
+  );
+
   return (
     <>
       <Card className="p-6 gap-3 items-start flex flex-col">
-        <Label forhtml="type">Order Type</Label>
+        <Label htmlFor="type">Order Type</Label>
         <ToggleGroup
           id="type"
           type="single"
           defaultValue="dine_in"
-          onValueChange={(value) => {
-            setOrder({ ...order, type: value });
-          }}
+          onValueChange={(value) => setOrder((prev) => ({ ...prev, type: value }))}
         >
-          {
-            outlet.services.map((service, key) => (
-              <ToggleGroupItem
-                key={key}
-                value={service}
-                className={`border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100`}
-              >
-                {SERVICE_MAP_ICON[service]}
-                {service.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-              </ToggleGroupItem>
-            ))
-          }
+          {outlet.services.map((service, key) => (
+            <ToggleGroupItem
+              key={key}
+              value={service}
+              className="border rounded-full data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:bg-rose-100"
+            >
+              {SERVICE_MAP_ICON[service]}
+              {service
+                .split("_")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+            </ToggleGroupItem>
+          ))}
         </ToggleGroup>
-        <Label forhtml="instruction">Add Cooking Instruction</Label>
+
+        <Label htmlFor="instruction">Add Cooking Instruction</Label>
         <Textarea
           id="instruction"
           name="instruction"
           placeholder="Add your cooking instruction"
           onChange={handleOrderType}
         />
+
         <Label htmlFor="table_id">Table</Label>
         <Select
           id="table_id"
-          onValueChange={(value) => {
-            setOrder({ ...order, table_id: value });
-            setAlert(null); // Clear alert when a table is selected
-          }}
+          onValueChange={(value) => setOrder((prev) => ({ ...prev, table_id: value }))}
           value={order.table_id || table?.table_id}
         >
           <SelectTrigger ref={tableSelectRef}>
             <SelectValue placeholder="Select Table" />
           </SelectTrigger>
           <SelectContent>
-            {tables.map((table, key) => (
-              <SelectItem key={key} value={table.table_id}>
+            {tables.map((table) => (
+              <SelectItem key={table.table_id} value={table.table_id}>
                 {table.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+
         {alert && <p className="text-xs text-red-500">{alert}</p>}
       </Card>
+
       <Summary totalPrice={totalPrice} />
-      <Button
-        onClick={handleSubmit}
-        className="sticky bottom-5 right-0 p-6 rounded-xl shadow-xl"
+
+      <ShinyButton
+        onClick={selectPaymentMethod}
+        className="sticky bottom-5 right-0 w-full p-6 rounded-xl text-lg font-bold text-white shadow-xl"
         disabled={loading}
+        shimmerWidth={150}
       >
-        <ShinyText
-          shimmerWidth={300}
-          className="drop-shadow-lg text-lg font-bold"
-        >
-          Proceed to Pay ₹{totalPrice}
-        </ShinyText>
-      </Button>
+        Proceed to Pay ₹{totalPrice}
+      </ShinyButton>
+
+      <Drawer open={paymentDrawer} onOpenChange={setPaymentDrawer}>
+        <DrawerContent className="mb-4">
+          <DrawerHeader className="flex items-start w-full">
+            <div className="flex flex-col items-start w-full">
+              <DrawerDescription>Pay ₹{totalPrice} to Place your order</DrawerDescription>
+              <DrawerTitle>Select Payment Method</DrawerTitle>
+            </div>
+          </DrawerHeader>
+
+          <ToggleGroup
+            className="w-full flex-col gap-4 p-4"
+            type="single"
+            variant="outline"
+            defaultValue={paymentMethod}
+            onValueChange={setPaymentMethod}
+          >
+            {outlet.payment_methods.includes("online") &&
+              renderToggleGroupItem("online", "Pay Now", <OnlineImage />)}
+
+            {outlet.payment_methods.includes("cash") &&
+              renderToggleGroupItem("cash", "Pay Cash", <CashImage />)}
+          </ToggleGroup>
+
+          <DrawerFooter>
+            <Button
+              className="text-lg font-bold h-12"
+              onClick={placeOrder}
+              disabled={!paymentMethod || loading}
+            >
+              Place Order
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }
+
+const CashImage = () => (
+  <Image
+    src="/rupee.png"
+    width={60}
+    height={16}
+    alt="cash"
+    className="object-cover h-8 w-12 rounded-[5px]"
+  />
+);
+
+const OnlineImage = () => (
+  <Image src="/payonline.png" width={400} height={100} alt="online" className="h-10 w-40" />
+);
