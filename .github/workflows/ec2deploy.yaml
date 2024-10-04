@@ -25,8 +25,8 @@ jobs:
 
     - name: Stop running container
       run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'docker compose -f "/home/ubuntu/client/docker-compose.yml" down'
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'docker compose -f "/home/${{ env.AWS_INSTANCE_USERNAME }}/client/docker-compose.yml" down'
 
     - name: Run new container
       run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'docker compose -f "/home/ubuntu/client/docker-compose.yml" up -d --build'
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ env.AWS_INSTANCE_USERNAME }}@${{ env.AWS_INSTANCE_IP }} 'docker compose -f "/home/${{ env.AWS_INSTANCE_USERNAME }}/client/docker-compose.yml" up -d --build'
