@@ -112,7 +112,7 @@ export default async function Order({ params }) {
       )}
 
       {/* Payment Processing */}
-      {(order.payment_status === "active" || "pending") && (
+      {(order.payment_status === "active" || order.payment_status === "pending") && (
         <section className="flex flex-col justify-center items-center">
           <span className="text-blue-600 font-bold text-lg">
             Your payment is processing.
