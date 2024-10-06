@@ -164,7 +164,7 @@ export function MenuItemComponent({ item }) {
           <span className="text-base font-medium text-muted-foreground">
             {item.variant
               ? `₹${Math.min(...item.item_variants.map((variant) => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map((variant) => parseFloat(variant.price)))}`
-              : `₹${item.price}`}
+              : `₹${Number(item.price)}`}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />
@@ -281,9 +281,9 @@ export function MenuItemComponent({ item }) {
                       </div>
                       <div className="flex items-center justify-between text-sm mt-1">
                         <span className="font-medium text-muted-foreground">
-                          ₹{item.food_item.price}
+                          ₹{item.variant ? Number(item.variant.price) : Number(item.food_item.price)}
                         </span>
-                        <span className="font-medium">₹{item.totalPrice}</span>
+                        <span className="font-medium">₹{Number(item.totalPrice)}</span>
                       </div>
                     </div>
                   ))}
