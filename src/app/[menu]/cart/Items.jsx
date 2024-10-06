@@ -46,7 +46,7 @@ export function Items() {
             </div>
             <div className="flex items-center justify-between text-sm mt-1">
               <span className="font-medium text-muted-foreground">
-                ₹{item.food_item.price}
+                ₹{item.variant ? Number(item.variant.price) : Number(item.food_item.price)}
               </span>
               <span className="font-medium">₹ {item.totalPrice}</span>
             </div>
