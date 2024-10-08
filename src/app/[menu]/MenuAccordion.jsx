@@ -164,7 +164,7 @@ export function MenuItemComponent({ item }) {
           <span className="text-base font-medium text-muted-foreground">
             {item.variant
               ? `₹${Math.min(...item.item_variants.map((variant) => parseFloat(variant.price)))} - ₹${Math.max(...item.item_variants.map((variant) => parseFloat(variant.price)))}`
-              : `₹${Number(item.price)}`}
+              : `₹${item.price}`}
           </span>
           <span className="text-green-700 flex gap-1 items-center my-2">
             <Star className="fill-green-700 w-4 h-4 ml-1" />
@@ -281,9 +281,9 @@ export function MenuItemComponent({ item }) {
                       </div>
                       <div className="flex items-center justify-between text-sm mt-1">
                         <span className="font-medium text-muted-foreground">
-                          ₹{item.variant ? Number(item.variant.price) : Number(item.food_item.price)}
+                          ₹{item.food_item.price}
                         </span>
-                        <span className="font-medium">₹{Number(item.totalPrice)}</span>
+                        <span className="font-medium">₹{item.totalPrice}</span>
                       </div>
                     </div>
                   ))}
@@ -577,17 +577,16 @@ export function MenuAccordion({ items, outlet }) {
 
   return (
     <>
-      <section className="relative w-full" ref={sectionRef}>
+      <section className="relative w-full pt-20" ref={sectionRef}>
         <div
           ref={divRef}
-          className={`animate-in slide-in-from-top-0 duration-300 ${isFixed ? "fixed top-0 left-0 w-full bg-white px-4 py-2 shadow z-40" : "relative"}`}
+          className={` w-full bg-white py-2 ${isFixed ? "fixed top-0 left-0 px-4 shadow z-40" : "absolute top-0"}`}
         >
           <div className="flex">
             <div className="flex items-center text-muted-foreground text-sm">
               Filters <Settings2 className="w-3.5 h-3.5 ml-1" />{" "}
               <Separator orientation="vertical" className="mx-2" />
             </div>
-
             <div className="flex items-center gap-1 overflow-x-scroll no-scrollbar">
               {outlet.type?.length === 1 ? (
                 <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">

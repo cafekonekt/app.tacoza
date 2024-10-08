@@ -23,11 +23,11 @@ export default async function Orders({ params }) {
     getTable(table_id),
     getOutlet(menu),
   ]);
-  if (table.status==404 || outlet.status==404) notFound();
+  if (table.status == 404 || outlet.status == 404) notFound();
 
   const tables = [table];
   return (
-    <main className="grid gap-4 p-6">
+    <main className="max-w-md grid gap-4 py-4 bg-gray-100">
       {/* Header */}
       <Header params={params} session={session} />
       {/* Breadcrumb */}
@@ -37,7 +37,13 @@ export default async function Orders({ params }) {
       {/* List Items */}
       <Items />
       {/* Order Form */}
-      <OrderForm params={params} outlet={outlet} tables={tables} table={table} session={session} />
+      <OrderForm
+        params={params}
+        outlet={outlet}
+        tables={tables}
+        table={table}
+        session={session}
+      />
     </main>
   );
 }

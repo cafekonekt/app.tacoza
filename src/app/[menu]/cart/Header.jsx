@@ -5,7 +5,7 @@ import { Auth } from "@/app/components/auth/Auth";
 
 export async function Header({ params, session }) {
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between mx-4">
       <h2 className="text-2xl font-semibold">
         <Link href={`/${params.menu}`}>
           <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
@@ -14,7 +14,7 @@ export async function Header({ params, session }) {
         </Link>
         Cart
       </h2>
-      {!session?.user?.name || !session?.user?.email ? <Auth /> : ''}
+      {!session?.user?.name || !session?.user?.email ? <Auth /> : ""}
     </div>
   );
 }

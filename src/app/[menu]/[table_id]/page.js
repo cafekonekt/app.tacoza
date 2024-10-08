@@ -13,22 +13,20 @@ import { notFound } from "next/navigation";
 export async function generateMetadata({ params }, parent) {
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
 
-  const response = await Promise.all([
-    outletPromis,
-  ]);
-  const outlet = response[0]
-  if (outlet.status === 404) notFound()
+  const response = await Promise.all([outletPromis]);
+  const outlet = response[0];
+  if (outlet.status === 404) notFound();
 
   return {
     title: outlet.name,
     openGraph: {
-      images: [ outlet.logo, ...outlet?.gallery],
+      images: [outlet.logo, ...outlet?.gallery],
     },
-  }
+  };
 }
 
 export default async function Home({ params }) {
-  const table_id = params.table_id
+  const table_id = params.table_id;
   const itemsPromis = apiGet(`/api/shop/menu/${params.menu}`);
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
   const waitPromisForLoader = new Promise((resolve) =>
@@ -41,25 +39,29 @@ export default async function Home({ params }) {
     waitPromisForLoader,
   ]);
 
-  if (items.status === 404) notFound()
-  if (outlet.status === 404) notFound()
-  if (table.status === 404) notFound()
+  if (items.status === 404) notFound();
+  if (outlet.status === 404) notFound();
+  if (table.status === 404) notFound();
 
   return (
     <>
-      <main className="flex w-full min-h-screen flex-col gap-4 justify-evenly p-6 overflow-hidden">
-        {/* Header */}
-        <Header />
-        {/* Breadcrumb */}
-        <BreadCrumb params={params} />
-        {/* Outlet Image */}
-        <Gallery outlet={outlet} />
-        {/* Restaurant Details */}
-        <Details outlet={outlet} />
+      <main className="flex w-full min-h-screen flex-col gap-4 overflow-hidden bg-gray-100">
+        <div className="bg-white px-4 rounded-b-3xl shadow-[0px_2px_6px_0px_rgba(0,_0,_0,_0.1)]">
+          {/* Header */}
+          <Header />
+          {/* Breadcrumb */}
+          <BreadCrumb params={params} />
+          {/* Outlet Image */}
+          <Gallery outlet={outlet} />
+          {/* Restaurant Details */}
+          <Details outlet={outlet} />
+        </div>
         {/* Call Waiter, Bookmark, Share */}
-        <Call />
+        <Call outlet={outlet} />
         {/* Menu and Filters */}
-        <MenuAccordion items={items} outlet={outlet} />
+        <div className="bg-white px-4 pt-8 rounded-t-3xl shadow-[0px_-1px_6px_0px_rgba(0,_0,_0,_0.1)]">
+          <MenuAccordion items={items} outlet={outlet} />
+        </div>
         {/* Item Added */}
         <ItemAdded params={params} />
       </main>

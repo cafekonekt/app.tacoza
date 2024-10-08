@@ -9,7 +9,7 @@ import {
 
 export function BreadCrumb({ params }) {
   return (
-    <Breadcrumb>
+    <Breadcrumb className="mx-4">
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">HOME</BreadcrumbLink>
