@@ -21,7 +21,7 @@ export async function Call({ outlet }) {
       <Popover>
         <PopoverTrigger asChild>
           <ShinyButton className="mx-0 text-white">
-            <Sparkles className="h-4 w-4 mr-1" /> Ask AI
+            <Sparkles className="h-4 w-4 mr-1" /> Ask Waiter
           </ShinyButton>
         </PopoverTrigger>
         <PopoverContent align="start">
