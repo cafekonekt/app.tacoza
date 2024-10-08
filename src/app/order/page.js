@@ -66,7 +66,9 @@ export default async function Order() {
             <div className="flex items-center gap-4">
               <div className="aspect-square h-14">
                 <Image
-                  src={outlet.logo ? outlet.logo : "/outlet-thumb.jpg"}
+                  src={
+                    order.outlet.logo ? order.outlet.logo : "/outlet-thumb.jpg"
+                  }
                   alt="Restaurant"
                   height="100"
                   width="100"
