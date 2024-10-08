@@ -70,3 +70,11 @@ export function HeartLabelBadge() {
     </div>
   );
 }
+
+export function PendingPayementAnimation() {
+  return (
+    <div className="w-32 h-32 mb-2">
+      <DotLottieReact src="/lottie/pending-payment.lottie" autoplay />
+    </div>
+  );
+}

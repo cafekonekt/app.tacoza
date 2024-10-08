@@ -26,7 +26,7 @@ export default async function Orders({ params }) {
 
   if (tables.status == 404 || outlet.status == 404) return notFound();
   return (
-    <main className="max-w-md grid gap-4 p-4">
+    <main className="max-w-md grid gap-4 py-4 bg-gray-100">
       {/* Header */}
       <Header params={params} session={session} />
       {/* Breadcrumb */}

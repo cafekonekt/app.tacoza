@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Bike, Package, UtensilsCrossed } from "lucide-react";
+import { Bike, HelpCircle, Package, UtensilsCrossed } from "lucide-react";
 import { Summary } from "@/app/components/orderForm/Summary";
 import { checkout } from "@/app/lib/order/checkout";
 import { useCart } from "@/context/CartContext";
@@ -30,6 +30,18 @@ import {
 } from "@/components/ui/drawer";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Separator } from "@/components/ui/separator";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const SERVICE_MAP_ICON = {
   dine_in: <UtensilsCrossed className="h-3.5 w-3.5 mr-1" />,
@@ -53,7 +65,10 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   const [loading, setLoading] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState("online");
 
-  const totalPrice = cartItems?.reduce((acc, item) => acc + Number(item.totalPrice), 0);
+  const totalPrice = cartItems?.reduce(
+    (acc, item) => acc + Number(item.totalPrice),
+    0,
+  );
 
   const handleOrderType = ({ target: { name, value } }) =>
     setOrder((prev) => ({ ...prev, [name]: value }));
@@ -119,13 +134,15 @@ export function OrderForm({ params, outlet, tables, table, session }) {
 
   return (
     <>
-      <Card className="p-6 gap-3 items-start flex flex-col">
+      <Card className="mx-4 p-6 gap-3 shadow-none items-start flex flex-col">
         <Label htmlFor="type">Order Type</Label>
         <ToggleGroup
           id="type"
           type="single"
           defaultValue="dine_in"
-          onValueChange={(value) => setOrder((prev) => ({ ...prev, type: value }))}
+          onValueChange={(value) =>
+            setOrder((prev) => ({ ...prev, type: value }))
+          }
         >
           {outlet.services.map((service, key) => (
             <ToggleGroupItem
@@ -142,18 +159,26 @@ export function OrderForm({ params, outlet, tables, table, session }) {
           ))}
         </ToggleGroup>
 
-        <Label htmlFor="instruction">Add Cooking Instruction</Label>
-        <Textarea
-          id="instruction"
-          name="instruction"
-          placeholder="Add your cooking instruction"
-          onChange={handleOrderType}
-        />
+        <Separator className="my-1" />
 
-        <Label htmlFor="table_id">Table</Label>
+        <Label htmlFor="table_id" className="flex items-center">
+          Table
+          <Popover>
+            <PopoverTrigger>
+              <HelpCircle className="h-4 w-4 ml-1" />
+            </PopoverTrigger>
+            <PopoverContent align="start" className="bg-rose-50">
+              <p className="text-sm">
+                Table number will be present on table or below the QR code.
+              </p>
+            </PopoverContent>
+          </Popover>
+        </Label>
         <Select
           id="table_id"
-          onValueChange={(value) => setOrder((prev) => ({ ...prev, table_id: value }))}
+          onValueChange={(value) =>
+            setOrder((prev) => ({ ...prev, table_id: value }))
+          }
           value={order.table_id || table?.table_id}
         >
           <SelectTrigger ref={tableSelectRef}>
@@ -169,13 +194,29 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         </Select>
 
         {alert && <p className="text-xs text-red-500">{alert}</p>}
+
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="item-1">
+            <AccordionTrigger htmlFor="instruction">
+              Add Cooking Instruction
+            </AccordionTrigger>
+            <AccordionContent>
+              <Textarea
+                id="instruction"
+                name="instruction"
+                placeholder="Add your cooking instruction"
+                onChange={handleOrderType}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </Card>
 
       <Summary totalPrice={totalPrice} />
 
       <ShinyButton
         onClick={selectPaymentMethod}
-        className="sticky bottom-5 right-0 w-full p-6 rounded-xl text-lg font-bold text-white shadow-xl"
+        className="sticky bottom-5 mx-4 w-auto p-6 rounded-xl text-lg font-bold text-white shadow-xl"
         disabled={loading}
         shimmerWidth={150}
       >
@@ -186,7 +227,9 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         <DrawerContent className="mb-4">
           <DrawerHeader className="flex items-start w-full">
             <div className="flex flex-col items-start w-full">
-              <DrawerDescription>Pay ₹{totalPrice} to Place your order</DrawerDescription>
+              <DrawerDescription>
+                Pay ₹{totalPrice} to Place your order
+              </DrawerDescription>
               <DrawerTitle>Select Payment Method</DrawerTitle>
             </div>
           </DrawerHeader>
@@ -231,5 +274,11 @@ const CashImage = () => (
 );
 
 const OnlineImage = () => (
-  <Image src="/payonline.png" width={400} height={100} alt="online" className="h-10 w-40" />
+  <Image
+    src="/payonline.png"
+    width={400}
+    height={100}
+    alt="online"
+    className="h-10 w-40"
+  />
 );

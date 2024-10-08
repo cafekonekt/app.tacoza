@@ -61,29 +61,29 @@ export default async function Order() {
       </Breadcrumb>
 
       {orderHistory?.map((order, key) => (
-        <Card className="overflow-hidden" key={key}>
+        <Card className="overflow-hidden p-4" key={key}>
           <CardHeader className="bg-muted/50">
             <div className="flex items-center gap-4">
-              <div className="aspect-square">
+              <div className="aspect-square h-14">
                 <Image
-                  src="/pizza.jpg"
+                  src={outlet.logo ? outlet.logo : "/outlet-thumb.jpg"}
                   alt="Restaurant"
                   height="100"
                   width="100"
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <div className="text-muted-foreground text-sm">
-                <div className="text-base text-primary font-semibold">
+              <div className="text-muted-foreground leading-tight text-xs">
+                <div className="text-base text-black font-semibold truncate">
                   {order.outlet.name}
                 </div>
                 {order.outlet.location}
                 <div className="flex items-center gap-1">
                   <Link
                     href={`/${order.outlet.menu_slug}`}
-                    className="flex items-center text-blue-500"
+                    className="flex items-center text-primary"
                   >
-                    View Menu <ChevronRightIcon className="h-4 w-4 mt-1" />
+                    View Menu <ChevronRightIcon className="h-3 w-3" />
                   </Link>
                 </div>
               </div>
@@ -92,14 +92,14 @@ export default async function Order() {
           <CardContent className="grid gap-2 mt-4">
             {order.items.map((item, key) => (
               <div className="flex items-center justify-between" key={key}>
-                <p className="font-medium flex items-center gap-2">
+                <p className="font-medium flex items-center gap-2 leading-tight">
                   <Image
                     src={iconMap[item.food_item.food_type]}
-                    alt="Dash"
+                    alt="veg"
                     height="16"
                     width="16"
                   />
-                  <span className="text-muted-foreground">
+                  <span className="text-muted-foreground text-nowrap">
                     {item.quantity} x
                   </span>
                   {item?.food_item?.name}
@@ -110,18 +110,17 @@ export default async function Order() {
             <Link href={`/order/${order.order_id}`}>
               <div className="flex items-center justify-between mt-2">
                 <span className="text-sm font-medium text-muted-foreground truncate">
-                  Ordered on {new Date(order.created_at).toLocaleDateString()},{" "}
-                  {new Date(order.created_at).toLocaleTimeString()}
+                  Ordered on {new Date(order.created_at).toLocaleDateString()}
                   <p className="text-base">{order.status.toUpperCase()}</p>
                 </span>
-                <span className="flex items-center text-base font-medium">
+                <span className="flex items-center text-base font-medium text-nowrap">
                   ₹{order.total} <ChevronRightIcon className="h-4 w-4" />
                 </span>
               </div>
             </Link>
-            <Separator />
+            <Separator className="hidden" />
 
-            <Button className="h-8 gap-1 w-fit">
+            <Button className="hidden h-8 gap-1 w-fit">
               <RotateCcwSquare className="h-3.5 w-3.5" />
               <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
                 Reorder

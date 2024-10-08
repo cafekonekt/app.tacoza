@@ -15,20 +15,17 @@ export async function Gallery({ outlet }) {
           className="h-40 w-full object-cover rounded-lg"
         />
       )}
-      <div className="absolute flex items-center bottom-0 right-0 rounded-full text-xs px-1.5 bg-black/30  shadow-md text-white m-2">
-        <Images className="h-3-5 w-3.5 mr-1" /> More
+      <div className="p-1 px-2 absolute flex items-center bottom-0 right-2 rounded-full text-xs backdrop-blur shadow-md text-secondary mb-2">
+        <span className="h-2.5 w-2.5 rounded-full mr-1 bg-green-500" /> OPEN
       </div>
-      <div className="absolute bottom-0 left-0 flex items-end">
+      <div className="absolute bottom-2 left-2 flex items-end">
         <Image
           src={outlet?.logo || "/outlet-thumb.jpg"}
           alt="logo"
           width={50}
           height={50}
-          className=" m-2 h-10 w-10 object-cover rounded-full"
+          className="h-10 w-10 object-cover rounded-full"
         />
-        <div className="p-1 px-2 flex items-center  rounded-full text-xs bg-black/30  shadow-md text-secondary mb-2">
-          <span className="h-2 w-2 rounded-full mr-1 bg-green-600" /> Open
-        </div>
       </div>
     </div>
   );

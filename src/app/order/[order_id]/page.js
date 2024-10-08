@@ -56,6 +56,7 @@ import {
   PaymentSuccessAnimation,
   PaymentFailAnimation,
   FoodPreparingAnimation,
+  PendingPayementAnimation,
 } from "@/app/components/lottie/lottie";
 import {
   Accordion,
@@ -112,9 +113,11 @@ export default async function Order({ params }) {
       )}
 
       {/* Payment Processing */}
-      {(order.payment_status === "active" || order.payment_status === "pending") && (
+      {(order.payment_status === "active" ||
+        order.payment_status === "pending") && (
         <section className="flex flex-col justify-center items-center">
-          <span className="text-blue-600 font-bold text-lg">
+          <PendingPayementAnimation />
+          <span className="text-yellow-600 font-bold text-lg">
             Your payment is processing.
           </span>
           <span className="text-sm text-center">
@@ -127,9 +130,7 @@ export default async function Order({ params }) {
       {order.payment_status === "failed" && (
         <section className="flex flex-col justify-center items-center">
           <PaymentFailAnimation />
-          <span className="text-red-600 font-bold text-lg">
-            Payment Failed
-          </span>
+          <span className="text-red-600 font-bold text-lg">Payment Failed</span>
           <span className="text-sm text-center">
             Customer rejected UPI request or other failure reasons.
           </span>
@@ -150,7 +151,7 @@ export default async function Order({ params }) {
               {Math.floor(
                 (new Date(order.created_at).getTime() -
                   new Date(order.updated_at).getTime()) /
-                (1000 * 60),
+                  (1000 * 60),
               )}{" "}
               mins • Ontime
             </span>

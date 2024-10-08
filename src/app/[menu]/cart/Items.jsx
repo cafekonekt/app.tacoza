@@ -20,8 +20,8 @@ const iconMap = {
 export function Items() {
   const { cartItems } = useCart();
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-rose-50">
+    <Card className="overflow-hidden shadow-none mx-4">
+      <CardHeader className="bg-gray-50">
         <CardTitle className="flex gap-1">
           <Utensils className="h-4 w-4" /> Items
         </CardTitle>
@@ -46,7 +46,10 @@ export function Items() {
             </div>
             <div className="flex items-center justify-between text-sm mt-1">
               <span className="font-medium text-muted-foreground">
-                ₹{item.variant ? Number(item.variant.price) : Number(item.food_item.price)}
+                ₹
+                {item.variant
+                  ? Number(item.variant.price)
+                  : Number(item.food_item.price)}
               </span>
               <span className="font-medium">₹ {item.totalPrice}</span>
             </div>
