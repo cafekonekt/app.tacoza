@@ -181,8 +181,18 @@ function Otp({ setDrawer }) {
   } = useContext(AuthContext);
   const { cartItems, addToCart, clearCart } = useCart();
 
+  const [error, setError] = useState({
+    message: "",
+    status: false,
+  });
+
   const handleNext = async () => {
     const response = await verifyOTP(phone, otp);
+    if (response.status) {
+      console.log("OTP Verification Failed", response.status);
+      setError({ message: "Invalid OTP, please check and try again.", status: true });
+      return;
+    }
     if (response) {
       if (cartItems.length > 0) {
         const tempCartItems = [...cartItems];
@@ -255,9 +265,7 @@ function Otp({ setDrawer }) {
             <span className="text-red-500">Max OTP attempts reached</span>
           )}
         </p>
-        <p className="text-sm text-red-500">
-          Wrong OTP, please check and try again
-        </p>
+        {error.status && <p className="text-sm text-red-500">{error.message}</p>}
       </div>
       <Button onClick={handleNext}>Continue</Button>
     </div>

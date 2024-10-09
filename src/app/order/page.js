@@ -40,7 +40,7 @@ export default async function Order() {
 
   return (
     <main
-      className="max-w-lg p-4 gap-4 flex flex-col bg-gray-100 h-screen"
+      className="max-w-lg p-4 gap-4 flex flex-col bg-gray-100"
       suppressHydrationWarning
     >
       <h2 className="text-2xl font-semibold">

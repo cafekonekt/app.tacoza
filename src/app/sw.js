@@ -9,4 +9,17 @@ const serwist = new Serwist({
   runtimeCaching: defaultCache,
 });
 
+self.addEventListener("push", (event) => {
+  const data = event.data.json();
+  const title = data.title || 'Notification';
+  const options = {
+    body: data.body,
+    icon: '/icon512_rounded.png',
+    url: data.url ? data.url : '/',
+  };
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
 serwist.addEventListeners();

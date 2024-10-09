@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { DrawerProvider } from "@/context/DrawerContext";
+import Subscribe from "./subscribe";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <DrawerProvider>
         <CartProvider>
           <body className={inter.className}>{children}</body>
+          <Subscribe />
         </CartProvider>
       </DrawerProvider>
     </html>
