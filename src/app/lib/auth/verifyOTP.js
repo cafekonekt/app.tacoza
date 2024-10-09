@@ -9,6 +9,9 @@ export async function verifyOTP(phone_number, otp) {
       'phone_number': phone_number,
       'otp': otp
     });
+    if (response.status === 401 || response.status === 400 || response.status === 500) {
+      return { message: "OTP Verification Failed", status: response.status };
+    }
     const session = await encrypt(response);
     cookies().set('session', session, {
       httpOnly: true,
