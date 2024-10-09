@@ -2,6 +2,18 @@
 import React from "react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
+export function LoaderAnimation() {
+  return (
+    <div className="h-20 w-20">
+      <DotLottieReact
+        src="https://lottie.host/f52a161b-2549-4b98-897c-3857ba806018/2HfELeC0cq.lottie"
+        autoplay
+        loop
+      />
+    </div>
+  );
+}
+
 export function SearchLoadingAnimation() {
   return (
     <DotLottieReact

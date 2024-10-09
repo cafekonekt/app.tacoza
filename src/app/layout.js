@@ -6,8 +6,13 @@ import { DrawerProvider } from "@/context/DrawerContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
+  manifest: "/manifest.json",
   title: "Home - tacoza (Instant food Ordering)",
   description: "Crave, Scan and Order superfast",
+};
+
+export const Viewport = {
+  themeColor: "#e21e47",
 };
 
 export default function RootLayout({ children }) {

@@ -1,15 +1,13 @@
 import {
+  BookmarkPlus,
   ChevronLeft,
   Copy,
   CreditCard,
-  HelpCircle,
-  Home,
-  MapPin,
   MoreVertical,
-  PhoneCall,
-  RefreshCcw,
+  Navigation,
+  Phone,
   Route,
-  Star,
+  Share2,
   Timer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -74,7 +72,7 @@ export default async function Order({ params }) {
   const order = await getOrder(params);
   if (order.status === 404) notFound();
   return (
-    <main className="max-w-lg p-4 gap-4 grid">
+    <main className="max-w-lg p-4 gap-4 grid bg-gray-100">
       <h2 className="text-2xl font-semibold">
         <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
           <Link href={`/order`}>
@@ -118,7 +116,7 @@ export default async function Order({ params }) {
         <section className="flex flex-col justify-center items-center">
           <PendingPayementAnimation />
           <span className="text-yellow-600 font-bold text-lg">
-            Your payment is processing.
+            Payment is processing
           </span>
           <span className="text-sm text-center">
             Please wait, do not make another payment until it is complete.
@@ -157,31 +155,37 @@ export default async function Order({ params }) {
             </span>
           </CardHeader>
         )}
-        <CardContent>
+        <CardContent className="!p-4">
           <div className="text-sm mt-4">
-            <div className="flex justify-between">
-              <div className="grid">
-                <span className="font-semibold">{order.outlet.name}</span>
-                <span className="text-muted-foreground">
-                  {order.outlet.address}
-                </span>
-              </div>
+            <div className="grid">
+              <span className="font-semibold">{order.outlet.name}</span>
+              <span className="text-muted-foreground">
+                {order.outlet.address}
+              </span>
+
               <div className="flex items-center gap-1">
-                <Badge variant="outline" className="w-fit h-6">
+                <Badge variant="outline" className="text-nowrap w-fit h-8">
                   {order.table}
                 </Badge>
-                <Button size="icon" variant="outline" className="h-8 w-8">
-                  <PhoneCall className="h-3.5 w-3.5" />
+                <Button size="icon" variant="outline" className=" rounded-full">
+                  <Link href={`tel:${order.outlet.phone}`}>
+                    <Phone className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="icon" variant="outline" className="rounded-full">
+                  <Navigation className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="outline" className="rounded-full">
+                  <BookmarkPlus className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           </div>
           <Rating />
-          <Separator className="mt-2" />
-          <Accordion className="-mb-4" collapsible>
+          <Accordion className="mt-2 px-4 border rounded-lg" collapsible>
             <AccordionItem value="item-1">
               <AccordionTrigger>
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 text-sm font-semibold">
                   <Route className="h-3.5 w-3.5" />
                   Order Timeline
                 </span>
@@ -234,12 +238,6 @@ export default async function Order({ params }) {
             </CardDescription>
           </div>
           <div className="ml-auto flex items-center gap-1">
-            <Button size="sm" variant="outline" className="h-8 gap-1">
-              <HelpCircle className="h-3.5 w-3.5" />
-              <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                Need Help
-              </span>
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size="icon" variant="outline" className="h-8 w-8">
@@ -266,7 +264,7 @@ export default async function Order({ params }) {
                   <span className="text-muted-foreground">
                     {item.food_item.name} x <span>{item.quantity}</span>
                   </span>
-                  <span>{item.totalPrice}</span>
+                  <span>₹{item.totalPrice}</span>
                 </li>
               ))}
             </ul>
@@ -300,9 +298,9 @@ export default async function Order({ params }) {
               <div className="flex items-center justify-between">
                 <dt className="flex items-center gap-1 text-muted-foreground">
                   <CreditCard className="h-4 w-4" />
-                  Visa
+                  UPI
                 </dt>
-                <dd>**** **** **** 4532</dd>
+                <dd>**** **** ****</dd>
               </div>
             </dl>
           </div>

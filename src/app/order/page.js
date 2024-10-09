@@ -39,7 +39,10 @@ export default async function Order() {
   if (orderHistory.status === 404 || orderHistory.status === 401) notFound();
 
   return (
-    <main className="max-w-lg p-4 gap-4 grid" suppressHydrationWarning>
+    <main
+      className="max-w-lg p-4 gap-4 flex flex-col bg-gray-100 h-screen"
+      suppressHydrationWarning
+    >
       <h2 className="text-2xl font-semibold">
         <Link href={`/`}>
           <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
@@ -61,8 +64,8 @@ export default async function Order() {
       </Breadcrumb>
 
       {orderHistory?.map((order, key) => (
-        <Card className="overflow-hidden p-4" key={key}>
-          <CardHeader className="bg-muted/50">
+        <Card className="overflow-hidden" key={key}>
+          <CardHeader className="bg-rose-50">
             <div className="flex items-center gap-4">
               <div className="aspect-square h-14">
                 <Image

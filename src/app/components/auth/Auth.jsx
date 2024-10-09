@@ -255,6 +255,9 @@ function Otp({ setDrawer }) {
             <span className="text-red-500">Max OTP attempts reached</span>
           )}
         </p>
+        <p className="text-sm text-red-500">
+          Wrong OTP, please check and try again
+        </p>
       </div>
       <Button onClick={handleNext}>Continue</Button>
     </div>
