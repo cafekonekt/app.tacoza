@@ -9,6 +9,7 @@ import { Call } from "./Call";
 import { Footer } from "./Footer";
 import { Details } from "./Details";
 import { notFound } from "next/navigation";
+import { InstallApp } from "../components/menu/installApp";
 
 export async function generateMetadata({ params }, parent) {
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
@@ -46,6 +47,7 @@ export default async function Home({ params }) {
           {/* Restaurant Details */}
           <Details outlet={outlet} />
         </div>
+        <InstallApp />
         {/* Call Waiter, Bookmark, Share */}
         <Call outlet={outlet} />
         {/* Menu and Filters */}

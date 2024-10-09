@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 export function Rating() {
   const [value, setValue] = useState(4);
   return (
-    <div className="mt-2">
+    <div className="mt-2 px-4 py-2 border rounded-lg">
       <span className="text-sm font-semibold">Rate this outlet</span>
       <StarRating
         value={value}

@@ -2,12 +2,18 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { DrawerProvider } from "@/context/DrawerContext";
+import Subscribe from "./subscribe";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
+  manifest: "/manifest.json",
   title: "Home - tacoza (Instant food Ordering)",
   description: "Crave, Scan and Order superfast",
+};
+
+export const Viewport = {
+  themeColor: "#e21e47",
 };
 
 export default function RootLayout({ children }) {
@@ -16,6 +22,7 @@ export default function RootLayout({ children }) {
       <DrawerProvider>
         <CartProvider>
           <body className={inter.className}>{children}</body>
+          <Subscribe />
         </CartProvider>
       </DrawerProvider>
     </html>
