@@ -17,14 +17,13 @@ export const metadata = {
 
 export default async function Orders({ params }) {
   const menu = params.menu;
-
   const [session, tables, outlet] = await Promise.all([
     getSession(),
     getTables(menu),
     getOutlet(menu),
   ]);
-
   if (tables.status == 404 || outlet.status == 404) return notFound();
+  
   return (
     <main className="max-w-md grid gap-4 py-4 bg-gray-100">
       {/* Header */}

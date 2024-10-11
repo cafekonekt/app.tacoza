@@ -1,5 +1,4 @@
 import { apiGet } from "@/handlers/apiHandler";
-
 import { MenuAccordion } from "./MenuAccordion";
 import { ItemAdded } from "./ItemAdded";
 import { BreadCrumb } from "./Breadcrumb";
@@ -11,15 +10,13 @@ import { Details } from "./Details";
 import { notFound } from "next/navigation";
 import { InstallApp } from "../components/menu/installApp";
 
-export async function generateMetadata({ params }, parent) {
-  const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
-
-  const response = await Promise.all([outletPromis]);
-  const outlet = response[0];
+export async function generateMetadata({ params }) {
+  const outlet = await apiGet(`/api/shop/outlet/${params.menu}`);
   if (outlet.status === 404) notFound();
 
   return {
     title: outlet.name,
+    description: outlet.description,
     openGraph: {
       images: [outlet.logo, ...outlet?.gallery],
     },
@@ -29,10 +26,10 @@ export async function generateMetadata({ params }, parent) {
 export default async function Home({ params }) {
   const itemsPromis = apiGet(`/api/shop/menu/${params.menu}`);
   const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
-
   const [items, outlet] = await Promise.all([itemsPromis, outletPromis]);
-  if (items.status === 404) notFound();
+
   if (outlet.status === 404) notFound();
+  if (items.status === 404) notFound();
 
   return (
     <>
