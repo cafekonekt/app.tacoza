@@ -31,7 +31,7 @@
       "label": "Instant Order"
     },
     {
-      "src": "screenshots/1.png",
+      "src": "screenshots/3.png",
       "sizes": "640x320",
       "type": "image/png",
       "form_factor": "narrow",
@@ -44,6 +44,7 @@
   "lang": "en-US",
   "name": "Tacoza - Instant Food Ordering",
   "short_name": "Tacoza",
+  "description": "Install and enjoy exclusive offers and discounts on your favorite food items. Order food instantly and get it on your table.",
   "start_url": "/",
   "id": "1001"
 }

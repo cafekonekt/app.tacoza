@@ -43,7 +43,14 @@ export default function Loading() {
       <div className="text-muted-foreground/70 font-semibold text-sm animate-pulse">
         {quote}
       </div>
-      <LoaderAnimation />
+      <Image
+        src="/vE0TYbrMbt.gif"
+        alt="logo"
+        className="h-16 aspect-square"
+        height="90"
+        width="60"
+        unoptimized
+      />
     </main>
   );
 }
