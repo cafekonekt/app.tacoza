@@ -15,7 +15,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: data.body,
     icon: '/icon512_rounded.png',
-    url: data.url ? data.url : '/',
+    url: data.url ? data.url : 'https://app.tacoza.co',
   };
   event.waitUntil(
     self.registration.showNotification(title, options)

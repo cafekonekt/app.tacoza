@@ -192,27 +192,15 @@ export default async function Order({ params }) {
               </AccordionTrigger>
               <AccordionContent>
                 <Timeline>
-                  <TimelineItem status="done">
-                    <TimelineHeading>Order Placed</TimelineHeading>
-                    <TimelineDot status="done" />
-                    <TimelineLine done />
-                    <TimelineContent>{order.created_at}</TimelineContent>
+                {order.order_timeline.map((item, key) => (
+                 
+                 <TimelineItem key={key} status={item.done ? "done" : ""}>
+                    <TimelineHeading>{item.stage}</TimelineHeading>
+                    <TimelineDot status={item.done ? "done" : ""} />
+                    {item.done && (order.order_timeline?.length-1 !== key) && <TimelineLine done />}
+                    <TimelineContent>{item.content}</TimelineContent>
                   </TimelineItem>
-                  <TimelineItem>
-                    <TimelineHeading>Payment</TimelineHeading>
-                    <TimelineDot status="done" />
-                    <TimelineLine done />
-                    <TimelineContent>Success</TimelineContent>
-                  </TimelineItem>
-                  <TimelineItem>
-                    <TimelineHeading>Preparing Food</TimelineHeading>
-                    <TimelineDot />
-                    <TimelineLine />
-                  </TimelineItem>
-                  <TimelineItem>
-                    <TimelineHeading>Served</TimelineHeading>
-                    <TimelineDot />
-                  </TimelineItem>
+                ))}
                 </Timeline>
               </AccordionContent>
             </AccordionItem>

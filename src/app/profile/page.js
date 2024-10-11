@@ -16,28 +16,49 @@ export const metadata = {
   description: "Scan, Crave and Order superfast",
 };
 
-export default function Profile() {
+export default function Profile({ searchParams }) {
+  const prev = searchParams.prev || "/";
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const formData = new FormData(e.target);
+  //   const data = Object.fromEntries(formData.entries());
+  //   console.log(data);
+  // }
+
   return (
     <main className="h-screen max-w-md">
       <section className="pb-32 flex flex-col h-full w-full p-4">
         <h2 className="flex items-center text-xl font-semibold drop-shadow-lg mb-4">
-          <Link href="/match">
+          <Link href={prev}>
             <ChevronLeft className="h-6 w-6 mr-2" />
           </Link>
           Profile
         </h2>
-        <div className="flex flex-col gap-4 items-start pb-10">
-          {/* Profile Card */}
+        <form className="flex flex-col gap-4 items-start pb-10">
           <Label forHtml="name">Full Name</Label>
-          <Input id="name" type="text" placeholder="Enter your name" />
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Enter your name" />
           <Label forHtml="email">Email</Label>
-          <Input id="email" type="email" placeholder="Enter your email" />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Enter your email" />
           <Label forHtml="Phone">Phone</Label>
-          <Input id="Phone" type="text" placeholder="Enter your Phone" />
+          <Input
+            id="Phone"
+            name="phone_number"
+            type="text"
+            placeholder="Enter your Phone" />
           <Label forHtml="dob">Birthday Date</Label>
-          <DatePicker id="dob" />
-          <Button className="w-full">Save</Button>
-        </div>
+          <DatePicker
+            id="dob" />
+          <Button className="w-full" type="submit">Save</Button>
+        </form>
       </section>
     </main>
   );
