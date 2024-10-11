@@ -19,6 +19,8 @@ const iconMap = {
 
 export function Items() {
   const { cartItems } = useCart();
+  console.log(cartItems, "cartItems");
+
   return (
     <Card className="overflow-hidden shadow-none mx-4">
       <CardHeader className="bg-gray-50">
@@ -48,8 +50,8 @@ export function Items() {
               <span className="font-medium text-muted-foreground">
                 ₹
                 {item.variant
-                  ? Number(item.variant.price)
-                  : Number(item.food_item.price)}
+                  ? Number(item.variant.price) + item.addons.reduce((acc, addon) => acc + Number(addon.price), 0)
+                  : Number(item.food_item.price) + item.addons.reduce((acc, addon) => acc + Number(addon.price), 0)}
               </span>
               <span className="font-medium">₹ {item.totalPrice}</span>
             </div>

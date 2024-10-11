@@ -9,16 +9,15 @@ import { Footer } from "../Footer";
 import { Details } from "../Details";
 import { getTable } from "@/app/lib/tables/getTables";
 import { notFound } from "next/navigation";
+import { InstallApp } from "@/app/components/menu/installApp";
 
-export async function generateMetadata({ params }, parent) {
-  const outletPromis = apiGet(`/api/shop/outlet/${params.menu}`);
-
-  const response = await Promise.all([outletPromis]);
-  const outlet = response[0];
+export async function generateMetadata({ params }) {
+  const outlet = await apiGet(`/api/shop/outlet/${params.menu}`);
   if (outlet.status === 404) notFound();
 
   return {
     title: outlet.name,
+    description: outlet.description,
     openGraph: {
       images: [outlet.logo, ...outlet?.gallery],
     },
@@ -56,6 +55,7 @@ export default async function Home({ params }) {
           {/* Restaurant Details */}
           <Details outlet={outlet} />
         </div>
+        <InstallApp />
         {/* Call Waiter, Bookmark, Share */}
         <Call outlet={outlet} />
         {/* Menu and Filters */}

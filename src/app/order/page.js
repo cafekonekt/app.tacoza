@@ -29,7 +29,7 @@ const iconMap = {
   egg: "/egg.svg",
 };
 
-export default async function Order() {
+export default async function Order({ searchParams }) {
   const user = await getSession();
   const orderHistory = await apiGet(`/api/shop/orders/`, {
     headers: {
@@ -37,6 +37,7 @@ export default async function Order() {
     },
   });
   if (orderHistory.status === 404 || orderHistory.status === 401) notFound();
+  const prev = searchParams.prev || "/";
 
   return (
     <main
@@ -44,7 +45,7 @@ export default async function Order() {
       suppressHydrationWarning
     >
       <h2 className="text-2xl font-semibold">
-        <Link href={`/`}>
+        <Link href={prev}>
           <Button size="icon" variant="outline" className="h-8 w-8 mr-2">
             <ChevronLeft className="h-4 w-4" />
           </Button>
