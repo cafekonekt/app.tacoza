@@ -15,11 +15,12 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { TextRotate } from "@/components/ui/TextRotate";
+import Link from "next/link";
 
 export function SearchRestaurant({ restaurants }) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
   const [loading, setLoading] = useState(false);
 
   const restaurantNames = restaurants.map((restaurant) => restaurant.name);
@@ -27,7 +28,7 @@ export function SearchRestaurant({ restaurants }) {
   // Handle search logic
   useEffect(() => {
     if (searchQuery === "") {
-      setFilteredRestaurants([]);
+      setFilteredRestaurants(restaurants);
       return;
     }
 
@@ -100,9 +101,9 @@ export function SearchRestaurant({ restaurants }) {
             {/* Display search results */}
             {!loading && filteredRestaurants.length > 0
               ? filteredRestaurants.map((restaurant) => (
-                  <div key={restaurant.id}>
+                  <Link key={restaurant.id} href={`/${restaurant.menu_slug}`}>
                     <RestaurantItemComponent restaurant={restaurant} />
-                  </div>
+                  </Link>
                 ))
               : !loading && (
                   <p className="text-center text-gray-500 text-sm">
@@ -122,7 +123,7 @@ function RestaurantItemComponent({ restaurant }) {
       <div className="grid grid-cols-4 gap-2 justify-between py-2">
         <div className="p-2 aspect-square col-span-1">
           <Image
-            src={restaurant.image || "/outlet-thumb.jpg"}
+            src={restaurant.logo || "/outlet-thumb.jpg"}
             alt={restaurant.name}
             width={100}
             height={100}
