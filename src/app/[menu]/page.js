@@ -48,7 +48,7 @@ export default async function Home({ params }) {
         {/* Call Waiter, Bookmark, Share */}
         <Call outlet={outlet} />
         {/* Menu and Filters */}
-        <div className="bg-white px-4 pt-8 rounded-t-3xl shadow-[0px_-1px_6px_0px_rgba(0,_0,_0,_0.1)]">
+        <div className="bg-white px-4 pt-4 rounded-t-3xl shadow-[0px_-1px_6px_0px_rgba(0,_0,_0,_0.1)]">
           <MenuAccordion items={items} outlet={outlet} />
         </div>
         {/* Item Added */}

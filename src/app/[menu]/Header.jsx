@@ -8,7 +8,13 @@ export async function Header() {
   const session = await getSession();
   return (
     <div className="pt-4 flex justify-between">
-      <Image src="/logo.png" alt="logo" width={150} height={100} />
+      <Image
+        src="/logo.png"
+        alt="logo"
+        width={130}
+        height={100}
+        className=" aspect-auto"
+      />
       {!session?.user?.name || !session?.user?.email ? <Auth /> : <Menu />}
     </div>
   );

@@ -20,58 +20,17 @@ import { Ads } from "./Ads";
 import { getSession } from "./lib/auth/session";
 import { Menu } from "@/app/components/menu/header/Menu";
 import { Auth } from "@/app/components/auth/Auth";
+import { apiGet } from "@/handlers/apiHandler";
 
 export const metadata = {
   title: "Home - tacoza (Instant food Ordering)",
   description: "Scan, Crave and Order superfast",
 };
 
-const restaurants = [
-  {
-    id: 1,
-    name: "Kohlis Restaurant",
-    description: "North Indian, Chinese, Fast Food",
-    location: "Dharam Tekri, Chindwara",
-    image: "/outlet-thumb.jpg", // Replace with actual image paths
-    rating: 4.2,
-    ratingCount: 12,
-  },
-  {
-    id: 2,
-    name: "Saffron Spice",
-    description: "Indian, Thai, Continental",
-    location: "MG Road, Indore",
-    rating: 4.5,
-    ratingCount: 50,
-  },
-  {
-    id: 3,
-    name: "Urban Diner",
-    description: "Burgers, Steaks, Beverages",
-    location: "Phoenix Market City, Mumbai",
-    rating: 4.3,
-    ratingCount: 25,
-  },
-  {
-    id: 4,
-    name: "The Royal Feast",
-    description: "Luxury Dining, Multi-cuisine",
-    location: "Connaught Place, Delhi",
-    rating: 4.7,
-    ratingCount: 100,
-  },
-  {
-    id: 5,
-    name: "Green Bowl",
-    description: "Vegan, Healthy, Organic",
-    location: "Brigade Road, Bangalore",
-    rating: 4.1,
-    ratingCount: 30,
-  },
-];
-
 export default async function Scan() {
   const session = await getSession();
+  const restaurants = await apiGet("/api/shop/list-outlets");
+  console.log(restaurants);
   return (
     <DrawerProvider>
       <main className="flex max-w-lg min-h-screen bg-gradient-to-tr from-rose-600 to-rose-500 flex-col gap-4 overflow-hidden">
