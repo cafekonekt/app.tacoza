@@ -54,11 +54,13 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   const { openDrawer } = useDrawer();
   const router = useRouter();
 
+  console.log(outlet)
+
   const tableSelectRef = React.useRef(null);
 
   const [paymentDrawer, setPaymentDrawer] = React.useState(false);
   const [order, setOrder] = React.useState({
-    type: "dine_in",
+    type: outlet?.services?.[0],
     table_id: table?.table_id,
   });
   const [alert, setAlert] = React.useState(null);
@@ -94,6 +96,9 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   const handlePayment = async () => {
     setLoading(true);
     try {
+      if (outlet.payment_link) {
+        router.push(outlet.payment_link);
+      }
       const response = await checkout({
         params,
         order_type: order.type,
@@ -101,7 +106,8 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         instructions: order.instruction,
         payment_method: paymentMethod,
       });
-      if (response?.error) return logout();
+      if (response?.status === 401) return logout();
+      if (response.error) return showAlert(response.error);
       if (response?.payment_session_id) {
         cashfree
           .checkout({
@@ -161,37 +167,39 @@ export function OrderForm({ params, outlet, tables, table, session }) {
 
         <Separator className="my-1" />
 
-        <Label htmlFor="table_id" className="flex items-center">
-          Table
-          <Popover>
-            <PopoverTrigger>
-              <HelpCircle className="h-4 w-4 ml-1" />
-            </PopoverTrigger>
-            <PopoverContent align="start" className="bg-rose-50">
-              <p className="text-sm">
-                Table number will be present on table or below the QR code.
-              </p>
-            </PopoverContent>
-          </Popover>
-        </Label>
-        <Select
-          id="table_id"
-          onValueChange={(value) =>
-            setOrder((prev) => ({ ...prev, table_id: value }))
-          }
-          value={order.table_id || table?.table_id}
-        >
-          <SelectTrigger ref={tableSelectRef}>
-            <SelectValue placeholder="Select Table" />
-          </SelectTrigger>
-          <SelectContent>
-            {tables.map((table) => (
-              <SelectItem key={table.table_id} value={table.table_id}>
-                {table.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {order.type === "dine_in" && <>
+          <Label htmlFor="table_id" className="flex items-center">
+            Table
+            <Popover>
+              <PopoverTrigger>
+                <HelpCircle className="h-4 w-4 ml-1" />
+              </PopoverTrigger>
+              <PopoverContent align="start" className="bg-rose-50">
+                <p className="text-sm">
+                  Table number will be present on table or below the QR code.
+                </p>
+              </PopoverContent>
+            </Popover>
+          </Label>
+          <Select
+            id="table_id"
+            onValueChange={(value) =>
+              setOrder((prev) => ({ ...prev, table_id: value }))
+            }
+            value={order.table_id || table?.table_id}
+          >
+            <SelectTrigger ref={tableSelectRef}>
+              <SelectValue placeholder="Select Table" />
+            </SelectTrigger>
+            <SelectContent>
+              {tables.map((table) => (
+                <SelectItem key={table.table_id} value={table.table_id}>
+                  {table.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </>}
 
         {alert && <p className="text-xs text-red-500">{alert}</p>}
 
@@ -243,6 +251,9 @@ export function OrderForm({ params, outlet, tables, table, session }) {
           >
             {outlet.payment_methods.includes("online") &&
               renderToggleGroupItem("online", "Pay Now", <OnlineImage />)}
+
+            {outlet.payment_methods.includes("upi") &&
+              renderToggleGroupItem("upi", "Pay UPI", <OnlineImage />)}
 
             {outlet.payment_methods.includes("cash") &&
               renderToggleGroupItem("cash", "Pay Cash", <CashImage />)}

@@ -51,6 +51,7 @@ const iconMap = {
 };
 import { SquareMinus, SquarePlus } from "lucide-react";
 import { SetQuantity } from "@/app/components/cart/item/SetQuantity";
+import { UpsellItemComponent } from "@/app/components/menu/itemCard/upsellItem";
 export function MenuTab({ items, setFocusCategory }) {
   const { cartItems } = useCart();
 
@@ -208,11 +209,10 @@ export function MenuItemComponent({ item }) {
               </div>
             ) : (
               <div
-                className={`absolute ${
-                  item.variant || item.addons
+                className={`absolute ${item.variant || item.addons
                     ? "bottom-[-4vh]"
                     : "bottom-[-2vh]"
-                } flex flex-col items-center`}
+                  } flex flex-col items-center`}
               >
                 <Button
                   className="bg-rose-50 w-24 border border-rose-600 text-rose-600 hover:text-rose-300 text-base rounded-[10px] font-bold shadow-lg"
@@ -294,6 +294,7 @@ export function MenuItemComponent({ item }) {
         </div>
       </div>
       <Separator className={`${item.variant || item.addons ? "mt-2" : ""}`} />
+      {existingItems.length > 0 && item.recommended_items && <UpsellItemComponent />}
     </>
   );
 }
@@ -375,23 +376,23 @@ function CategoryComponent({ category, depth = 0, focusCategory }) {
         <AccordionContent>
           {/* Check if sub_categories exists and has items */}
           {Array.isArray(category.sub_categories) &&
-          category.sub_categories.length > 0
+            category.sub_categories.length > 0
             ? // If subcategories exist, recursively render them
-              category.sub_categories.map((subCategory) => (
-                <CategoryComponent
-                  key={subCategory.name}
-                  category={subCategory}
-                  depth={depth + 1} // Increment the depth for subcategories
-                />
-              ))
+            category.sub_categories.map((subCategory) => (
+              <CategoryComponent
+                key={subCategory.name}
+                category={subCategory}
+                depth={depth + 1} // Increment the depth for subcategories
+              />
+            ))
             : // If no subcategories, render the menu items
-              category.food_items.map((item) =>
-                item.in_stock ? (
-                  <MenuItemComponent key={item.name} item={item} />
-                ) : (
-                  <MenuDisabledItemComponent key={item.name} item={item} />
-                ),
-              )}
+            category.food_items.map((item) =>
+              item.in_stock ? (
+                <MenuItemComponent key={item.name} item={item} />
+              ) : (
+                <MenuDisabledItemComponent key={item.name} item={item} />
+              ),
+            )}
         </AccordionContent>
       </AccordionItem>
     </Accordion>
@@ -498,15 +499,15 @@ export function SearchMenu({ items }) {
             {/* Display search results */}
             {!loading && filteredItems.length > 0
               ? filteredItems.map((item) => (
-                  <div key={item.name}>
-                    <MenuItemComponent item={item} />
-                  </div>
-                ))
+                <div key={item.name}>
+                  <MenuItemComponent item={item} />
+                </div>
+              ))
               : !loading && (
-                  <p className="text-center text-gray-500 text-sm">
-                    Nothing found
-                  </p>
-                )}
+                <p className="text-center text-gray-500 text-sm">
+                  Nothing found
+                </p>
+              )}
           </section>
         </div>
       </DrawerContent>
