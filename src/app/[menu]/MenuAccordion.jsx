@@ -460,9 +460,9 @@ export function SearchMenu({ items }) {
       <DrawerTrigger asChild>
         <Button
           variant="outline"
-          className="w-full justify-start items-center text-muted-foreground mt-2"
+          className="w-full justify-start items-center text-muted-foreground"
         >
-          <Search className="w-4 h-4 mr-2" /> Search for
+          <Search className="min-w-4 min-h-4 mr-2" /> Search for
           <TextRotate className="ml-1 truncate" duration={2000} words={words} />
         </Button>
       </DrawerTrigger>
@@ -543,54 +543,76 @@ export function MenuAccordion({ items, outlet }) {
     };
   });
 
-  const divRef = useRef(null); // Reference to the div
-  const sectionRef = useRef(null); // Reference to the section
+  const sectionRef = useRef(null);
+  const divRef = useRef(null);
   const [isFixed, setIsFixed] = useState(false);
-  const [divTop, setDivTop] = useState(0); // To store the original top position of the div
+  const [showFilters, setShowFilters] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [hideFiltersTimeout, setHideFiltersTimeout] = useState(null);
+
+  const handleScroll = () => {
+    if (!sectionRef.current) return;
+
+    const sectionTop = sectionRef.current.getBoundingClientRect().top;
+    const currentScrollY = window.scrollY;
+
+    // Only trigger the logic if we are within the section
+    if (sectionTop <= 0) {
+      setIsFixed(true);
+
+      // Show/Hide Filters on scroll direction
+      if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        setShowFilters(false);
+        clearTimeout(hideFiltersTimeout);
+        const timeout = setTimeout(() => setShowFilters(false), 2000); // Hide after 1 second
+        setHideFiltersTimeout(timeout);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up
+        setShowFilters(true);
+      }
+    } else {
+      // Reset the state when the section is not in view
+      setIsFixed(false);
+      setShowFilters(true); // Reset filter visibility when leaving the section
+    }
+
+    setLastScrollY(currentScrollY);
+  };
 
   useEffect(() => {
-    // Function to handle the scroll event
-    const handleScroll = () => {
-      const div = divRef.current;
-      const divRect = div.getBoundingClientRect();
-
-      // Check if the top of the div is going to be out of the viewport (scrolling up)
-      if (divRect.top <= 0 && !isFixed) {
-        setIsFixed(true); // Fix the div to the top
-      } else if (window.scrollY < divTop && isFixed) {
-        setIsFixed(false); // Restore the div to its original position
-      }
-    };
-
-    // Set the initial top position of the div when the component mounts
-    const divPosition =
-      divRef.current.getBoundingClientRect().top + window.scrollY;
-    setDivTop(divPosition);
-
-    // Attach the scroll event listener
     window.addEventListener("scroll", handleScroll);
 
-    // Cleanup the event listener on component unmount
+    // Cleanup scroll event on component unmount
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      clearTimeout(hideFiltersTimeout); // Cleanup any leftover timeout
     };
-  }, [isFixed, divTop]);
+  }, [lastScrollY, hideFiltersTimeout]);
 
   return (
     <>
       <section className="relative w-full pt-20" ref={sectionRef}>
         <div
           ref={divRef}
-          className={` w-full bg-white py-2 ${isFixed ? "fixed top-0 left-0 px-4 shadow z-40" : "absolute top-0"}`}
+          className={`w-full bg-white py-2  ${
+            isFixed ? "fixed top-0 left-0 px-4 shadow z-40" : "absolute top-0"
+          }  ${showFilters ? "h-24" : "h-14"}`}
         >
-          <div className="flex">
+          {/* Search Menu */}
+          <SearchMenu items={filteredItems} />
+
+          {/* Filters */}
+          <div
+            className={`flex mt-2 ${showFilters ? "opacity-100" : "opacity-0"}`}
+          >
             <div className="flex items-center text-muted-foreground text-sm">
               Filters <Settings2 className="w-3.5 h-3.5 ml-1" />{" "}
               <Separator orientation="vertical" className="mx-2" />
             </div>
             <div className="flex items-center gap-1 overflow-x-scroll no-scrollbar">
               {outlet.type?.length === 1 ? (
-                <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1  p-1 px-2 rounded-xl w-fit">
+                <p className="text-sm whitespace-nowrap h-full text-green-600 bg-gradient-to-bl from-green-200 border flex items-center gap-1 p-1 px-2 rounded-xl w-fit">
                   <LeafyGreen className="h-3.5 w-3.5 fill-green-200" /> Pure Veg
                 </p>
               ) : (
@@ -621,9 +643,6 @@ export function MenuAccordion({ items, outlet }) {
               )}
             </div>
           </div>
-
-          {/* Search Menu */}
-          <SearchMenu items={filteredItems} />
         </div>
 
         {/* Menu */}

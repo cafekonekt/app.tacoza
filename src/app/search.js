@@ -121,18 +121,18 @@ function RestaurantItemComponent({ restaurant }) {
   return (
     <div>
       <div className="grid grid-cols-4 gap-2 justify-between py-2">
-        <div className="p-2 aspect-square col-span-1">
+        <div className="p-2 col-span-1">
           <Image
             src={restaurant.logo || "/outlet-thumb.jpg"}
             alt={restaurant.name}
             width={100}
             height={100}
-            className="object-cover rounded-lg"
+            className="object-cover h-18 aspect-square rounded-lg"
           />
         </div>
         <div className="col-span-3 leading-tight">
           <p className="font-medium leading-tight">{restaurant.name}</p>
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-sm text-muted-foreground line-clamp-1">
             {restaurant.description}
           </span>
           <p className="flex items-center text-muted-foreground text-xs line-clamp-2">
