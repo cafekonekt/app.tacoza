@@ -29,7 +29,6 @@ import {
   DrawerDescription,
 } from "@/components/ui/drawer";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import {
   Accordion,
@@ -52,10 +51,6 @@ const SERVICE_MAP_ICON = {
 export function OrderForm({ params, outlet, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
-  const router = useRouter();
-
-  console.log(outlet)
-
   const tableSelectRef = React.useRef(null);
 
   const [paymentDrawer, setPaymentDrawer] = React.useState(false);
@@ -96,9 +91,6 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   const handlePayment = async () => {
     setLoading(true);
     try {
-      if (outlet.payment_link) {
-        router.push(outlet.payment_link);
-      }
       const response = await checkout({
         params,
         order_type: order.type,
@@ -115,8 +107,16 @@ export function OrderForm({ params, outlet, tables, table, session }) {
             returnUrl: `https://app.tacoza.co/order/${response.order_id}`,
           })
           .catch((err) => console.error(err));
+      } else {
+        if (outlet.payment_link) {
+          const order_summary = cartItems.map(item => `${item.food_item.name} x${item.quantity}`).join(', ');
+          const payment_summary = `ID: ${response.order_id} | Order Summary: ${order_summary}`;
+          const upiPaymentUrl = `upi://pay?pa=${encodeURIComponent(outlet.payment_link)}&am=${totalPrice}&tn=${encodeURIComponent(payment_summary)}&pn=${encodeURIComponent(session.user.name)}&cu=INR`;
+          window.open(upiPaymentUrl)
+        } else {
+          router.push(`/order/${response.order_id}`);
+        }
       }
-      router.push(`/order/${response.order_id}`);
     } catch (error) {
       console.error(error);
     } finally {
