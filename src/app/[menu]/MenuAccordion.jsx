@@ -30,7 +30,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import Counter from "@/app/components/menu/menuAccordion/Counter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
@@ -42,7 +41,7 @@ import { Customize } from "@/app/components/menu/menuAccordion/Customize";
 // context
 import { useCart } from "@/context/CartContext";
 import { SearchLoadingAnimation } from "../components/lottie/lottie";
-import { DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { DialogTitle } from "@/components/ui/dialog";
 // utils
 const iconMap = {
   veg: "/veg.svg",
