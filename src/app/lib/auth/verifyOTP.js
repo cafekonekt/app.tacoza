@@ -16,7 +16,7 @@ export async function verifyOTP(phone_number, otp) {
     cookies().set('session', session, {
       httpOnly: true,
       secure: true,
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      maxAge: 60 * 60 * 24 * 365,
     });
     return response;
   } catch (error) {

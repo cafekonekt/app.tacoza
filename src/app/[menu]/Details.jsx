@@ -1,5 +1,5 @@
 "use server";
-import { Star, MapPin, Phone, LeafyGreen, Timer, Users } from "lucide-react";
+import { Star, MapPin, LeafyGreen, Timer, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
