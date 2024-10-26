@@ -109,8 +109,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
           .catch((err) => console.error(err));
       } else {
         if (outlet.payment_link) {
-          const order_summary = cartItems.map(item => `${item.food_item.name} x${item.quantity}`).join(', ');
-          const payment_summary = `ID: ${response.order_id} | Order Summary: ${order_summary}`;
+          const payment_summary = `ID: ${response.order_id.split("-")[0]} Quantity: ${cartItems.length}`;
           const upiPaymentUrl = `upi://pay?pa=${encodeURIComponent(outlet.payment_link)}&am=${totalPrice}&tn=${encodeURIComponent(payment_summary)}&pn=${encodeURIComponent(session.user.name)}&cu=INR`;
           window.open(upiPaymentUrl)
         } else {
