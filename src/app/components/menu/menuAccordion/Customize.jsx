@@ -109,7 +109,7 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
   const [totalPrice, setTotalPrice] = useState(parseFloat(item.price) || 0);
   const [selectedVariant, setSelectedVariant] = useState(item.variant); // Root variant
   const [availableAddons, setAvailableAddons] = useState(
-    item.addons?.filter((addon) => addon.applied_variant.length === 0),
+    item.addons?.filter((addon) => addon.applied_variant.length === 0) || [],
   );
   const [previousVariants, setPreviousVariants] = useState([]);
 
@@ -135,7 +135,7 @@ export function Customize({ item, addDrawerOpen, setAddDrawerOpen }) {
       );
       setAvailableAddons(
         item.addons?.filter((addon) =>
-          addon.applied_variant.includes(matchedVariant?.id),
+          addon.applied_variant.includes(matchedVariant?.id) || addon.applied_variant.length === 0,
         ),
       );
     }
