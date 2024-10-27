@@ -41,6 +41,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useRouter } from "next/navigation";
 
 const SERVICE_MAP_ICON = {
   dine_in: <UtensilsCrossed className="h-3.5 w-3.5 mr-1" />,
@@ -52,6 +53,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   const { cartItems } = useCart();
   const { openDrawer } = useDrawer();
   const tableSelectRef = React.useRef(null);
+  const router = useRouter();
 
   const [paymentDrawer, setPaymentDrawer] = React.useState(false);
   const [order, setOrder] = React.useState({
@@ -111,7 +113,13 @@ export function OrderForm({ params, outlet, tables, table, session }) {
         if (outlet.payment_link) {
           const payment_summary = `ID: ${response.order_id.split("-")[0]} Quantity: ${cartItems.length}`;
           const upiPaymentUrl = `upi://pay?pa=${encodeURIComponent(outlet.payment_link)}&am=${totalPrice}&tn=${encodeURIComponent(payment_summary)}&pn=${encodeURIComponent(session.user.name)}&cu=INR`;
-          window.open(upiPaymentUrl)
+          
+          // Open UPI payment link in a new tab
+          window.open(upiPaymentUrl, "_blank");
+          // Delay navigation to order summary page
+          setTimeout(() => {
+            router.push(`/order/${response.order_id}`);
+          }, 500);
         } else {
           router.push(`/order/${response.order_id}`);
         }
