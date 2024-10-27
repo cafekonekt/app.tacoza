@@ -15,7 +15,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { notFound } from "next/navigation";
-import { getSession, logout } from "@/app/lib/auth/session";
+import { getSession } from "@/app/lib/auth/session";
 import { apiGet } from "@/handlers/apiHandler";
 
 export const metadata = {
@@ -125,7 +125,6 @@ export default async function Order({ searchParams }) {
               </div>
             </Link>
             <Separator className="hidden" />
-
             <Button className="hidden h-8 gap-1 w-fit">
               <RotateCcwSquare className="h-3.5 w-3.5" />
               <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
