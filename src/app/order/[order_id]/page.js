@@ -62,6 +62,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { PaymentLink } from "./paymentLink";
 
 export const metadata = {
   title: "Order Summary - tacoza (Instant food Ordering)",
@@ -71,6 +72,9 @@ export const metadata = {
 export default async function Order({ params }) {
   const order = await getOrder(params);
   if (order.status === 404) notFound();
+  const isCounterPayment = (order) => order.payment_method === "cash" && order.payment_status === "active";
+  const needsLiteModeMessage = (order) => order.outlet?.lite && order.payment_status == "active";
+
   return (
     <main className="max-w-lg p-4 gap-4 grid bg-gray-100">
       <h2 className="text-2xl font-semibold">
@@ -97,22 +101,34 @@ export default async function Order({ params }) {
         </BreadcrumbList>
       </Breadcrumb>
 
+      {/* Payment Status Conditions */}
       {order.payment_status === "success" && (
         <section className="flex flex-col justify-center items-center">
           <PaymentSuccessAnimation />
-          <span className="text-green-600 font-bold text-lg">
-            Payment Received
-          </span>
-          <span className="text-sm text-center">
-            Rs. {order.total}
-            <br /> Ref Id: XXXX23423XXXX
-          </span>
+          <span className="text-green-600 font-bold text-lg">Payment Received</span>
+          <span className="text-sm text-center">Rs. {order.total}</span>
         </section>
       )}
 
-      {/* Payment Processing */}
-      {(order.payment_status === "active" ||
-        order.payment_status === "pending") && (
+      {order.payment_status === "active" && (
+        <section className="flex flex-col justify-center items-center">
+          {needsLiteModeMessage(order) ? (
+            <>
+              <PaymentSuccessAnimation />
+              <span className="text-green-600 font-bold text-lg">Order Received</span>
+              <span className="text-sm text-center">If you have made the payment, please show this to the vendor or pay <PaymentLink order={order} /> if not.</span>
+            </>
+          ): isCounterPayment(order) && (
+            <>
+              <PendingPayementAnimation />
+              <span className="text-green-600 font-bold text-lg">Payment is pending</span>
+              <span className="text-sm text-center">Please pay Rs. {order.total} at the counter</span>
+            </>
+          )}
+        </section>
+      )}
+
+      {order.payment_status === "pending" && (
         <section className="flex flex-col justify-center items-center">
           <PendingPayementAnimation />
           <span className="text-yellow-600 font-bold text-lg">
@@ -124,14 +140,10 @@ export default async function Order({ params }) {
         </section>
       )}
 
-      {/* Payment Failed */}
       {order.payment_status === "failed" && (
         <section className="flex flex-col justify-center items-center">
           <PaymentFailAnimation />
           <span className="text-red-600 font-bold text-lg">Payment Failed</span>
-          <span className="text-sm text-center">
-            Customer rejected UPI request or other failure reasons.
-          </span>
           <Payment order={order} params={params} />
         </section>
       )}
@@ -149,7 +161,7 @@ export default async function Order({ params }) {
               {Math.floor(
                 (new Date(order.created_at).getTime() -
                   new Date(order.updated_at).getTime()) /
-                  (1000 * 60),
+                (1000 * 60),
               )}{" "}
               mins • Ontime
             </span>
@@ -164,15 +176,15 @@ export default async function Order({ params }) {
               </span>
 
               <div className="flex items-center gap-1">
-                <Badge variant="outline" className="text-nowrap w-fit h-8">
+                {order.table && <Badge variant="outline" className="text-nowrap w-fit h-8">
                   {order.table}
-                </Badge>
+                </Badge>}
                 <Button size="icon" variant="outline" className=" rounded-full">
                   <Link href={`tel:${order.outlet.phone}`}>
                     <Phone className="h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="icon" variant="outline" className="rounded-full">
+                <Button size="icon" variant="outline" className="rounded-full" >
                   <Navigation className="h-4 w-4" />
                 </Button>
                 <Button size="icon" variant="outline" className="rounded-full">
@@ -192,15 +204,15 @@ export default async function Order({ params }) {
               </AccordionTrigger>
               <AccordionContent>
                 <Timeline>
-                {order.order_timeline.map((item, key) => (
-                 
-                 <TimelineItem key={key} status={item.done ? "done" : ""}>
-                    <TimelineHeading>{item.stage}</TimelineHeading>
-                    <TimelineDot status={item.done ? "done" : ""} />
-                    {item.done && (order.order_timeline?.length-1 !== key) && <TimelineLine done />}
-                    <TimelineContent>{item.content}</TimelineContent>
-                  </TimelineItem>
-                ))}
+                  {order.order_timeline.map((item, key) => (
+
+                    <TimelineItem key={key} status={item.done ? "done" : ""}>
+                      <TimelineHeading>{item.stage}</TimelineHeading>
+                      <TimelineDot status={item.done ? "done" : ""} />
+                      {item.done && (order.order_timeline?.length - 1 !== key) && <TimelineLine done />}
+                      <TimelineContent>{item.content}</TimelineContent>
+                    </TimelineItem>
+                  ))}
                 </Timeline>
               </AccordionContent>
             </AccordionItem>
@@ -259,34 +271,12 @@ export default async function Order({ params }) {
           </div>
           <Separator className="my-4" />
           <div className="grid gap-3">
-            <div className="font-semibold">Customer Information</div>
-            <dl className="grid gap-3">
-              <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Customer</dt>
-                <dd>{order.user.name}</dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Email</dt>
-                <dd>
-                  <a href="mailto:">{order.user.email}</a>
-                </dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className="text-muted-foreground">Phone</dt>
-                <dd>
-                  <a href="tel:">{order.user.phone_number}</a>
-                </dd>
-              </div>
-            </dl>
-          </div>
-          <Separator className="my-4" />
-          <div className="grid gap-3">
             <div className="font-semibold">Payment Information</div>
             <dl className="grid gap-3">
               <div className="flex items-center justify-between">
                 <dt className="flex items-center gap-1 text-muted-foreground">
                   <CreditCard className="h-4 w-4" />
-                  UPI
+                  {order.payment_method.toUpperCase()}
                 </dt>
                 <dd>**** **** ****</dd>
               </div>
