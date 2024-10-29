@@ -62,7 +62,7 @@ export function OrderForm({ params, outlet, tables, table, session }) {
   });
   const [alert, setAlert] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
-  const [paymentMethod, setPaymentMethod] = React.useState("online");
+  const [paymentMethod, setPaymentMethod] = React.useState(outlet.payment_methods?.[0]);
 
   const totalPrice = cartItems?.reduce(
     (acc, item) => acc + Number(item.totalPrice),
