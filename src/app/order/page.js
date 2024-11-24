@@ -64,7 +64,7 @@ export default async function Order({ searchParams }) {
         </BreadcrumbList>
       </Breadcrumb>
 
-      {orderHistory?.map((order, key) => (
+      {orderHistory.results?.map((order, key) => (
         <Card className="overflow-hidden" key={key}>
           <CardHeader className="bg-rose-50">
             <div className="flex items-center gap-4">
