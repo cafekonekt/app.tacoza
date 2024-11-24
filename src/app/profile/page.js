@@ -10,14 +10,17 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
+import { getSession } from "@/app/lib/auth/session";
 
 export const metadata = {
   title: "My Profile - tacoza",
   description: "Scan, Crave and Order superfast",
 };
 
-export default function Profile({ searchParams }) {
+export default async function Profile({ searchParams }) {
   const prev = searchParams.prev || "/";
+  const session = await getSession();
+  const user = session?.user;
 
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
@@ -41,18 +44,21 @@ export default function Profile({ searchParams }) {
             id="name"
             name="name"
             type="text"
+            value={user?.name}
             placeholder="Enter your name" />
           <Label forHtml="email">Email</Label>
           <Input
             id="email"
             name="email"
             type="email"
+            value={user?.email}
             placeholder="Enter your email" />
           <Label forHtml="Phone">Phone</Label>
           <Input
             id="Phone"
             name="phone_number"
             type="text"
+            value={user?.phone_number}
             placeholder="Enter your Phone" />
           <Label forHtml="dob">Birthday Date</Label>
           <DatePicker
